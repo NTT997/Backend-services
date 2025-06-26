@@ -310,6 +310,7 @@ public class UserFacadeImpl implements UserFacade {
 
 			// check if user exists
 			User tempUser = userService.getByUserName(user.getUserName(), store.getCode());
+			
 			if (tempUser != null) {
 				throw new ServiceRuntimeException(
 						"User [" + user.getUserName() + "] already exists for store [" + store.getCode() + "]");
