@@ -1,0 +1,23 @@
+package com.bpharma.api_gateway.configuration.routes;
+
+import org.springframework.cloud.gateway.route.RouteLocator;
+import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+
+//Configures routes for public, non-authenticated services (e.g., public info, customer login)
+@Configuration
+public class PublicRouteConfig {
+    @Bean
+    public RouteLocator publicRoutes(RouteLocatorBuilder builder) {
+        return builder.routes()
+        		.route("customer-login", r -> r
+        			    .path("/public/login")
+        			    .and()
+        			    .method(HttpMethod.POST)
+        			    .filters(f -> f.rewritePath("/public/login", "/api/v1/private/login"))
+        			    .uri("http://localhost:8080"))
+                .build();
+    }
+}

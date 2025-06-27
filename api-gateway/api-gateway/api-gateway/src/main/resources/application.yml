@@ -1,0 +1,61 @@
+server:
+  port: 8085
+
+spring:
+  cloud:
+    gateway:
+#      routes:
+#        - id: catalog-service
+#          uri: http://localhost:8080
+#          predicates:
+#            - Path=/api/v1/private/catalogs
+#            - Path=/api/v1/private/catalog/**
+#          filters:
+#            - name: JwtAuthFilter
+#
+#        - id: shop-service
+#          uri: http://localhost:8080
+#          predicates:
+#            - Path=/services/public/**
+#
+#        - id: system-service
+#          uri: http://localhost:8080
+#          predicates:
+#            - Path=/services/private/system/**
+#          filters:
+#            - name: JwtAuthFilter
+#
+#        - id: category-service-private
+#          uri: http://localhost:8080
+#          predicates:
+#            - Path=/api/v1/private/category/**
+#          filters:
+#            - name: JwtAuthFilter
+#
+#        - id: category-service-public
+#          uri: http://localhost:8080
+#          predicates:
+#            - Path=/api/v1/category/**
+#
+#        - id: configuration-service
+#          uri: http://localhost:8080
+#          predicates:
+#            - Path=/api/v1/auth/cache/**
+#            - Path=/api/v1/private/configurations
+#          filters:
+#            - name: JwtAuthFilter
+#
+jwt:
+  header: Authorization
+  secret: BPharmaSecret@12
+  expiration: 604800
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
