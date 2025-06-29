@@ -30,7 +30,7 @@ public class CorsFilter extends HandlerInterceptorAdapter {
 		   
         	HttpServletResponse httpResponse = (HttpServletResponse) response;
         	
-        	String origin = "*";
+        	String origin = "*";   //update after 
         	if(!StringUtils.isBlank(request.getHeader("origin"))) {
         		origin = request.getHeader("origin");
         	}
