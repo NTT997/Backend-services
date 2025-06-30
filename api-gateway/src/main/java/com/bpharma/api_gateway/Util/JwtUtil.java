@@ -21,7 +21,7 @@ public class JwtUtil {
 
 	public boolean isTokenExpired(Claims claims) {
 		Date expiration = claims.getExpiration();
-		return expiration.before(new Date(new Date().getTime()));
+		return expiration.before(new Date());
 	}
 
 	public boolean hasPermission(Claims claims, String requiredPermission) {

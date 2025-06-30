@@ -13,10 +13,10 @@ public class UserLoginRouteConfig {
     public RouteLocator userPrivateRoutes(RouteLocatorBuilder builder) {
         return builder.routes()
         		.route("user-login", r -> r
-        			    .path("/public/user/login")
+        			    .path("/user/login")
         			    .and()
         			    .method(HttpMethod.POST)
-        			    .filters(f -> f.rewritePath("/public/user/login", "/api/v1/private/login"))
+        			    .filters(f -> f.rewritePath("/user/login", "/api/v1/private/login"))
         			    .uri("http://localhost:8080"))
                 .build();
     }
