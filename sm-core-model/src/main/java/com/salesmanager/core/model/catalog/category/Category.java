@@ -213,7 +213,7 @@ public class Category extends SalesManagerEntity<Long, Category> implements Audi
         return featured;
     }
 
-    public void setFeatured(boolean featured) {
+    public void setFeatured(Boolean featured) {
         this.featured = featured;
     }
 
