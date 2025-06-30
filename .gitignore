@@ -67,3 +67,4 @@ Icon?
 *.rej
 *.backup
 *.old
+/.metadata/
