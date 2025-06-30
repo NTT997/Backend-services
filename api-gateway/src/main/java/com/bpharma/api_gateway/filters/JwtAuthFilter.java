@@ -27,7 +27,6 @@ public class JwtAuthFilter extends AbstractGatewayFilterFactory<JwtAuthFilter.Co
 
 	@Override
 	public GatewayFilter apply(Config config) {
-		System.out.println("da vao apply");
 		return (exchange, chain) -> {
             String path = exchange.getRequest().getPath().toString();
             String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);

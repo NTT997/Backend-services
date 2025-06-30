@@ -24,9 +24,15 @@ public interface CatalogRepository extends JpaRepository<Catalog, Long> {
 			+ "left join fetch ce.category cec where c.code=?1 and cm.id = ?2")
 	Optional<Catalog> findByCode(String code, Integer merchantId);
 	
-	@Query("SELECT COUNT(c) > 0 FROM Catalog c "
-			+ "join c.merchantStore cm  "
-			+ "WHERE c.code = ?1 and cm.id = ?2")
+//	@Query("SELECT COUNT(c) > 0 FROM Catalog c "
+//			+ "join c.merchantStore cm  "
+//			+ "WHERE c.code = ?1 and cm.id = ?2")
+//	boolean existsByCode(String code, Integer merchantId);
+	
+	@Query("SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END " +
+		       "FROM Catalog c JOIN c.merchantStore cm " +
+		       "WHERE c.code = ?1 AND cm.id = ?2")
 	boolean existsByCode(String code, Integer merchantId);
+
 
 }

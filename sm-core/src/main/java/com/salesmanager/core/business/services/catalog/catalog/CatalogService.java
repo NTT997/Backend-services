@@ -39,5 +39,6 @@ public interface CatalogService extends SalesManagerEntityService<Long, Catalog>
 	void delete(Catalog catalog) throws ServiceException;
 	
 	boolean existByCode(String code, MerchantStore store);
+	
 
 }
