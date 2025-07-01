@@ -1,5 +1,6 @@
 package com.salesmanager.shop.store.api.v1.product;
 
+import java.io.IOException;
 import java.util.List;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +29,7 @@ import com.salesmanager.shop.model.catalog.manufacturer.ReadableManufacturer;
 import com.salesmanager.shop.model.catalog.manufacturer.ReadableManufacturerList;
 import com.salesmanager.shop.model.entity.EntityExists;
 import com.salesmanager.shop.model.entity.ListCriteria;
+import com.salesmanager.shop.store.api.exception.ResourceNotFoundException;
 import com.salesmanager.shop.store.controller.manufacturer.facade.ManufacturerFacade;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -90,44 +92,67 @@ public class ProductManufacturerApi {
 		}
 	}
 
+//	@RequestMapping(value = "/manufacturer/{id}", method = RequestMethod.GET)
+//	@ResponseStatus(HttpStatus.OK)
+//	@ResponseBody
+//	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
+//			@ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en") })
+//	public ReadableManufacturer get(@PathVariable Long id, @ApiIgnore MerchantStore merchantStore,
+//			@ApiIgnore Language language, HttpServletResponse response) {
+//
+//		try {
+//			ReadableManufacturer manufacturer = manufacturerFacade.getManufacturer(id, merchantStore, language);
+//
+//			if (manufacturer == null) {
+//				response.sendError(404, "No Manufacturer found for ID : " + id);
+//			}
+//
+//			return manufacturer;
+//
+//		} catch (Exception e) {
+//			LOGGER.error("Error while getting manufacturer", e);
+//			try {
+//				response.sendError(503, "Error while getting manufacturer " + e.getMessage());
+//			} catch (Exception ignore) {
+//			}
+//		}
+//
+//		return null;
+//	}
+
 	@RequestMapping(value = "/manufacturer/{id}", method = RequestMethod.GET)
-	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
 	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
 			@ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en") })
 	public ReadableManufacturer get(@PathVariable Long id, @ApiIgnore MerchantStore merchantStore,
 			@ApiIgnore Language language, HttpServletResponse response) {
-
 		try {
-			ReadableManufacturer manufacturer = manufacturerFacade.getManufacturer(id, merchantStore, language);
-
-			if (manufacturer == null) {
-				response.sendError(404, "No Manufacturer found for ID : " + id);
-			}
-
-			return manufacturer;
-
-		} catch (Exception e) {
-			LOGGER.error("Error while getting manufacturer", e);
+			return manufacturerFacade.getManufacturer(id, merchantStore, language);
+		} catch (ResourceNotFoundException e) {
+			LOGGER.warn("Manufacturer not found", e);
 			try {
-				response.sendError(503, "Error while getting manufacturer " + e.getMessage());
-			} catch (Exception ignore) {
+				response.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
+			} catch (IOException ioEx) {
+				LOGGER.error("Error sending 404 response", ioEx);
+			}
+		} catch (Exception e) {
+			LOGGER.error("Unexpected error while getting manufacturer", e);
+			try {
+				response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, "Internal server error");
+			} catch (IOException ioEx) {
+				LOGGER.error("Error sending 503 response", ioEx);
 			}
 		}
-
 		return null;
 	}
 
-	
 	@RequestMapping(value = "/private/manufacturers", method = RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
 	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
 			@ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en") })
 	@ApiOperation(httpMethod = "GET", value = "List manufacturers by store", notes = "This request supports paging or not. Paging supports page number and request count", response = ReadableManufacturerList.class)
-	public ReadableManufacturerList listByStore(
-			@ApiIgnore MerchantStore merchantStore,
-			@ApiIgnore Language language,
+	public ReadableManufacturerList listByStore(@ApiIgnore MerchantStore merchantStore, @ApiIgnore Language language,
 			@RequestParam(value = "name", required = false) String name,
 			@RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
 			@RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
@@ -136,8 +161,7 @@ public class ProductManufacturerApi {
 		listCriteria.setName(name);
 		return manufacturerFacade.listByStore(merchantStore, language, listCriteria, page, count);
 	}
-	
-	
+
 	@RequestMapping(value = "/manufacturers", method = RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
@@ -171,9 +195,9 @@ public class ProductManufacturerApi {
 	@ResponseBody
 	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
 			@ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en") })
-	public void update(@PathVariable Long id,
-			@Valid @RequestBody PersistableManufacturer manufacturer, @ApiIgnore MerchantStore merchantStore,
-			@ApiIgnore Language language, HttpServletRequest request, HttpServletResponse response) {
+	public void update(@PathVariable Long id, @Valid @RequestBody PersistableManufacturer manufacturer,
+			@ApiIgnore MerchantStore merchantStore, @ApiIgnore Language language, HttpServletRequest request,
+			HttpServletResponse response) {
 
 		try {
 			manufacturer.setId(id);
@@ -220,7 +244,7 @@ public class ProductManufacturerApi {
 	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
 			@ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en") })
 	public List<ReadableManufacturer> list(@PathVariable final Long id, // category
-																					// id
+																		// id
 			@ApiIgnore MerchantStore merchantStore, @ApiIgnore Language language, HttpServletResponse response)
 			throws Exception {
 

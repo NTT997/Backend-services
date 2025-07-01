@@ -24,6 +24,7 @@ import com.salesmanager.shop.model.catalog.manufacturer.ReadableManufacturerList
 import com.salesmanager.shop.model.entity.ListCriteria;
 import com.salesmanager.shop.populator.manufacturer.PersistableManufacturerPopulator;
 import com.salesmanager.shop.populator.manufacturer.ReadableManufacturerPopulator;
+import com.salesmanager.shop.store.api.exception.ResourceAlreadyExistsException;
 import com.salesmanager.shop.store.api.exception.ResourceNotFoundException;
 import com.salesmanager.shop.store.api.exception.ServiceRuntimeException;
 import com.salesmanager.shop.store.api.exception.UnauthorizedException;
@@ -82,6 +83,35 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
 
   }
 
+//  @Override
+//  public void saveOrUpdateManufacturer(PersistableManufacturer manufacturer, MerchantStore store,
+//      Language language) throws Exception {
+//
+//    PersistableManufacturerPopulator populator = new PersistableManufacturerPopulator();
+//    populator.setLanguageService(languageService);
+//
+//
+//    Manufacturer manuf = new Manufacturer();
+//  
+//    if(manufacturer.getId() != null && manufacturer.getId().longValue() > 0) {
+//    	manuf = manufacturerService.getById(manufacturer.getId());
+//    	if(manuf == null) {
+//    		throw new ResourceNotFoundException("Manufacturer with id [" + manufacturer.getId() + "] not found");
+//    	}
+//    	
+//    	if(manuf.getMerchantStore().getId().intValue() != store.getId().intValue()) {
+//    		throw new ResourceNotFoundException("Manufacturer with id [" + manufacturer.getId() + "] not found for store [" + store.getId() + "]");
+//    	}
+//    }
+//
+//    populator.populate(manufacturer, manuf, store, language);
+//
+//    manufacturerService.saveOrUpdate(manuf);
+//
+//    manufacturer.setId(manuf.getId());
+//
+//  }
+
   @Override
   public void saveOrUpdateManufacturer(PersistableManufacturer manufacturer, MerchantStore store,
       Language language) throws Exception {
@@ -91,9 +121,18 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
 
 
     Manufacturer manuf = new Manufacturer();
+    // check if manufacturer code already exists before create new manufacturer
+    Manufacturer existing = manufacturerService.getByCode(store, manufacturer.getCode());
+    if (existing != null) {
+    	throw new ResourceAlreadyExistsException(
+    			"Manufacturer with code [" + manufacturer.getCode() + "] already exists for store [" + store.getId() + "]"
+    			);
+    }
   
     if(manufacturer.getId() != null && manufacturer.getId().longValue() > 0) {
     	manuf = manufacturerService.getById(manufacturer.getId());
+    	
+        
     	if(manuf == null) {
     		throw new ResourceNotFoundException("Manufacturer with id [" + manufacturer.getId() + "] not found");
     	}
@@ -110,7 +149,7 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
     manufacturer.setId(manuf.getId());
 
   }
-
+  
   @Override
   public void deleteManufacturer(Manufacturer manufacturer, MerchantStore store, Language language)
       throws Exception {
@@ -208,50 +247,48 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
     return exists;
   }
 
-@Override
-public ReadableManufacturerList listByStore(MerchantStore store, Language language, ListCriteria criteria, int page,
-		int count) {
-	
-	ReadableManufacturerList readableList = new ReadableManufacturerList();
+	@Override
+	public ReadableManufacturerList listByStore(MerchantStore store, Language language, ListCriteria criteria, int page,
+			int count) {
 
-    try {
-        /**
-         * Is this a pageable request
-         */
+		ReadableManufacturerList readableList = new ReadableManufacturerList();
 
-        List<Manufacturer> manufacturers = null;
+		try {
+			/**
+			 * Is this a pageable request
+			 */
 
-        Page<Manufacturer> m = null;
-        if(language != null) {
-            m = manufacturerService.listByStore(store, language, criteria.getName(), page, count);
-        } else {
-            m = manufacturerService.listByStore(store, criteria.getName(), page, count);
-        }
-        
-        manufacturers = m.getContent();
-        readableList.setTotalPages(m.getTotalPages());
-        readableList.setRecordsTotal(m.getTotalElements());
-        readableList.setNumber(m.getContent().size());
+			List<Manufacturer> manufacturers = null;
 
+			Page<Manufacturer> m = null;
+			if (language != null) {
+				m = manufacturerService.listByStore(store, language, criteria.getName(), page, count);
+			} else {
+				m = manufacturerService.listByStore(store, criteria.getName(), page, count);
+			}
 
-        
-        ReadableManufacturerPopulator populator = new ReadableManufacturerPopulator();
-        List<ReadableManufacturer> returnList = new ArrayList<ReadableManufacturer>();
-    
-        for (Manufacturer mf : manufacturers) {
-          ReadableManufacturer readableManufacturer = new ReadableManufacturer();
-          populator.populate(mf, readableManufacturer, store, language);
-          returnList.add(readableManufacturer);
-        }
+			manufacturers = m.getContent();
+			readableList.setTotalPages(m.getTotalPages());
+			readableList.setRecordsTotal(m.getTotalElements());
+			readableList.setNumber(m.getContent().size());
 
-        readableList.setManufacturers(returnList);
-        return readableList;
-        
-      } catch (Exception e) {
-        throw new ServiceRuntimeException("Error while get manufacturers",e);
-      }
-	
-}
+			ReadableManufacturerPopulator populator = new ReadableManufacturerPopulator();
+			List<ReadableManufacturer> returnList = new ArrayList<ReadableManufacturer>();
+
+			for (Manufacturer mf : manufacturers) {
+				ReadableManufacturer readableManufacturer = new ReadableManufacturer();
+				populator.populate(mf, readableManufacturer, store, language);
+				returnList.add(readableManufacturer);
+			}
+
+			readableList.setManufacturers(returnList);
+			return readableList;
+
+		} catch (Exception e) {
+			throw new ServiceRuntimeException("Error while get manufacturers", e);
+		}
+
+	}
 
 
 }
