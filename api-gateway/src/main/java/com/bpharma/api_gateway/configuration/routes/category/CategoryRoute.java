@@ -1,13 +1,20 @@
 package com.bpharma.api_gateway.configuration.routes.category;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 
+import com.bpharma.api_gateway.filters.JwtAuthFilter;
+
 @Configuration
-public class CategoryPublicRoute {
+public class CategoryRoute {
+	
+	@Autowired
+	private JwtAuthFilter jwtAuthFilter;
+	
     @Bean
     public RouteLocator publicRoutes(RouteLocatorBuilder builder) {
         return builder.routes()
@@ -32,7 +39,10 @@ public class CategoryPublicRoute {
         			    .path("/private/category")
         			    .and()
         			    .method(HttpMethod.POST)
-        			    .filters(f -> f.rewritePath("/private/category", "/api/v1/private/category"))
+        			    .filters(f -> f
+        			    		.rewritePath("/private/category", "/api/v1/private/category")
+				                .filter(jwtAuthFilter.apply(new JwtAuthFilter.Config()))
+        			    )
         			    .uri("http://localhost:8080")) 
         		.route("category-private", r -> r
         			    .path("/private/category/**")
