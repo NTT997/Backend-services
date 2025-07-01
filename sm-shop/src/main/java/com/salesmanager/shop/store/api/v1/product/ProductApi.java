@@ -113,6 +113,7 @@ public class ProductApi {
 		Long id = productCommonFacade.saveProduct(merchantStore, product, language);
 		Entity returnEntity = new Entity();
 		returnEntity.setId(id);
+		
 		return returnEntity;
 
 	}
@@ -156,7 +157,9 @@ public class ProductApi {
 			LightPersistableProduct product,
 			@ApiIgnore MerchantStore merchantStore,
 			@ApiIgnore Language language) {
+		System.out.println("begin api");
 		productCommonFacade.update(id, product, merchantStore, language);
+		System.out.println("after api:");
 		return;
 
 	}
