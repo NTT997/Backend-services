@@ -68,7 +68,5 @@ implements CatalogService {
 	public boolean existByCode(String code, MerchantStore store) {
 		return catalogRepository.existsByCode(code, store.getId());
 	}
-	
-	
 
 }
