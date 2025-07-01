@@ -120,8 +120,6 @@ public class CatalogApi {
 
   }
 
-
-
   @DeleteMapping(value = "/private/catalog/{id}")
   @ApiOperation(httpMethod = "DELETE", value = "Deletes a catalog", notes = "",
   response = Void.class)
