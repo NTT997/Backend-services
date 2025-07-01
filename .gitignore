@@ -16,6 +16,7 @@ buildNumber.properties
 .classpath
 .project
 .settings/
+.metadata/
 
 # IntelliJ IDEA
 .idea/
@@ -44,6 +45,7 @@ Icon?
 *.swp
 *~
 *.swo
+*.gz
 
 # =========================
 # Java and JVM
