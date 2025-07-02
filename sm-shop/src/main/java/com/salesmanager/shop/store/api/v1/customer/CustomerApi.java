@@ -81,6 +81,7 @@ public class CustomerApi {
 	public PersistableCustomer update(@PathVariable Long id, @ApiIgnore MerchantStore merchantStore,
 			@Valid @RequestBody PersistableCustomer customer) {
 
+		customerFacade.getCustomerById(id, merchantStore, null);//exception throwed inside the get customerby id
 		customer.setId(id);
 		return customerFacade.update(customer, merchantStore);
 	}
@@ -90,7 +91,8 @@ public class CustomerApi {
 	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "string", defaultValue = "DEFAULT") })
 	public void updateAddress(@PathVariable Long id, @ApiIgnore MerchantStore merchantStore,
 			@RequestBody PersistableCustomer customer) {
-
+		//ensure user exist before update
+		customerFacade.getCustomerById(id, merchantStore, null);//exception throw inside the get customerby id
 		customer.setId(id);
 		customerFacade.updateAddress(customer, merchantStore);
 	}

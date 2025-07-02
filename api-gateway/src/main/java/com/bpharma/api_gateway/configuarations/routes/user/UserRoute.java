@@ -35,7 +35,7 @@ public class UserRoute {
                 .and()
 	            .method(HttpMethod.GET, HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE,HttpMethod.PATCH)
 	            .filters(f -> f
-	                .rewritePath("/private/user-service/(?<segment>.*)", "/api/v1/private/user/${segment}")       
+	                .rewritePath("/private/user-service/(?<segment>.*)", "/api/v1/private/${segment}")       
 	                .filter(jwtAuthFilter.apply(new JwtAuthFilter.Config())) 
 	            )
 	            .uri("http://localhost:8080")

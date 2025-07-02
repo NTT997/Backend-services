@@ -115,7 +115,7 @@ public class UserApi {
 		/** Must be superadmin or admin */
 		String authenticatedUser = userFacade.authenticatedUser();
 		if (authenticatedUser == null) {
-			throw new UnauthorizedException();
+			throw new UnauthorizedException("401","Unauthorized");
 		}
 		// only admin and superadmin allowed
 		userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()));

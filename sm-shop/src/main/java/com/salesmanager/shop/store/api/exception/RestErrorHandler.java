@@ -79,7 +79,7 @@ public class RestErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorEntity handleServiceException(ConversionRuntimeException exception) {
         log.error(exception.getErrorMessage(), exception);
-        ErrorEntity errorEntity = createErrorEntity(exception.getErrorCode(), exception.getErrorMessage(),
+        ErrorEntity errorEntity = createErrorEntity(exception.getErrorCode()!=null?exception.getErrorCode():"400", exception.getErrorMessage(),
             exception.getLocalizedMessage());
         return errorEntity;
     }
