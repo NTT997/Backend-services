@@ -106,4 +106,11 @@ public class JWTUser implements UserDetails {
         return lastPasswordResetDate;
     }
 
+    @Override
+    public String toString() {
+        return "JWTUser [id=" + id + ", username=" + username + ", firstname=" + firstname + ", lastname=" + lastname
+                + ", password=" + password + ", email=" + email + ", authorities=" + authorities + ", enabled="
+                + enabled + ", lastPasswordResetDate=" + lastPasswordResetDate + "]";
+    }
+    
 }
