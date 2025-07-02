@@ -62,4 +62,28 @@ public class ProductRoute {
 					.build();
 					
 	}
+	@Bean
+	public RouteLocator productAuthRoute(RouteLocatorBuilder builder) {
+		return builder
+				.routes()
+					.route("product-auth-create" ,r -> r
+						.path("/product/auth/**")
+						.and()
+						.method(HttpMethod.POST)
+						.filters(f -> f
+								.rewritePath("/product/auth", "/api/v1/auth/product")
+								.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config())))
+						.uri("http://localhost:8080")
+					)	
+					.route("product-auth" ,r -> r
+							.path("/product/auth/**")
+							.and()
+							.method(HttpMethod.PUT, HttpMethod.DELETE)
+							.filters(f -> f
+									.rewritePath("/product/auth/(?<segment>.*)", "/api/v1/auth/product/${segment}")
+									.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config())))
+							.uri("http://localhost:8080")
+					)	
+				.build();
+	}
 }
