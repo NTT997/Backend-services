@@ -145,7 +145,7 @@ public class UserApi {
 																	// user
 																	// doing
 																	// action
-
+		System.out.println(user);
 		userFacade.authorizedGroups(authenticatedUser, user);
 
 		return userFacade.update(id, authenticatedUser, merchantStore, user);

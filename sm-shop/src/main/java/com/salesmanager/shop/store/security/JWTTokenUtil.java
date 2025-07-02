@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -173,6 +174,7 @@ public class JWTTokenUtil implements Serializable {
         }	    
 
 	    public Boolean canTokenBeRefreshed(String token, Date lastPasswordReset) {
+			System.out.println("Enter line 177 at jwt token utils");
 	        final Date created = getIssuedAtDateFromToken(token);
 	        return !isCreatedBeforeLastPasswordReset(created, lastPasswordReset)
 	                && (!isTokenExpired(token) || ignoreTokenExpiration(token));

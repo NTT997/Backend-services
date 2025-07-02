@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.salesmanager.core.model.customer.Customer;
@@ -60,12 +61,18 @@ public class CustomerApi {
 
 	/** Create new customer for a given MerchantStore */
 	@PostMapping("/private/customer")
+	@ResponseBody
 	@ApiOperation(httpMethod = "POST", value = "Creates a customer", notes = "Requires administration access", produces = "application/json", response = ReadableCustomer.class)
 	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "string", defaultValue = "DEFAULT") })
 	public ReadableCustomer create(@ApiIgnore MerchantStore merchantStore, @ApiIgnore Language language,
 			@Valid @RequestBody PersistableCustomer customer) {
+		
+//		try {
 		return customerFacade.create(customer, merchantStore, language);
-
+//		}catch(ServiceRuntimeException e){
+//			throw e;
+//		}
+		
 	}
 
 	@PutMapping("/private/customer/{id}")

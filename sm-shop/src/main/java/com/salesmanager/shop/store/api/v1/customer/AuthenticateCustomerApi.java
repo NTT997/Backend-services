@@ -1,5 +1,9 @@
 package com.salesmanager.shop.store.api.v1.customer;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -109,7 +113,7 @@ public class AuthenticateCustomerApi {
 				//409 Conflict
 				throw new GenericRuntimeException("409", "Customer with email [" + customer.getEmailAddress() + "] is already registered");
 			}
-            
+            System.out.println(customer.getUserName());
             Validate.notNull(customer.getUserName(),"Username cannot be null");
             Validate.notNull(customer.getBilling(),"Requires customer Country code");
             Validate.notNull(customer.getBilling().getCountry(),"Requires customer Country code");
@@ -164,7 +168,8 @@ public class AuthenticateCustomerApi {
         Authentication authentication = null;
         try {
             
-    
+                System.out.println(authenticationRequest.getUsername());
+                System.out.println(authenticationRequest.getUsername());
                 //to be used when username and password are set
                 authentication = jwtCustomerAuthenticationManager.authenticate(
                         new UsernamePasswordAuthenticationToken(
@@ -194,16 +199,30 @@ public class AuthenticateCustomerApi {
         // Return the token
         return ResponseEntity.ok(new AuthenticationResponse(userDetails.getId(),token));
     }
-
+    //ORIGINAL VERSION OF REFRESH TOKEN
+//    @RequestMapping(value = "/auth/customer/refresh", method = RequestMethod.GET, produces ={ "application/json" })
+//    public ResponseEntity<?> refreshToken(HttpServletRequest request) {
+//        String token = request.getHeader(tokenHeader);
+//
+//        String username = jwtTokenUtil.getUsernameFromToken(token);
+//        JWTUser user = (JWTUser) jwtCustomerDetailsService.loadUserByUsername(username);
+//
+//        if (jwtTokenUtil.canTokenBeRefreshed(token, user.getLastPasswordResetDate())) {
+//            String refreshedToken = jwtTokenUtil.refreshToken(token);
+//            return ResponseEntity.ok(new AuthenticationResponse(user.getId(),refreshedToken));
+//        } else {
+//            return ResponseEntity.badRequest().body(null);
+//        }
+//    }
     @RequestMapping(value = "/auth/customer/refresh", method = RequestMethod.GET, produces ={ "application/json" })
-    public ResponseEntity<?> refreshToken(HttpServletRequest request) {
-        String token = request.getHeader(tokenHeader);
-
-        String username = jwtTokenUtil.getUsernameFromToken(token);
+    public ResponseEntity<?> refreshToken(HttpServletRequest request){
+        String authorizationHeader = request.getHeader(tokenHeader);// Bearer "hashedstring"
+        String authToken = authorizationHeader.substring(7);
+       
+        String username = jwtTokenUtil.getUsernameFromToken(authToken);
         JWTUser user = (JWTUser) jwtCustomerDetailsService.loadUserByUsername(username);
-
-        if (jwtTokenUtil.canTokenBeRefreshed(token, user.getLastPasswordResetDate())) {
-            String refreshedToken = jwtTokenUtil.refreshToken(token);
+        if (jwtTokenUtil.canTokenBeRefreshed(authToken,user.getLastPasswordResetDate())) {
+            String refreshedToken = jwtTokenUtil.refreshToken(authToken);
             return ResponseEntity.ok(new AuthenticationResponse(user.getId(),refreshedToken));
         } else {
             return ResponseEntity.badRequest().body(null);
@@ -215,7 +234,7 @@ public class AuthenticateCustomerApi {
     @RequestMapping(value = "/auth/customer/password", method = RequestMethod.POST, produces ={ "application/json" })
     @ApiOperation(httpMethod = "POST", value = "Sends a request to reset password", notes = "Password reset request is {\"username\":\"test@email.com\"}",response = ResponseEntity.class)
     public ResponseEntity<?> changePassword(@RequestBody @Valid PasswordRequest passwordRequest, HttpServletRequest request) {
-
+        org.jboss.logging.Logger.getLogger("Enter the change password endpoint", tokenHeader);
 
         try {
             

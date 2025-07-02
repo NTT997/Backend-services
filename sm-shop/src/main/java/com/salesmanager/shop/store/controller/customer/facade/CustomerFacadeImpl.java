@@ -587,6 +587,7 @@ public class CustomerFacadeImpl implements CustomerFacade {
 	//set customer user name
 	customer.setUserName(customer.getEmailAddress());
     if (userExist(customer.getUserName())) {
+      System.out.println("user already exist");
       throw new ServiceRuntimeException("User already exist");
     }
     //end user exists
