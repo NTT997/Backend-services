@@ -17,6 +17,7 @@ buildNumber.properties
 .project
 .settings/
 .metadata/
+
 # IntelliJ IDEA
 .idea/
 *.iml
@@ -68,3 +69,4 @@ Icon?
 *.rej
 *.backup
 *.old
+/.metadata/

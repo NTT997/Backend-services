@@ -63,7 +63,20 @@ public class CategoryApi {
 	@Inject
 	private UserFacade userFacade;
 
-	@GetMapping(value = "/category/{id}", produces = { APPLICATION_JSON_VALUE })
+//	@GetMapping(value = "/category/{id}", produces = { APPLICATION_JSON_VALUE })
+//	@ApiOperation(httpMethod = "GET", value = "Get category list for an given Category id", notes = "List current Category and child category")
+//	@ApiResponses(value = {
+//			@ApiResponse(code = 200, message = "List of category found", response = ReadableCategory.class) })
+//	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "string", defaultValue = "DEFAULT"),
+//			@ApiImplicitParam(name = "lang", dataType = "string", defaultValue = "en") })
+//	public ReadableCategory get(@PathVariable(name = "id") Long categoryId, @ApiIgnore MerchantStore merchantStore,
+//			@ApiIgnore Language language) {
+//		ReadableCategory category = categoryFacade.getById(merchantStore, categoryId, language);
+//		return category;
+//	}
+	
+	//sua lai
+	@GetMapping(value = "/category/id/{id}", produces = { APPLICATION_JSON_VALUE })
 	@ApiOperation(httpMethod = "GET", value = "Get category list for an given Category id", notes = "List current Category and child category")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "List of category found", response = ReadableCategory.class) })
@@ -74,6 +87,7 @@ public class CategoryApi {
 		ReadableCategory category = categoryFacade.getById(merchantStore, categoryId, language);
 		return category;
 	}
+
 
 	@GetMapping(value = "/category/{friendlyUrl}", produces = { APPLICATION_JSON_VALUE })
 	@ApiOperation(httpMethod = "GET", value = "Get category list for an given Category code", notes = "List current Category and child category")
