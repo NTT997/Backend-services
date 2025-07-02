@@ -116,7 +116,7 @@ public class ProductImageApi {
 					}
 				}
 			}
-
+			//reading images from files.
 			List<ProductImage> contentImagesList = new ArrayList<ProductImage>();
 			int sortOrder = position;
 			for (MultipartFile multipartFile : files) {

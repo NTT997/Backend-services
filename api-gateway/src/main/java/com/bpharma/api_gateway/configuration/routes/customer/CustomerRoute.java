@@ -1,4 +1,4 @@
-package com.bpharma.api_gateway.configuarations.routes.customer;
+package com.bpharma.api_gateway.configuration.routes.customer;
 
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
