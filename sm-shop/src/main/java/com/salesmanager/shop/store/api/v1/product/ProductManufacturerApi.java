@@ -29,6 +29,7 @@ import com.salesmanager.shop.model.catalog.manufacturer.ReadableManufacturer;
 import com.salesmanager.shop.model.catalog.manufacturer.ReadableManufacturerList;
 import com.salesmanager.shop.model.entity.EntityExists;
 import com.salesmanager.shop.model.entity.ListCriteria;
+import com.salesmanager.shop.store.api.exception.ResourceAlreadyExistsException;
 import com.salesmanager.shop.store.api.exception.ResourceNotFoundException;
 import com.salesmanager.shop.store.controller.manufacturer.facade.ManufacturerFacade;
 import io.swagger.annotations.Api;
@@ -190,24 +191,43 @@ public class ProductManufacturerApi {
 
 	}
 
+//	@RequestMapping(value = "/private/manufacturer/{id}", method = RequestMethod.PUT)
+//	@ResponseStatus(HttpStatus.OK)
+//	@ResponseBody
+//	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
+//			@ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en") })
+//	public void update(@PathVariable Long id, @Valid @RequestBody PersistableManufacturer manufacturer,
+//			@ApiIgnore MerchantStore merchantStore, @ApiIgnore Language language, HttpServletRequest request,
+//			HttpServletResponse response) {
+//
+//		try {
+//			manufacturer.setId(id);
+//			manufacturerFacade.saveOrUpdateManufacturer(manufacturer, merchantStore, language);
+//		} catch (Exception e) {
+//			LOGGER.error("Error while creating manufacturer", e);
+//			try {
+//				response.sendError(503, "Error while creating manufacturer " + e.getMessage());
+//			} catch (Exception ignore) {
+//			}
+//		}
+//	}
+
 	@RequestMapping(value = "/private/manufacturer/{id}", method = RequestMethod.PUT)
-	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
 	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
 			@ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en") })
 	public void update(@PathVariable Long id, @Valid @RequestBody PersistableManufacturer manufacturer,
-			@ApiIgnore MerchantStore merchantStore, @ApiIgnore Language language, HttpServletRequest request,
-			HttpServletResponse response) {
+			@ApiIgnore MerchantStore merchantStore, @ApiIgnore Language language) {
+
+		manufacturer.setId(id);
 
 		try {
-			manufacturer.setId(id);
 			manufacturerFacade.saveOrUpdateManufacturer(manufacturer, merchantStore, language);
+		} catch (ResourceAlreadyExistsException e) {
+			throw e; // Let @ControllerAdvice handle this
 		} catch (Exception e) {
-			LOGGER.error("Error while creating manufacturer", e);
-			try {
-				response.sendError(503, "Error while creating manufacturer " + e.getMessage());
-			} catch (Exception ignore) {
-			}
+			LOGGER.error("Unexpected error while updating manufacturer", e);
+			throw new RuntimeException("Failed to update manufacturer", e); // Let global handler or fallback handle
 		}
 	}
 
