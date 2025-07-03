@@ -83,9 +83,20 @@ public class ProductDefinitionFacadeImpl implements ProductDefinitionFacade {
 		this.saveProductDefinition(merchant, product, language);
 	}
 
+//	@Override
+//	public ReadableProductDefinition getProduct(MerchantStore store, Long id, Language language) {
+//		Product product = productService.findOne(id, store);
+//		return readableProductDefinitionMapper.convert(product, store, language);
+//	}
+	
 	@Override
 	public ReadableProductDefinition getProduct(MerchantStore store, Long id, Language language) {
 		Product product = productService.findOne(id, store);
+		
+	    if (product == null) {
+	        throw new ResourceNotFoundException("Product with ID [" + id + "] not found for store [" + store.getCode() + "]");
+	    }
+		
 		return readableProductDefinitionMapper.convert(product, store, language);
 	}
 
