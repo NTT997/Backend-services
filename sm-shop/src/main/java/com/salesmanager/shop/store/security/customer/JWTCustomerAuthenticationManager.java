@@ -58,26 +58,22 @@ public class JWTCustomerAuthenticationManager extends CustomAuthenticationManage
 		
         
         logger.info("checking authentication for user " + username);
-        logger.info("Enter line 59 hihi " + username);
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
   
             // It is not compelling necessary to load the use details from the database. You could also store the information
             // in the token and read it from it. It's up to you ;)
-            logger.info("Enter line 64 hihi " + username);
             UserDetails userDetails = this.jwtCustomerDetailsService.loadUserByUsername(username);
 
             // For simple validation it is completely sufficient to just check the token integrity. You don't have to call
             // the database compellingly. Again it's up to you ;)
-            logger.info("token "+authToken);
             if(userDetails != null && jwtTokenUtil.validateToken(authToken, userDetails)) {
                 authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                logger.info("Enter line 71" + username + ", setting security context");
+
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 logger.info("authenticated user " + username + ", setting security context");
                 //SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
-        logger.info("Enter line 74 hihi " + username);
 		
 		return authentication;
 	}
