@@ -26,13 +26,14 @@ jobs:
       # === Build Core App ===
       - name: Build sm-shop (without tests)
         working-directory: sm-shop
-        run: mvn clean install -DskipTests
+        run: mvn clean install -P aggregate-all
+        
         
       # === Build Gateway App ===
       - name: Build api-gateway (without tests)
         working-directory: api-gateway
-        run: mvn clean install -B -DskipTests
-
+        run: mvn clean install -DskipTests
+        #run: mvn clean install -B -DskipTests
         #run: mvn clean install -DskipTests
         
       - name: Cache Maven packages
