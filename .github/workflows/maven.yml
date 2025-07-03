@@ -31,8 +31,18 @@ jobs:
       # === Build Gateway App ===
       - name: Build api-gateway (without tests)
         working-directory: api-gateway
-        run: mvn clean install -DskipTests
+        run: mvn clean install -B -DskipTests
+
+        #run: mvn clean install -DskipTests
         
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-  
+            
       # === Upload core JAR ===
       - name: Upload app-core JAR
         uses: actions/upload-artifact@v4
