@@ -67,11 +67,9 @@ public class CustomerApi {
 	public ReadableCustomer create(@ApiIgnore MerchantStore merchantStore, @ApiIgnore Language language,
 			@Valid @RequestBody PersistableCustomer customer) {
 		
-//		try {
+
 		return customerFacade.create(customer, merchantStore, language);
-//		}catch(ServiceRuntimeException e){
-//			throw e;
-//		}
+
 		
 	}
 
