@@ -349,7 +349,7 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
 	public void update(Long productId, LightPersistableProduct product, MerchantStore merchant, Language language) {
 		// Get product
 		Product modified = productService.findOne(productId, merchant);
-
+		System.out.println("modified:" + modified.toString());
 		// Update product with minimal set
 		modified.setAvailable(product.isAvailable());
 
