@@ -25,16 +25,17 @@ jobs:
           distribution: 'temurin'
       # === Build Core App ===
       - name: Build sm-shop (without tests)
-        working-directory: sm-shop
-        run: mvn clean install -P aggregate-all
-        
-        
-      # === Build Gateway App ===
-      - name: Build api-gateway (without tests)
-        working-directory: api-gateway
+        # working-directory: sm-shop
         run: mvn clean install -DskipTests
-        #run: mvn clean install -B -DskipTests
-        #run: mvn clean install -DskipTests
+        # run: mvn clean install -P aggregate-all
+        
+        
+      # # === Build Gateway App ===
+      # - name: Build api-gateway (without tests)
+      #   working-directory: api-gateway
+      #   run: mvn clean install -DskipTests
+      #   #run: mvn clean install -B -DskipTests
+      #   #run: mvn clean install -DskipTests
         
       - name: Cache Maven packages
         uses: actions/cache@v3
@@ -44,18 +45,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-  
             
-      # === Upload core JAR ===
-      - name: Upload app-core JAR
-        uses: actions/upload-artifact@v4
-        with:
-          name: sm-shop
-          path: sm-shop/target/*.jar
+      # # === Upload core JAR ===
+      # - name: Upload app-core JAR
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: sm-shop
+      #     path: sm-shop/target/*.jar
           
-      # === Upload gateway JAR ===
-      - name: Upload app-gateway JAR
-        uses: actions/upload-artifact@v4
-        with:
-          name: api-gateway
-          path: api-gateway/target/*.jar
+      # # === Upload gateway JAR ===
+      # - name: Upload app-gateway JAR
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: api-gateway
+      #     path: api-gateway/target/*.jar
 
 
