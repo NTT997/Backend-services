@@ -1,0 +1,49 @@
+name: Build Pharmacy Spring Boot Project
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+  pull_request:
+    branches:
+      - dev
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # === Build Gateway App ===
+      - name: Build api-gateway (without tests)
+        working-directory: api-gateway
+        run: mvn clean install -DskipTests
+
+      # === Build Core App ===
+      - name: Build sm-shop (without tests)
+        working-directory: sm-shop
+        run: mvn clean install -DskipTests
+
+      # === Upload gateway JAR ===
+      - name: Upload app-gateway JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-gateway
+          path: api-gateway/target/*.jar
+
+      # === Upload core JAR ===
+      - name: Upload app-core JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: sm-shop
+          path: sm-shop/target/*.jar
