@@ -23,20 +23,10 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      # === Build Core App ===
-      - name: Build sm-shop (without tests)
-        # working-directory: sm-shop
+          
+      - name: Build btm-bpharmacy project (without tests)
         run: mvn clean install -DskipTests
-        # run: mvn clean install -P aggregate-all
-        
-        
-      # # === Build Gateway App ===
-      # - name: Build api-gateway (without tests)
-      #   working-directory: api-gateway
-      #   run: mvn clean install -DskipTests
-      #   #run: mvn clean install -B -DskipTests
-      #   #run: mvn clean install -DskipTests
-        
+
       - name: Cache Maven packages
         uses: actions/cache@v3
         with:
@@ -44,19 +34,14 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-  
-            
-      # # === Upload core JAR ===
-      # - name: Upload app-core JAR
+
+      # Currently we do not need artifact
+      # - name: Upload artifact for deployment job
       #   uses: actions/upload-artifact@v4
+
       #   with:
-      #     name: sm-shop
-      #     path: sm-shop/target/*.jar
-          
-      # # === Upload gateway JAR ===
-      # - name: Upload app-gateway JAR
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: api-gateway
-      #     path: api-gateway/target/*.jar
+      #     name: java-app
+      #     path: '${{ github.workspace }}/target/*.jar'    
+
 
 
