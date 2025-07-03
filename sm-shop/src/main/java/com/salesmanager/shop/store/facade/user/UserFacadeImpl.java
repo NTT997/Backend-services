@@ -310,8 +310,9 @@ public class UserFacadeImpl implements UserFacade {
 
 			// check if user exists
 			User tempUser = userService.getByUserName(user.getUserName(), store.getCode());
+			
 			if (tempUser != null) {
-				throw new ServiceRuntimeException(
+				throw new ServiceRuntimeException("400",
 						"User [" + user.getUserName() + "] already exists for store [" + store.getCode() + "]");
 			}
 			
@@ -375,7 +376,7 @@ public class UserFacadeImpl implements UserFacade {
 		try {
 			User user = userService.findByStore(id, merchant);
 			if (user == null) {
-				throw new ServiceRuntimeException("Cannot find user [" + id + "]");
+				throw new ServiceRuntimeException("400","Cannot find user [" + id + "]");
 			}
 
 			// cannot delete superadmin
