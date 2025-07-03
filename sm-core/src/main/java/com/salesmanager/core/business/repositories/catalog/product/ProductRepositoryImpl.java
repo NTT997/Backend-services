@@ -259,6 +259,9 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 				LOGGER.error("Found multiple products for list of criterias with main criteria [" + seUrl + "]");
 			}
 			// p = (Product)q.getSingleResult();
+			
+			if(products.isEmpty()) return p;
+			
 			p = products.get(0);
 		} catch (javax.persistence.NoResultException ignore) {
 
