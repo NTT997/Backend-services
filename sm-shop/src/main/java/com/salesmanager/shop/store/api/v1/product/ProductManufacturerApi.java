@@ -82,7 +82,10 @@ public class ProductManufacturerApi {
 
 			return manufacturer;
 
-		} catch (Exception e) {
+		} catch (ResourceAlreadyExistsException e) {
+	        throw e;
+
+	    }catch (Exception e) {
 			LOGGER.error("Error while creating manufacturer", e);
 			try {
 				response.sendError(503, "Error while creating manufacturer " + e.getMessage());
