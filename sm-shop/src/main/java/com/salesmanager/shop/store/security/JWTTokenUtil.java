@@ -174,7 +174,6 @@ public class JWTTokenUtil implements Serializable {
         }	    
 
 	    public Boolean canTokenBeRefreshed(String token, Date lastPasswordReset) {
-			System.out.println("Enter line 177 at jwt token utils");
 	        final Date created = getIssuedAtDateFromToken(token);
 	        return !isCreatedBeforeLastPasswordReset(created, lastPasswordReset)
 	                && (!isTokenExpired(token) || ignoreTokenExpiration(token));
