@@ -42,7 +42,9 @@ public class JWTCustomerAuthenticationManager extends CustomAuthenticationManage
         if (requestHeader != null && requestHeader.startsWith("Bearer ")) {//Bearer
             authToken = requestHeader.substring(7);
             try {
+            	logger.info("token "+authToken);
                 username = jwtTokenUtil.getUsernameFromToken(authToken);
+                logger.info(username);
             } catch (IllegalArgumentException e) {
             	logger.error("an error occured during getting username from token", e);
             } catch (ExpiredJwtException e) {
@@ -57,15 +59,16 @@ public class JWTCustomerAuthenticationManager extends CustomAuthenticationManage
         
         logger.info("checking authentication for user " + username);
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
+  
             // It is not compelling necessary to load the use details from the database. You could also store the information
             // in the token and read it from it. It's up to you ;)
             UserDetails userDetails = this.jwtCustomerDetailsService.loadUserByUsername(username);
 
             // For simple validation it is completely sufficient to just check the token integrity. You don't have to call
             // the database compellingly. Again it's up to you ;)
-            if (userDetails != null && jwtTokenUtil.validateToken(authToken, userDetails)) {
+            if(userDetails != null && jwtTokenUtil.validateToken(authToken, userDetails)) {
                 authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 logger.info("authenticated user " + username + ", setting security context");
                 //SecurityContextHolder.getContext().setAuthentication(authentication);

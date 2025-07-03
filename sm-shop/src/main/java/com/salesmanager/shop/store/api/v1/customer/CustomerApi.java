@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.salesmanager.core.model.customer.Customer;
@@ -60,12 +61,16 @@ public class CustomerApi {
 
 	/** Create new customer for a given MerchantStore */
 	@PostMapping("/private/customer")
+	@ResponseBody
 	@ApiOperation(httpMethod = "POST", value = "Creates a customer", notes = "Requires administration access", produces = "application/json", response = ReadableCustomer.class)
 	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "string", defaultValue = "DEFAULT") })
 	public ReadableCustomer create(@ApiIgnore MerchantStore merchantStore, @ApiIgnore Language language,
 			@Valid @RequestBody PersistableCustomer customer) {
+		
+
 		return customerFacade.create(customer, merchantStore, language);
 
+		
 	}
 
 	@PutMapping("/private/customer/{id}")
@@ -74,6 +79,7 @@ public class CustomerApi {
 	public PersistableCustomer update(@PathVariable Long id, @ApiIgnore MerchantStore merchantStore,
 			@Valid @RequestBody PersistableCustomer customer) {
 
+		customerFacade.getCustomerById(id, merchantStore, null);//exception throwed inside the get customerby id
 		customer.setId(id);
 		return customerFacade.update(customer, merchantStore);
 	}
@@ -83,7 +89,8 @@ public class CustomerApi {
 	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "string", defaultValue = "DEFAULT") })
 	public void updateAddress(@PathVariable Long id, @ApiIgnore MerchantStore merchantStore,
 			@RequestBody PersistableCustomer customer) {
-
+		//ensure user exist before update
+		customerFacade.getCustomerById(id, merchantStore, null);//exception throw inside the get customerby id
 		customer.setId(id);
 		customerFacade.updateAddress(customer, merchantStore);
 	}

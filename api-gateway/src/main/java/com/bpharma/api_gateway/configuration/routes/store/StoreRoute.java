@@ -10,14 +10,15 @@ import com.bpharma.api_gateway.filters.JwtAuthFilter;
 
 @Configuration
 public class StoreRoute {
-	
-    private final JwtAuthFilter jwtAuthFilter;
 
-    public StoreRoute(JwtAuthFilter jwtAuthFilter) {
-        this.jwtAuthFilter = jwtAuthFilter;
-    }
+	private final JwtAuthFilter jwtAuthFilter;
+
+	public StoreRoute(JwtAuthFilter jwtAuthFilter) {
+		this.jwtAuthFilter = jwtAuthFilter;
+	}
 
 	@Bean
+
 	public RouteLocator routingPublicStore(RouteLocatorBuilder builder) {
 	    return builder.routes()
 	        .route("store", r -> r
@@ -28,9 +29,11 @@ public class StoreRoute {
 	            .uri("http://localhost:8080") 
 	        )
 	        .build(); 
+
 	}
-	
+
 	@Bean
+
 	public RouteLocator routingPrivateStore(RouteLocatorBuilder builder) {
 	    return builder.routes()
 	        .route("store-private", r -> r
@@ -44,8 +47,11 @@ public class StoreRoute {
 	            .uri("http://localhost:8080")
 	        )
 	        .build();
+
 	}
+
 	@Bean
+
 	public RouteLocator routingPrivateMerchant(RouteLocatorBuilder builder) {
 	    return builder.routes()
 	        .route("merchant-private", r -> r
@@ -59,8 +65,11 @@ public class StoreRoute {
 	            .uri("http://localhost:8080")
 	        )
 	        .build();
+
 	}
+
 	@Bean
+
 	public RouteLocator routingPrivateStores(RouteLocatorBuilder builder) {
 	    return builder.routes()
 	    		.route("stores-private-root", r -> r
@@ -83,7 +92,7 @@ public class StoreRoute {
 	            )
 	    				.uri("http://localhost:8080")
 	        ).build();
-	}
 
+	}
 
 }
