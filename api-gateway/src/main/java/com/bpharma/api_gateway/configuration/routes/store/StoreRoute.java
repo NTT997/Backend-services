@@ -18,7 +18,7 @@ public class StoreRoute {
     }
 
 	@Bean
-	public RouteLocator publicStoreRouteLocator(RouteLocatorBuilder builder) {
+	public RouteLocator routingPublicStore(RouteLocatorBuilder builder) {
 	    return builder.routes()
 	        .route("store", r -> r
 	            .path("/public/store/**")
@@ -31,7 +31,7 @@ public class StoreRoute {
 	}
 	
 	@Bean
-	public RouteLocator privateStoreRouteLocator(RouteLocatorBuilder builder) {
+	public RouteLocator routingPrivateStore(RouteLocatorBuilder builder) {
 	    return builder.routes()
 	        .route("store-private", r -> r
 	            .path("/private/store/**")
@@ -46,7 +46,7 @@ public class StoreRoute {
 	        .build();
 	}
 	@Bean
-	public RouteLocator privateMerchantRouteLocator(RouteLocatorBuilder builder) {
+	public RouteLocator routingPrivateMerchant(RouteLocatorBuilder builder) {
 	    return builder.routes()
 	        .route("merchant-private", r -> r
 	            .path("/private/merchant/**")
@@ -61,7 +61,7 @@ public class StoreRoute {
 	        .build();
 	}
 	@Bean
-	public RouteLocator privateStoresRouteLocator(RouteLocatorBuilder builder) {
+	public RouteLocator routingPrivateStores(RouteLocatorBuilder builder) {
 	    return builder.routes()
 	    		.route("stores-private-root", r -> r
 	    			    .path("/private/stores")

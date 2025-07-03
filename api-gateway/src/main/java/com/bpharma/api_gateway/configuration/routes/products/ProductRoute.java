@@ -16,7 +16,7 @@ public class ProductRoute {
 	private JwtAuthFilter jwtAuthFilter;
 	
 	@Bean
-	public RouteLocator productAdminRouting(RouteLocatorBuilder builder) {
+	public RouteLocator routingAdminProduct(RouteLocatorBuilder builder) {
 		return builder
 				.routes()
 					.route("product-create", r -> r
@@ -42,7 +42,7 @@ public class ProductRoute {
 	}
 	
 	@Bean
-	public RouteLocator productPublicRouting(RouteLocatorBuilder builder) {
+	public RouteLocator routingPublicProduct(RouteLocatorBuilder builder) {
 		return builder
 				.routes()
 					.route("product-public", r-> r
@@ -63,7 +63,7 @@ public class ProductRoute {
 					
 	}
 	@Bean
-	public RouteLocator productAuthRoute(RouteLocatorBuilder builder) {
+	public RouteLocator routingAuthProduct(RouteLocatorBuilder builder) {
 		return builder
 				.routes()
 					.route("product-auth-create" ,r -> r
