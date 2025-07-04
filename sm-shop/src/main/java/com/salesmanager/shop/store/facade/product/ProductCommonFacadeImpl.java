@@ -393,12 +393,12 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
 		Product p = productService.getById(id);
 
 		if (p == null) {
-			throw new ResourceNotFoundException("Product with id [" + id + " not found");
+			throw new ResourceNotFoundException("Product with id [" + id + "] not found");
 		}
 
 		if (p.getMerchantStore().getId().intValue() != store.getId().intValue()) {
 			throw new ResourceNotFoundException(
-					"Product with id [" + id + " not found for store [" + store.getCode() + "]");
+					"Product with id [" + id + "] not found for store [" + store.getCode() + "]");
 		}
 
 		try {
