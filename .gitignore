@@ -40,6 +40,7 @@ Icon?
 # Logs and Temporary Files
 # =========================
 *.log
+*.gz
 *.tmp
 *.bak
 *.swp

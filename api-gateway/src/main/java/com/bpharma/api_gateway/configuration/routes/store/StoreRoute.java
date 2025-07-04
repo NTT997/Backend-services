@@ -18,61 +18,81 @@ public class StoreRoute {
 	}
 
 	@Bean
-	public RouteLocator publicStoreRouteLocator(RouteLocatorBuilder builder) {
-		return builder.routes()
-				.route("store",
-						r -> r.path("/public/store/**").and().method(HttpMethod.GET)
-								.filters(f -> f.rewritePath("/public/store/(?<segment>.*)", "/api/v1/store/${segment}"))
-								.uri("http://localhost:8080"))
-				.build();
+
+	public RouteLocator routingPublicStore(RouteLocatorBuilder builder) {
+	    return builder.routes()
+	        .route("store", r -> r
+	            .path("/public/store/**")
+	            .and()
+	            .method(HttpMethod.GET)
+	            .filters(f -> f.rewritePath("/public/store/(?<segment>.*)", "/api/v1/store/${segment}"))
+	            .uri("http://localhost:8080") 
+	        )
+	        .build(); 
+
 	}
 
 	@Bean
-	public RouteLocator privateStoreRouteLocator(RouteLocatorBuilder builder) {
-		return builder.routes()
-				.route("store-private", r -> r.path("/private/store/**").and()
-						.method(HttpMethod.GET, HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE)
-						.filters(f -> f.rewritePath("/private/store/(?<segment>.*)", "/api/v1/private/store/${segment}")
-								.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config())))
-						.uri("http://localhost:8080"))
-				.build();
+
+	public RouteLocator routingPrivateStore(RouteLocatorBuilder builder) {
+	    return builder.routes()
+	        .route("store-private", r -> r
+	            .path("/private/store/**")
+	            .and()
+	            .method(HttpMethod.GET, HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE)
+	            .filters(f -> f
+	                .rewritePath("/private/store/(?<segment>.*)", "/api/v1/private/store/${segment}")
+	                .filter(jwtAuthFilter.apply(new JwtAuthFilter.Config())) 
+	            )
+	            .uri("http://localhost:8080")
+	        )
+	        .build();
+
 	}
 
 	@Bean
-	public RouteLocator privateMerchantRouteLocator(RouteLocatorBuilder builder) {
-		return builder.routes()
-				.route("merchant-private", r -> r.path("/private/merchant/**").and()
-						.method(HttpMethod.GET, HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE)
-						.filters(f -> f
-								.rewritePath("/private/merchant/(?<segment>.*)", "/api/v1/private/merchant/${segment}")
-								.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config())))
-						.uri("http://localhost:8080"))
-				.build();
+
+	public RouteLocator routingPrivateMerchant(RouteLocatorBuilder builder) {
+	    return builder.routes()
+	        .route("merchant-private", r -> r
+	            .path("/private/merchant/**")
+	            .and()
+	            .method(HttpMethod.GET, HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE)
+	            .filters(f -> f
+	                .rewritePath("/private/merchant/(?<segment>.*)", "/api/v1/private/merchant/${segment}")
+	                .filter(jwtAuthFilter.apply(new JwtAuthFilter.Config())) 
+	            )
+	            .uri("http://localhost:8080")
+	        )
+	        .build();
+
 	}
 
 	@Bean
-	public RouteLocator privateStoresRouteLocator(RouteLocatorBuilder builder) {
-		return builder.routes()
-				.route("store-private-create", r -> r.path("/private/store").and().method(HttpMethod.POST)
-						.filters(f -> f.rewritePath("/private/store", "/api/v1/private/store")
-								.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config())))
-						.uri("http://localhost:8080"))
-				.route("stores-private-root", r -> r.path("/private/stores").and().method(HttpMethod.GET)
-						.filters(f -> f.rewritePath("/private/stores", "/api/v1/private/stores")
-								.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config())))
-						.uri("http://localhost:8080"))
-				.route("stores-private", r -> r.path("/private/stores/**").and()
-						.method(HttpMethod.GET, HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE)
-						.filters(f -> f
-								.rewritePath("/private/stores/(?<segment>.*)", "/api/v1/private/stores/${segment}")
-								.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config())))
-						.uri("http://localhost:8080"))
-				.route("store-private", r -> r.path("/private/store/**").and()
-						.method(HttpMethod.GET, HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE)
-						.filters(f -> f.rewritePath("/private/store/(?<segment>.*)", "/api/v1/private/store/${segment}")
-								.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config())))
-						.uri("http://localhost:8080"))
-				.build();
+
+	public RouteLocator routingPrivateStores(RouteLocatorBuilder builder) {
+	    return builder.routes()
+	    		.route("stores-private-root", r -> r
+	    			    .path("/private/stores")
+	    			    .and()
+	    			    .method(HttpMethod.GET)
+	    			    .filters(f -> f
+	    			        .rewritePath("/private/stores", "/api/v1/private/stores")
+	    			        .filter(jwtAuthFilter.apply(new JwtAuthFilter.Config()))
+	    			    )
+	    			    .uri("http://localhost:8080")
+	    		)
+	    		.route("stores-private", r -> r
+	    				.path("/private/stores/**")
+	    				.and()
+	    				.method(HttpMethod.GET, HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE)
+	    				.filters(f -> f
+	    						.rewritePath("/private/stores/(?<segment>.*)", "/api/v1/private/stores/${segment}")
+	    						.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config())) 
+	            )
+	    				.uri("http://localhost:8080")
+	        ).build();
+
 	}
 
 }

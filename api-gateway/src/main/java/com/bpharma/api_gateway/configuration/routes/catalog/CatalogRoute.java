@@ -14,7 +14,7 @@ public class CatalogRoute {
 	private JwtAuthFilter jwtAuthFilter;
 	
 	@Bean
-	public RouteLocator catalogPrivateRoute(RouteLocatorBuilder builder) {
+	public RouteLocator routingPrivateCatalog(RouteLocatorBuilder builder) {
 	    return builder.routes()
 		     .route("catalog", r -> r
 			     .path("/private/catalog")
