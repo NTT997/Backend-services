@@ -64,7 +64,7 @@ public class ProductRoute {
 					.route("products-public", r-> r
 							.path("/public/products/**")
 							.and()
-							.method(HttpMethod.GET, HttpMethod.DELETE)
+							.method(HttpMethod.GET, HttpMethod.DELETE )
 							.filters(f -> f.rewritePath("/public/products/(?<segment>.*)", "/api/v1/products/${segment}"))
 							.uri("http://localhost:8080")
 						)
