@@ -35,8 +35,28 @@ public abstract class SalesManagerEntityServiceImpl<K extends Serializable & Com
 	}
 
 
+//	public E getById(K id) {
+//		return repository.getOne(id);
+//	}
+	
 	public E getById(K id) {
-		return repository.getOne(id);
+		/*
+		 * Changed from repository.getOne(id) to repository.findById(id).orElse(null)
+		 * Reason: - repository.getOne(id) returns a lazy proxy and does NOT hit
+		 * the database immediately. - If the entity is not found, it only throws
+		 * EntityNotFoundException later when accessing any field, which can cause
+		 * unexpected 500 Internal Server Error in REST APIs. - This makes exception
+		 * handling and debugging harder in service layers that expect immediate
+		 * validation.
+		 * 
+		 * By using repository.findById(id).orElse(null): - We perform an
+		 * immediate lookup (eager fetch), allowing us to detect missing records
+		 * explicitly. - This enables proper use of custom exceptions (e.g.
+		 * ResourceNotFoundException), which are correctly mapped to 404 responses by
+		 * our @ControllerAdvice error handler. - It improves API robustness and
+		 * predictability, especially in delete/update operations.
+		 */
+	    return repository.findById(id).orElse(null);
 	}
 
 	
