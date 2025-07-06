@@ -65,7 +65,7 @@ public class ProductFileManagerImpl extends ProductFileManager {
   public void addProductImage(ProductImage productImage, ImageContentFile contentImage)
       throws ServiceException {
 
-
+    
     try {
 
       /** copy to input stream **/
@@ -86,7 +86,7 @@ public class ProductFileManagerImpl extends ProductFileManager {
       InputStream is2 = new ByteArrayInputStream(baos.toByteArray());
 
       BufferedImage bufferedImage = ImageIO.read(is2);
-
+      System.out.println(is1);
 
       if (bufferedImage == null) {
         LOGGER.error("Cannot read image format for " + productImage.getProductImage());
