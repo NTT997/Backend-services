@@ -107,16 +107,22 @@ public class SearchServiceImpl implements com.salesmanager.core.business.service
 		/**
 		 * Configure search module
 		 */
+		System.out.println("ENTER LINE 110 OF SEARCH MODELS");
+		System.out.println(searchModule.getUniqueCode());
+		System.out.println(searchModule.toString());
 
+		System.out.println("ENTER LINE 118 END CHECK VALUE");
 		if (searchModule != null && !noIndex) {
 
 			SearchConfiguration searchConfiguration = config();
 			try {
+				System.out.println("ENTER LINE 115 OF SEARCH SERVICE IMPL");
 				searchModule.configure(searchConfiguration);
 			} catch (Exception e) {
 				LOGGER.error("SearchModule cannot be configured [" + e.getMessage() + "]", e);
 			}
 		}
+		System.out.println("ENTER LINE 120");
 	}
 
 	public void index(MerchantStore store, Product product) throws ServiceException {
@@ -254,7 +260,7 @@ public class SearchServiceImpl implements com.salesmanager.core.business.service
 	}
 
 	private SearchConfiguration config() throws Exception {
-
+		System.out.println("PRINT LINE 257 OF SEARCH CONFIGURATION");
 		SearchConfiguration config = new SearchConfiguration();
 		config.setClusterName(applicationSearchConfiguration.getClusterName());
 		config.setHosts(applicationSearchConfiguration.getHost());
@@ -266,6 +272,7 @@ public class SearchServiceImpl implements com.salesmanager.core.business.service
 			try {
 				this.mappings(config,l);
 			} catch (Exception e) {
+				System.out.println("PRINT LINE 273 EXCEPTION ");
 				throw new IllegalStateException(e);
 			}
 		});
@@ -412,14 +419,18 @@ public class SearchServiceImpl implements com.salesmanager.core.business.service
 	public SearchResponse search(MerchantStore store, String language, SearchRequest search, int entriesCount,
 			int startIndex) throws ServiceException {
 
-		if (configuration.getProperty(INDEX_PRODUCTS) == null
-				|| configuration.getProperty(INDEX_PRODUCTS).equals(Constants.FALSE) || searchModule == null) {
-			return null;
-		}
+		 if (configuration.getProperty(INDEX_PRODUCTS) == null
+		 		|| configuration.getProperty(INDEX_PRODUCTS).equals(Constants.FALSE) || searchModule == null) {
+		 	return null;
+		 }
 
 		try {
+			System.out.println("ENTER LINE 428 AT SEARCH SERVICE"+search.getSearchString());
+			
 			return searchModule.searchProducts(search);
 		} catch (Exception e) {
+			System.out.println("ENTERLINE 423 OF SEARCH FUNCTION");
+			System.out.println(e);
 			throw new ServiceException(e);
 		}
 

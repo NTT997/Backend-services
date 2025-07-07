@@ -71,12 +71,14 @@ public class SearchFacadeImpl implements SearchFacade {
 	@Async
 	public void indexAllData(MerchantStore store) throws Exception {
 		List<Product> products = productService.listByStore(store);
-
+		System.out.println(products.toString());
 		products.stream().forEach(p -> {
+			System.out.println(p.toString());
 			try {
+				System.out.println(p.toString());
 				searchService.index(store, p);
 			} catch (ServiceException e) {
-				throw new RuntimeException("Exception while indexing products", e);
+				throw new RuntimeException("Exception while indexing products"+ e);
 			}
 		});
 
@@ -99,6 +101,7 @@ public class SearchFacadeImpl implements SearchFacade {
 		
 		try {
 			LOGGER.debug("Search " + query);
+			System.out.println("PRINTLINE 102 AT SEARCH REQUEST");
 			SearchRequest searchRequest = new SearchRequest();
 			searchRequest.setLanguage(languageCode);
 			searchRequest.setSearchString(query);

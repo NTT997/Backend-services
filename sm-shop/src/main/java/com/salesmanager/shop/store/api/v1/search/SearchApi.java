@@ -55,7 +55,7 @@ public class SearchApi {
       @RequestBody SearchProductRequest searchRequest,
       @ApiIgnore MerchantStore merchantStore,
       @ApiIgnore Language language) {
-
+    System.out.println("Print line 58 of search service");
     return searchFacade.search(merchantStore, language, searchRequest);
   }
 

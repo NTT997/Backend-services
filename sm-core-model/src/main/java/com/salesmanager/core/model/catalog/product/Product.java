@@ -70,7 +70,11 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "product")
 	private Set<ProductDescription> descriptions = new HashSet<ProductDescription>();
-	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return super.toString();
+	}
 	/**
 	 * Inventory
 	 */
