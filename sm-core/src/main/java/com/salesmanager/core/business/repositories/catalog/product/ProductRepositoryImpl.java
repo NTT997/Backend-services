@@ -259,6 +259,9 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 				LOGGER.error("Found multiple products for list of criterias with main criteria [" + seUrl + "]");
 			}
 			// p = (Product)q.getSingleResult();
+			
+			if(products.isEmpty()) return p;
+			
 			p = products.get(0);
 		} catch (javax.persistence.NoResultException ignore) {
 
@@ -748,7 +751,9 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 			return productList;
 
 		StringBuilder qs = new StringBuilder();
-		qs.append("select distinct p from Product as p ");
+//		qs.append("select distinct p from Product as p ");
+
+		qs.append("select p from Product as p ");
 		qs.append("join fetch p.merchantStore merch ");
 		qs.append("join fetch p.availabilities pa ");
 		qs.append("left join fetch pa.prices pap ");

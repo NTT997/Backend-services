@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -99,8 +100,10 @@ public class ProductApi {
 	 * @param language
 	 * @return Entity
 	 */
+	
+	//, "/auth/products" 
 	@ResponseStatus(HttpStatus.CREATED)
-	@RequestMapping(value = { "/private/product", "/auth/products" }, // private
+	@RequestMapping(value = { "/private/product"}, // private
 																			// for
 			// adding
 			// products
@@ -113,12 +116,14 @@ public class ProductApi {
 		Long id = productCommonFacade.saveProduct(merchantStore, product, language);
 		Entity returnEntity = new Entity();
 		returnEntity.setId(id);
+		
 		return returnEntity;
 
 	}
-
+	
+	//, "/auth/product/{id}"
 	@ResponseStatus(HttpStatus.OK)
-	@RequestMapping(value = { "/private/product/{id}", "/auth/product/{id}" }, method = RequestMethod.PUT)
+	@RequestMapping(value = { "/private/product/{id}" }, method = RequestMethod.PUT)
 	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
 			@ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en") })
 	@ApiOperation(httpMethod = "PUT", value = "Update product", notes = "", produces = "application/json", response = PersistableProduct.class)
@@ -156,13 +161,16 @@ public class ProductApi {
 			LightPersistableProduct product,
 			@ApiIgnore MerchantStore merchantStore,
 			@ApiIgnore Language language) {
+		System.out.println("begin api");
 		productCommonFacade.update(id, product, merchantStore, language);
+		System.out.println("after api:");
 		return;
 
 	}
 
+	//, "/auth/product/{id}" 
 	@ResponseStatus(HttpStatus.OK)
-	@RequestMapping(value = { "/private/product/{id}", "/auth/product/{id}" }, method = RequestMethod.DELETE)
+	@RequestMapping(value = { "/private/product/{id}"}, method = RequestMethod.DELETE)
 	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
 			@ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en") })
 	public void delete(@PathVariable Long id, @ApiIgnore MerchantStore merchantStore, @ApiIgnore Language language) {

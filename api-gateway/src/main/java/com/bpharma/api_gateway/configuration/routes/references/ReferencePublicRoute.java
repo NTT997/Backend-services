@@ -10,7 +10,7 @@ import org.springframework.http.HttpMethod;
 @Configuration
 public class ReferencePublicRoute {
     @Bean
-    public RouteLocator referencePublicRoutes(RouteLocatorBuilder builder) {
+    public RouteLocator routingReferencesPublicRoute(RouteLocatorBuilder builder) {
         return builder.routes()
         		.route("country", r -> r
         			    .path("/public/country")
