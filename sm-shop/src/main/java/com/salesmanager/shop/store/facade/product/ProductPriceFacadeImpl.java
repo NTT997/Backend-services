@@ -2,6 +2,7 @@ package com.salesmanager.shop.store.facade.product;
 
 import static com.salesmanager.core.business.utils.NumberUtils.isPositive;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.jsoup.helper.Validate;
@@ -70,16 +71,18 @@ public class ProductPriceFacadeImpl implements ProductPriceFacade {
 		Validate.notNull(store, "MerchantStore cannot be null");
 		Validate.notNull(sku, "Product sku cannot be null");
 		Validate.notNull(inventoryId, "Product inventory cannot be null");
-		
+				
 		List<ProductPrice> prices = productPriceService.findByInventoryId(inventoryId, sku, store);
+		
 		List<ReadableProductPrice> returnPrices = prices.stream().map(p -> {
 			try {
 				return this.readablePrice(p, store, language);
 			} catch (ConversionException e) {
 				throw new ServiceRuntimeException("An exception occured while getting product price for sku [" + sku + "] and Store [" + store.getCode() + "]", e);
 			}
-		}).collect(Collectors.toList());
-		
+		})
+				.collect(Collectors.toList());
+				
 		return returnPrices;
 		
 		
@@ -91,8 +94,10 @@ public class ProductPriceFacadeImpl implements ProductPriceFacade {
 		Validate.notNull(sku, "Product sku cannot be null");
 
 			List<ProductPrice> prices = productPriceService.findByProductSku(sku, store);
+			
 			List<ReadableProductPrice> returnPrices = prices.stream().map(p -> {
 				try {
+					
 					return this.readablePrice(p, store, language);
 				} catch (ConversionException e) {
 					throw new ServiceRuntimeException("An exception occured while getting product price for sku [" + sku + "] and Store [" + store.getCode() + "]", e);

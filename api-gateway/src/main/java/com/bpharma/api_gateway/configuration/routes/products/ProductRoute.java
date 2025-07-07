@@ -38,6 +38,15 @@ public class ProductRoute {
 								.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config()))
 						)
 						.uri("http://localhost:8080"))
+					.route("products-private", r -> r
+						.path("/private/products/**")
+						.and()
+						.method(HttpMethod.GET, HttpMethod.POST, HttpMethod.DELETE, HttpMethod.PATCH)
+						.filters(f -> f
+								.rewritePath("/private/products/(?<segment>.*)", "/api/v1/private/products/${segment}")
+								.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config())))
+						.uri("http://localhost:8080")
+					)
 				.build();
 	}
 	
@@ -53,10 +62,10 @@ public class ProductRoute {
 						.uri("http://localhost:8080")
 					)
 					.route("products-public", r-> r
-							.path("/public/products*")
+							.path("/public/products/**")
 							.and()
-							.method(HttpMethod.GET)
-							.filters(f -> f.rewritePath("/public/products", "/api/v1/products"))
+							.method(HttpMethod.GET, HttpMethod.DELETE )
+							.filters(f -> f.rewritePath("/public/products/(?<segment>.*)", "/api/v1/products/${segment}"))
 							.uri("http://localhost:8080")
 						)
 					.build();
