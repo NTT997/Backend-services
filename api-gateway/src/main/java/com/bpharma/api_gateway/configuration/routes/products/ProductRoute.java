@@ -38,15 +38,6 @@ public class ProductRoute {
 								.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config()))
 						)
 						.uri("http://localhost:8080"))
-					.route("products-private", r -> r
-						.path("/private/products/**")
-						.and()
-						.method(HttpMethod.GET, HttpMethod.POST, HttpMethod.DELETE, HttpMethod.PATCH)
-						.filters(f -> f
-								.rewritePath("/private/products/(?<segment>.*)", "/api/v1/private/products/${segment}")
-								.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config())))
-						.uri("http://localhost:8080")
-					)
 				.build();
 	}
 	

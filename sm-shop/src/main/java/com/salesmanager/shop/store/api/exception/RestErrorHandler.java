@@ -127,6 +127,7 @@ public class RestErrorHandler {
                 exception.getLocalizedMessage());
         return errorEntity;
     }
+
     private ErrorEntity createErrorEntity(String errorCode, String message, String detailMessage) {
         ErrorEntity errorEntity = new ErrorEntity();
         Optional.ofNullable(errorCode)
