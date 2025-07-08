@@ -28,6 +28,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 
 import org.hibernate.annotations.Cascade;
+import org.springframework.data.jpa.repository.Query;
 
 import com.salesmanager.core.model.catalog.category.Category;
 import com.salesmanager.core.model.catalog.product.attribute.ProductAttribute;
@@ -70,11 +71,12 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "product")
 	private Set<ProductDescription> descriptions = new HashSet<ProductDescription>();
+	
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
-		return super.toString();
-	}
+		return this.sku;
+	}	
 	/**
 	 * Inventory
 	 */
@@ -128,8 +130,11 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
 	 * Decorates the product with variants
 	 * 
 	 */
+
+
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "product")
 	private Set<ProductVariant> variants = new HashSet<ProductVariant>();
+	
 	
 	@Column(name="DATE_AVAILABLE")
 	@Temporal(TemporalType.TIMESTAMP)
