@@ -130,7 +130,7 @@ public class ProductApi {
 	public void update(@PathVariable Long id,
 			@Valid @RequestBody PersistableProduct product, @ApiIgnore MerchantStore merchantStore,
 			HttpServletRequest request, HttpServletResponse response) {
-
+		
 		try {
 			// Make sure we have consistency in this request
 			if (!id.equals(product.getId())) {

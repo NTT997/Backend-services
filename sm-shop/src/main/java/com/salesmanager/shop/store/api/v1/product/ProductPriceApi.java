@@ -21,6 +21,7 @@ import com.salesmanager.core.model.reference.language.Language;
 import com.salesmanager.shop.model.catalog.product.PersistableProductPrice;
 import com.salesmanager.shop.model.catalog.product.ReadableProductPrice;
 import com.salesmanager.shop.model.entity.Entity;
+import com.salesmanager.shop.store.api.exception.ResourceNotFoundException;
 import com.salesmanager.shop.store.controller.product.facade.ProductPriceFacade;
 
 import io.swagger.annotations.Api;
@@ -144,10 +145,7 @@ public class ProductPriceApi {
 		
 		
 		return productPriceFacade.list(sku, inventoryId, merchantStore, language);
-
-		
 	}
-	
 	
 	@RequestMapping(value = { "/private/product/{sku}/prices"},
 			method = RequestMethod.GET)
