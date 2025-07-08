@@ -298,25 +298,60 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
 		return readableProduct;
 	}
 
+//	@Override
+//	public void saveOrUpdateReview(PersistableProductReview review, MerchantStore store, Language language)
+//			throws Exception {
+//		PersistableProductReviewPopulator populator = new PersistableProductReviewPopulator();
+//		populator.setLanguageService(languageService);
+//		populator.setCustomerService(customerService);
+//		populator.setProductService(productService);
+//
+//		com.salesmanager.core.model.catalog.product.review.ProductReview rev = new com.salesmanager.core.model.catalog.product.review.ProductReview();
+//		populator.populate(review, rev, store, language);
+//
+//		if (review.getId() == null) {
+//			productReviewService.create(rev);
+//		} else {
+//			productReviewService.update(rev);
+//		}
+//
+//		review.setId(rev.getId());
+//
+//	}
+	
 	@Override
 	public void saveOrUpdateReview(PersistableProductReview review, MerchantStore store, Language language)
-			throws Exception {
-		PersistableProductReviewPopulator populator = new PersistableProductReviewPopulator();
-		populator.setLanguageService(languageService);
-		populator.setCustomerService(customerService);
-		populator.setProductService(productService);
+	        throws Exception {
+	    
+	    PersistableProductReviewPopulator populator = new PersistableProductReviewPopulator();
+	    populator.setLanguageService(languageService);
+	    populator.setCustomerService(customerService);
+	    populator.setProductService(productService);
 
-		com.salesmanager.core.model.catalog.product.review.ProductReview rev = new com.salesmanager.core.model.catalog.product.review.ProductReview();
-		populator.populate(review, rev, store, language);
+	    ProductReview rev;
 
-		if (review.getId() == null) {
-			productReviewService.create(rev);
-		} else {
-			productReviewService.update(rev);
-		}
+	    if (review.getId() != null) {
+	        // Load existing review to ensure Hibernate session awareness
+	        rev = productReviewService.getById(review.getId());
+	        if (rev == null) {
+	            throw new ResourceNotFoundException("Product review with ID " + review.getId() + " not found");
+	        }
+	    } else {
+	        rev = new ProductReview(); // new review
+	    }
 
-		review.setId(rev.getId());
+	    // Populate the fetched or new entity
+	    populator.populate(review, rev, store, language);
 
+	    // Hibernate now knows whether this is an update or create
+	    if (review.getId() == null) {
+	        productReviewService.create(rev);
+	    } else {
+	        productReviewService.update(rev);
+	    }
+
+	    // Return updated ID
+	    review.setId(rev.getId());
 	}
 
 	@Override

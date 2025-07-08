@@ -10,6 +10,7 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.salesmanager.core.business.services.catalog.product.ProductService;
 import com.salesmanager.core.business.services.catalog.product.review.ProductReviewService;
@@ -27,6 +29,8 @@ import com.salesmanager.core.model.reference.language.Language;
 import com.salesmanager.shop.constants.Constants;
 import com.salesmanager.shop.model.catalog.product.PersistableProductReview;
 import com.salesmanager.shop.model.catalog.product.ReadableProductReview;
+import com.salesmanager.shop.store.api.exception.ResourceAlreadyExistsException;
+import com.salesmanager.shop.store.api.exception.ResourceNotFoundException;
 import com.salesmanager.shop.store.controller.product.facade.ProductCommonFacade;
 
 import io.swagger.annotations.ApiImplicitParam;
@@ -37,204 +41,178 @@ import springfox.documentation.annotations.ApiIgnore;
 @RequestMapping("/api/v1")
 public class ProductReviewApi {
 
-  @Inject private ProductCommonFacade productCommonFacade;
+	@Inject
+	private ProductCommonFacade productCommonFacade;
 
-  @Inject private ProductService productService;
+	@Inject
+	private ProductService productService;
 
-  @Inject private ProductReviewService productReviewService;
+	@Inject
+	private ProductReviewService productReviewService;
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProductReviewApi.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ProductReviewApi.class);
 
-  @RequestMapping(
-      value = {
-        "/private/products/{id}/reviews",
-        "/auth/products/{id}/reviews",
-        "/auth/products/{id}/reviews",
-        "/auth/products/{id}/reviews"
-      },
-      method = RequestMethod.POST)
-  @ResponseStatus(HttpStatus.CREATED)
-  @ResponseBody
-  @ApiImplicitParams({
-      @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
-      @ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en")
-  })
-  public PersistableProductReview create(
-      @PathVariable final Long id,
-      @Valid @RequestBody PersistableProductReview review,
-      @ApiIgnore MerchantStore merchantStore,
-      @ApiIgnore Language language,
-      HttpServletRequest request,
-      HttpServletResponse response) {
+	@RequestMapping(value = { "/private/products/{id}/reviews",
+			"/auth/products/{id}/reviews" }, method = RequestMethod.POST)
+	@PreAuthorize("hasAuthority('AUTH')")
+	@ResponseStatus(HttpStatus.CREATED)
+	@ResponseBody
+	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
+			@ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en") })
+	public PersistableProductReview create(@PathVariable final Long id,
+			@Valid @RequestBody PersistableProductReview review, @ApiIgnore MerchantStore merchantStore,
+			@ApiIgnore Language language, HttpServletRequest request, HttpServletResponse response) {
 
-    try {
-      // rating already exist
-      ProductReview prodReview =
-          productReviewService.getByProductAndCustomer(
-              review.getProductId(), review.getCustomerId());
-      if (prodReview != null) {
-        response.sendError(500, "A review already exist for this customer and product");
-        return null;
-      }
+		try {
+			// rating already exist
+			ProductReview prodReview = productReviewService.getByProductAndCustomer(review.getProductId(),
+					review.getCustomerId());
+			if (prodReview != null) {
+//        response.sendError(500, "A review already exist for this customer and product");
+//    	  return null;
+				throw new ResourceAlreadyExistsException("A review already exists for this customer and product");
+			}
 
-      // rating maximum 5
-      if (review.getRating() > Constants.MAX_REVIEW_RATING_SCORE) {
-        response.sendError(503, "Maximum rating score is " + Constants.MAX_REVIEW_RATING_SCORE);
-        return null;
-      }
+			// rating maximum 5
+			if (review.getRating() > Constants.MAX_REVIEW_RATING_SCORE) {
+//        response.sendError(503, "Maximum rating score is " + Constants.MAX_REVIEW_RATING_SCORE);
+//        return null;
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+						"Maximum rating score is " + Constants.MAX_REVIEW_RATING_SCORE);
+			}
 
-      review.setProductId(id);
+			review.setProductId(id);
 
-      productCommonFacade.saveOrUpdateReview(review, merchantStore, language);
+			productCommonFacade.saveOrUpdateReview(review, merchantStore, language);
 
-      return review;
+			return review;
 
-    } catch (Exception e) {
-      LOGGER.error("Error while saving product review", e);
-      try {
-        response.sendError(503, "Error while saving product review" + e.getMessage());
-      } catch (Exception ignore) {
-      }
+		} catch (ResourceNotFoundException ex) {
+		    throw ex;
+		} catch (ResourceAlreadyExistsException ex) {
+		    throw ex;
+		} catch (ResponseStatusException ex) {
+		    throw ex;
+		} catch (Exception e) {
+			LOGGER.error("Error while saving product review", e);
+			try {
+				response.sendError(503, "Error while saving product review" + e.getMessage());
+			} catch (Exception ignore) {
+			}
 
-      return null;
-    }
-  }
+			return null;
+		}
+	}
 
-  @RequestMapping(value = "/product/{id}/reviews", method = RequestMethod.GET)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  @ApiImplicitParams({
-      @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
-      @ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en")
-  })
-  public List<ReadableProductReview> getAll(
-      @PathVariable final Long id,
-      @ApiIgnore MerchantStore merchantStore,
-      @ApiIgnore Language language,
-      HttpServletResponse response) {
+	@RequestMapping(value = "/product/{id}/reviews", method = RequestMethod.GET)
+	@ResponseStatus(HttpStatus.OK)
+	@ResponseBody
+	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
+			@ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en") })
+	public List<ReadableProductReview> getAll(@PathVariable final Long id, @ApiIgnore MerchantStore merchantStore,
+			@ApiIgnore Language language, HttpServletResponse response) {
 
-    try {
-      // product exist
-      Product product = productService.getById(id);
+		try {
+			// product exist
+			Product product = productService.getById(id);
 
-      if (product == null) {
-        response.sendError(404, "Product id " + id + " does not exists");
-        return null;
-      }
+			if (product == null) {
+				response.sendError(404, "Product id " + id + " does not exists");
+				return null;
+			}
 
-      List<ReadableProductReview> reviews =
-    		  productCommonFacade.getProductReviews(product, merchantStore, language);
+			List<ReadableProductReview> reviews = productCommonFacade.getProductReviews(product, merchantStore,
+					language);
 
-      return reviews;
+			return reviews;
 
-    } catch (Exception e) {
-      LOGGER.error("Error while getting product reviews", e);
-      try {
-        response.sendError(503, "Error while getting product reviews" + e.getMessage());
-      } catch (Exception ignore) {
-      }
+		} catch (Exception e) {
+			LOGGER.error("Error while getting product reviews", e);
+			try {
+				response.sendError(503, "Error while getting product reviews" + e.getMessage());
+			} catch (Exception ignore) {
+			}
 
-      return null;
-    }
-  }
+			return null;
+		}
+	}
 
-  @RequestMapping(
-      value = {
-        "/private/products/{id}/reviews/{reviewid}",
-        "/auth/products/{id}/reviews/{reviewid}"
-      },
-      method = RequestMethod.PUT)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  @ApiImplicitParams({
-      @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
-      @ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en")
-  })
-  public PersistableProductReview update(
-      @PathVariable final Long id,
-      @PathVariable final Long reviewId,
-      @Valid @RequestBody PersistableProductReview review,
-      @ApiIgnore MerchantStore merchantStore,
-      @ApiIgnore Language language,
-      HttpServletRequest request,
-      HttpServletResponse response) {
+	@RequestMapping(value = { "/private/products/{id}/reviews/{reviewId}",
+			"/auth/products/{id}/reviews/{reviewId}" }, method = RequestMethod.PUT)
+	@ResponseStatus(HttpStatus.OK)
+	@ResponseBody
+	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
+			@ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en") })
+	public PersistableProductReview update(@PathVariable final Long id, @PathVariable final Long reviewId,
+			@Valid @RequestBody PersistableProductReview review, @ApiIgnore MerchantStore merchantStore,
+			@ApiIgnore Language language, HttpServletRequest request, HttpServletResponse response) {
 
-    try {
-      ProductReview prodReview = productReviewService.getById(reviewId);
-      if (prodReview == null) {
-        response.sendError(404, "Product review with id " + reviewId + " does not exist");
-        return null;
-      }
+		try {
+			ProductReview prodReview = productReviewService.getById(reviewId);
+			if (prodReview == null) {
+				response.sendError(404, "Product review with id " + reviewId + " does not exist");
+				return null;
+			}
 
-      if (prodReview.getCustomer().getId().longValue() != review.getCustomerId().longValue()) {
-        response.sendError(404, "Product review with id " + reviewId + " does not exist");
-        return null;
-      }
+			if (prodReview.getCustomer().getId().longValue() != review.getCustomerId().longValue()) {
+				response.sendError(404, "Product review with id " + reviewId + " does not exist");
+				return null;
+			}
 
-      // rating maximum 5
-      if (review.getRating() > Constants.MAX_REVIEW_RATING_SCORE) {
-        response.sendError(503, "Maximum rating score is " + Constants.MAX_REVIEW_RATING_SCORE);
-        return null;
-      }
+			// rating maximum 5
+			if (review.getRating() > Constants.MAX_REVIEW_RATING_SCORE) {
+				response.sendError(503, "Maximum rating score is " + Constants.MAX_REVIEW_RATING_SCORE);
+				return null;
+			}
 
-      review.setProductId(id);
+			review.setProductId(id);
 
-      productCommonFacade.saveOrUpdateReview(review, merchantStore, language);
+			productCommonFacade.saveOrUpdateReview(review, merchantStore, language);
 
-      return review;
+			return review;
 
-    } catch (Exception e) {
-      LOGGER.error("Error while saving product review", e);
-      try {
-        response.sendError(503, "Error while saving product review" + e.getMessage());
-      } catch (Exception ignore) {
-      }
+		} catch (Exception e) {
+			LOGGER.error("Error while saving product review", e);
+			try {
+				response.sendError(503, "Error while saving product review" + e.getMessage());
+			} catch (Exception ignore) {
+			}
 
-      return null;
-    }
-  }
+			return null;
+		}
+	}
 
-  @RequestMapping(
-      value = {
-        "/private/products/{id}/reviews/{reviewid}",
-        "/auth/products/{id}/reviews/{reviewid}"
-      },
-      method = RequestMethod.DELETE)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  @ApiImplicitParams({
-      @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
-      @ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en")
-  })
-  public void delete(
-      @PathVariable final Long id,
-      @PathVariable final Long reviewId,
-      @ApiIgnore MerchantStore merchantStore,
-      @ApiIgnore Language language,
-      HttpServletResponse response) {
+	@RequestMapping(value = { "/private/products/{id}/reviews/{reviewId}",
+			"/auth/products/{id}/reviews/{reviewId}" }, method = RequestMethod.DELETE)
+	@ResponseStatus(HttpStatus.OK)
+	@ResponseBody
+	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
+			@ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en") })
+	public void delete(@PathVariable final Long id, @PathVariable final Long reviewId,
+			@ApiIgnore MerchantStore merchantStore, @ApiIgnore Language language, HttpServletResponse response) {
 
-    try {
-      ProductReview prodReview = productReviewService.getById(reviewId);
-      if (prodReview == null) {
-        response.sendError(404, "Product review with id " + reviewId + " does not exist");
-        return;
-      }
+		try {
+			ProductReview prodReview = productReviewService.getById(reviewId);
+			if (prodReview == null) {
+				response.sendError(404, "Product review with id " + reviewId + " does not exist");
+				return;
+			}
 
-      if (prodReview.getProduct().getId().longValue() != id.longValue()) {
-        response.sendError(404, "Product review with id " + reviewId + " does not exist");
-        return;
-      }
+			if (prodReview.getProduct().getId().longValue() != id.longValue()) {
+				response.sendError(404, "Product review with id " + reviewId + " does not exist");
+				return;
+			}
 
-      productCommonFacade.deleteReview(prodReview, merchantStore, language);
+			productCommonFacade.deleteReview(prodReview, merchantStore, language);
 
-    } catch (Exception e) {
-      LOGGER.error("Error while deleting product review", e);
-      try {
-        response.sendError(503, "Error while deleting product review" + e.getMessage());
-      } catch (Exception ignore) {
-      }
+		} catch (Exception e) {
+			LOGGER.error("Error while deleting product review", e);
+			try {
+				response.sendError(503, "Error while deleting product review" + e.getMessage());
+			} catch (Exception ignore) {
+			}
 
-      return;
-    }
-  }
+			return;
+		}
+	}
 }
