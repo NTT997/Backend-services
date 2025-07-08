@@ -182,8 +182,8 @@ public class ProductReviewApi {
 		}
 	}
 
-	@RequestMapping(value = { "/private/products/{id}/reviews/{reviewid}",
-			"/auth/products/{id}/reviews/{reviewid}" }, method = RequestMethod.DELETE)
+	@RequestMapping(value = { "/private/products/{id}/reviews/{reviewId}",
+			"/auth/products/{id}/reviews/{reviewId}" }, method = RequestMethod.DELETE)
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
 	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
