@@ -20,12 +20,12 @@ public class ProductReviewRoute {
 		return builder
 				.routes()
 					.route("auth-product-preview-create", r -> r
-						.path("/auth/product-review/{id}/reviews")
+						.path("/customer/product-review/{id}/reviews")
 						.and()
 						.method(HttpMethod.POST)
 						.filters(f -> f
-								.rewritePath("/auth/product-review/(?<id>[^/]+)/reviews", "/api/v1/auth/products/${id}/reviews")
-								.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config()))						)
+								.rewritePath("/customer/product-review/(?<id>[^/]+)/reviews", "/api/v1/auth/products/${id}/reviews")
+								.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config())))
 						.uri("http://localhost:8080"))			
 					.route("auth-product-preview-manage", r -> r
 							.path("/auth/product-review/{id}/reviews/{reviewid}")
@@ -46,7 +46,7 @@ public class ProductReviewRoute {
 						.path("/public/product-review/{id}/reviews")
 						.and()
 						.method(HttpMethod.GET)
-						.filters(f -> f.rewritePath("/public/product-review/(?<id>[^/]+)/reviews", "/api/v1/products/${id}/reviews"))
+						.filters(f -> f.rewritePath("/public/product-review/(?<id>[^/]+)/reviews", "/api/v1/product/${id}/reviews"))
 						.uri("http://localhost:8080"))
 					.build();
 					

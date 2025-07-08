@@ -18,6 +18,7 @@ import com.salesmanager.core.model.customer.Customer;
 import com.salesmanager.core.model.merchant.MerchantStore;
 import com.salesmanager.core.model.reference.language.Language;
 import com.salesmanager.shop.model.catalog.product.PersistableProductReview;
+import com.salesmanager.shop.store.api.exception.ResourceNotFoundException;
 import com.salesmanager.shop.utils.DateUtil;
 
 
@@ -64,10 +65,14 @@ public class PersistableProductReviewPopulator extends
 			}
 			
 			Customer customer = customerService.getById(source.getCustomerId());
-			
+
 			//check if customer belongs to store
+//			if(customer ==null || customer.getMerchantStore().getId().intValue()!=store.getId().intValue()) {
+//				throw new ConversionException("Invalid customer id for the given store");
+//			}
+			
 			if(customer ==null || customer.getMerchantStore().getId().intValue()!=store.getId().intValue()) {
-				throw new ConversionException("Invalid customer id for the given store");
+				throw new ResourceNotFoundException("Invalid customer id for the given store");
 			}
 			
 			if(source.getDate() == null) {
@@ -81,8 +86,12 @@ public class PersistableProductReviewPopulator extends
 			Product product = productService.getById(source.getProductId());
 			
 			//check if product belongs to store
+//			if(product ==null || product.getMerchantStore().getId().intValue()!=store.getId().intValue()) {
+//				throw new ConversionException("Invalid product id for the given store");
+//			}
+			
 			if(product ==null || product.getMerchantStore().getId().intValue()!=store.getId().intValue()) {
-				throw new ConversionException("Invalid product id for the given store");
+				throw new ResourceNotFoundException("Product with ID " + source.getProductId() + " not found in store " + store.getCode());
 			}
 			
 			target.setProduct(product);
@@ -103,13 +112,19 @@ public class PersistableProductReviewPopulator extends
 			
 			target.setDescriptions(descriptions);
 			
-			
-
+//			if(customer.getCustomerReviewCount() == null) {
+//				customer.setCustomerReviewCount(1);
+//			} else {				
+//				customer.setCustomerReviewCount(customer.getCustomerReviewCount()+1);
+//			}
+//			customerService.saveOrUpdate(customer);
 			
 			
 			return target;
 			
-		} catch (Exception e) {
+		} catch (ResourceNotFoundException ex) {
+		    throw ex;
+		}catch (Exception e) {
 			throw new ConversionException("Cannot populate ProductReview", e);
 		}
 		
