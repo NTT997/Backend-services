@@ -31,8 +31,8 @@ public class JwtAuthFilter extends AbstractGatewayFilterFactory<JwtAuthFilter.Co
             String path = exchange.getRequest().getPath().toString();
             String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
 
-            System.out.println(">> [JwtAuthFilter] Path: " + path);
-            System.out.println(">> [JwtAuthFilter] Authorization Header: " + authHeader);
+            System.out.println("[JwtAuthFilter] Path: " + path);
+            System.out.println("[JwtAuthFilter] Authorization Header: " + authHeader);
             if(authHeader == null || !authHeader.startsWith("Bearer ")) {
             	exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             	return exchange.getResponse().setComplete();
