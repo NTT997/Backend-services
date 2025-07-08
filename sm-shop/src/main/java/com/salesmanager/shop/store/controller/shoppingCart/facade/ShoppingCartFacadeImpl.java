@@ -256,7 +256,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
 		// USE Product sku
 		Product product = null;
-
+		System.out.println(shoppingCartItem.getProduct());
 		product = productService.getBySku(shoppingCartItem.getProduct(), store, store.getDefaultLanguage());// todo use
 																											// language
 																											// from api
