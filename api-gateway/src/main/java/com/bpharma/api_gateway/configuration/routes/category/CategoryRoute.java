@@ -16,7 +16,7 @@ public class CategoryRoute {
 	private JwtAuthFilter jwtAuthFilter;
 	
     @Bean
-    public RouteLocator publicRoutes(RouteLocatorBuilder builder) {
+    public RouteLocator routingPublicCategory(RouteLocatorBuilder builder) {
         return builder.routes()
         		.route("category-public-create", r -> r
         			    .path("/public/category")
@@ -33,7 +33,7 @@ public class CategoryRoute {
                 .build();
     }
     @Bean
-    public RouteLocator privateRoutes(RouteLocatorBuilder builder) {
+    public RouteLocator routingPrivateCategory(RouteLocatorBuilder builder) {
         return builder.routes()
         		.route("category-create", r -> r
         			    .path("/private/category")

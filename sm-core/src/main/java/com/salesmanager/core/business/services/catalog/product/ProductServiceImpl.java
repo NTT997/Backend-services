@@ -2,6 +2,7 @@ package com.salesmanager.core.business.services.catalog.product;
 
 
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -370,6 +371,24 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
 		
 	}
 
+//	@Override
+//	public Product getBySku(String productCode, MerchantStore merchant, Language language) throws ServiceException {
+//
+//		try {
+//			List<Object> products = productRepository.findBySku(productCode, merchant.getId());
+//			if(products.isEmpty()) {
+//				throw new ServiceException("Cannot get product with sku [" + productCode + "]");
+//			}
+//			BigInteger id = (BigInteger) products.get(0);
+//			return productRepository.getById(id.longValue(), merchant, language);
+//		} catch (Exception e) {
+//			throw new ServiceException("Cannot get product with sku [" + productCode + "]", e);
+//		}
+//		
+//
+//
+//	}
+	
 	@Override
 	public Product getBySku(String productCode, MerchantStore merchant, Language language) throws ServiceException {
 
@@ -378,14 +397,11 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
 			if(products.isEmpty()) {
 				throw new ServiceException("Cannot get product with sku [" + productCode + "]");
 			}
-			BigInteger id = (BigInteger) products.get(0);
-			return productRepository.getById(id.longValue(), merchant, language);
+			BigDecimal idDecimal = (BigDecimal) products.get(0);
+			return productRepository.getById(idDecimal.longValue(), merchant, language);
 		} catch (Exception e) {
 			throw new ServiceException("Cannot get product with sku [" + productCode + "]", e);
 		}
-		
-
-
 	}
 	
 	public Product getBySku(String productCode, MerchantStore merchant) throws ServiceException {

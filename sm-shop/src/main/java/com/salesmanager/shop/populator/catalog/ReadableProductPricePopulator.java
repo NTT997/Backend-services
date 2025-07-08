@@ -42,11 +42,12 @@ public class ReadableProductPricePopulator extends
 		Validate.notNull(source.getProductAvailability().getProduct(),"productPrice.availability.product cannot be null");
 		
 		try {
+			System.out.println("target: " + target);
 		  
 		    if(language == null) {
 		      target = new ReadableProductPriceFull();
 		    }
-		    
+
 		    if(source.getId() != null && source.getId() > 0) {
 		      target.setId(source.getId());
 		    }

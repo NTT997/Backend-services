@@ -398,6 +398,7 @@ public class MultipleEntryPointsSecurityConfig {
 					.antMatchers(API_VERSION + "/auth/login").permitAll()
 					.antMatchers(API_VERSION + "/auth/register").permitAll()
 					.antMatchers(HttpMethod.OPTIONS, API_VERSION + "/auth/**").permitAll()
+
 					.antMatchers(API_VERSION + "/auth/**")
 					.hasRole("AUTH_CUSTOMER").anyRequest().authenticated()
 					.and()

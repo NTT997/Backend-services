@@ -16,7 +16,7 @@ public class SecurityRoute {
 	private JwtAuthFilter jwtAuthFilter;
 
 	@Bean
-	public RouteLocator permissionPrivateRoute(RouteLocatorBuilder builder) {
+	public RouteLocator routingPrivatePermission(RouteLocatorBuilder builder) {
 		return builder
 				.routes()
 					.route("permission-private", r-> r

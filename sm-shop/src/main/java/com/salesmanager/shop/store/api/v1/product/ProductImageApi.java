@@ -122,6 +122,8 @@ public class ProductImageApi {
 			for (MultipartFile multipartFile : files) {
 				if (!multipartFile.isEmpty()) {
 					ProductImage productImage = new ProductImage();
+					System.out.print(multipartFile.getInputStream());
+					
 					productImage.setImage(multipartFile.getInputStream());
 					productImage.setProductImage(multipartFile.getOriginalFilename());
 					productImage.setProduct(product);
@@ -151,17 +153,23 @@ public class ProductImageApi {
 			"/auth/product/images/{id}" }, method = RequestMethod.DELETE)
 	public void deleteImage(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-
+		
 		try {
 			ProductImage productImage = productImageService.getById(id);
 
 			if (productImage != null) {
+				System.out.println("ENTER LINE 161 DELETE PRODUCT IMAGES");
 				productImageService.delete(productImage);
 			} else {
+				System.out.println("ENTER LINE 163 DELETE PRODUCT IMAGES");
+
 				response.sendError(404, "No ProductImage found for ID : " + id);
 			}
 
-		} catch (Exception e) {
+		}catch(ResourceNotFoundException e){
+			throw e;
+		} 
+		catch (Exception e) {
 			LOGGER.error("Error while deleting ProductImage", e);
 			try {
 				response.sendError(503, "Error while deleting ProductImage " + e.getMessage());
