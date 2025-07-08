@@ -47,6 +47,76 @@ public class PersistableProductReviewPopulator extends
 		this.languageService = languageService;
 	}
 
+//	@Override
+//	public ProductReview populate(PersistableProductReview source,
+//			ProductReview target, MerchantStore store, Language language)
+//			throws ConversionException {
+//		
+//		
+//		Validate.notNull(customerService,"customerService cannot be null");
+//		Validate.notNull(productService,"productService cannot be null");
+//		Validate.notNull(languageService,"languageService cannot be null");
+//		Validate.notNull(source.getRating(),"Rating cannot bot be null");
+//		
+//		try {
+//			
+//			if(target==null) {
+//				target = new ProductReview();
+//			}
+//			
+//			Customer customer = customerService.getById(source.getCustomerId());
+//
+//			//check if customer belongs to store
+//			if(customer ==null || customer.getMerchantStore().getId().intValue()!=store.getId().intValue()) {
+//				throw new ConversionException("Invalid customer id for the given store");
+//			}
+//			
+//			
+//			if(source.getDate() == null) {
+//				String date = DateUtil.formatDate(new Date());
+//				source.setDate(date);
+//			}
+//			target.setReviewDate(DateUtil.getDate(source.getDate()));
+//			target.setCustomer(customer);
+//			target.setReviewRating(source.getRating());
+//			
+//			Product product = productService.getById(source.getProductId());
+//			
+//			//check if product belongs to store
+//			if(product ==null || product.getMerchantStore().getId().intValue()!=store.getId().intValue()) {
+//				throw new ConversionException("Invalid product id for the given store");
+//			}
+//			
+//			
+//			target.setProduct(product);
+//			
+//			Language lang = languageService.getByCode(language.getCode());
+//			if(lang ==null) {
+//				throw new ConversionException("Invalid language code, use iso codes (en, fr ...)");
+//			}
+//			
+//			ProductReviewDescription description = new ProductReviewDescription();
+//			description.setDescription(source.getDescription());
+//			description.setLanguage(lang);
+//			description.setName("-");
+//			description.setProductReview(target);
+//			
+//			Set<ProductReviewDescription> descriptions = new HashSet<ProductReviewDescription>();
+//			descriptions.add(description);
+//			
+//			target.setDescriptions(descriptions);
+//			
+//			
+//			return target;
+//			
+//		} catch (ResourceNotFoundException ex) {
+//		    throw ex;
+//		}catch (Exception e) {
+//			throw new ConversionException("Cannot populate ProductReview", e);
+//		}
+//		
+//	}
+	
 	@Override
 	public ProductReview populate(PersistableProductReview source,
 			ProductReview target, MerchantStore store, Language language)
@@ -99,16 +169,39 @@ public class PersistableProductReviewPopulator extends
 			Language lang = languageService.getByCode(language.getCode());
 			if(lang ==null) {
 				throw new ConversionException("Invalid language code, use iso codes (en, fr ...)");
+			}		
+						
+//			ProductReviewDescription productReviewDescription = new ProductReviewDescription();
+//			productReviewDescription.setDescription(source.getDescription());
+//			productReviewDescription.setLanguage(lang);
+//			productReviewDescription.setName("-");
+//			productReviewDescription.setProductReview(target);
+			
+			Set<ProductReviewDescription> descriptions = target.getDescriptions();
+			if (descriptions == null) {
+			    descriptions = new HashSet<ProductReviewDescription>();
+			    target.setDescriptions(descriptions);
 			}
 			
-			ProductReviewDescription description = new ProductReviewDescription();
-			description.setDescription(source.getDescription());
-			description.setLanguage(lang);
-			description.setName("-");
-			description.setProductReview(target);
+			// Look for existing description
+			ProductReviewDescription existingDescription = descriptions.stream()
+			    .filter(desc -> desc.getLanguage() != null && lang.getId().equals(desc.getLanguage().getId()))
+			    .findFirst()
+			    .orElse(null);
 			
-			Set<ProductReviewDescription> descriptions = new HashSet<ProductReviewDescription>();
-			descriptions.add(description);
+			if (existingDescription != null) {
+			    existingDescription.setDescription(source.getDescription());
+			} else {
+			    ProductReviewDescription description = new ProductReviewDescription();
+			    description.setDescription(source.getDescription());
+			    description.setLanguage(lang);
+			    description.setName("-"); // Placeholder or title
+			    description.setProductReview(target);
+			    descriptions.add(description);
+			}
+			
+//			Set<ProductReviewDescription> descriptions = new HashSet<ProductReviewDescription>();
+//			descriptions.add(description);
 			
 			target.setDescriptions(descriptions);
 			

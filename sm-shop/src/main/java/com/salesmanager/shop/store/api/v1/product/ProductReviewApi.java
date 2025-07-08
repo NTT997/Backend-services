@@ -137,8 +137,8 @@ public class ProductReviewApi {
 		}
 	}
 
-	@RequestMapping(value = { "/private/products/{id}/reviews/{reviewid}",
-			"/auth/products/{id}/reviews/{reviewid}" }, method = RequestMethod.PUT)
+	@RequestMapping(value = { "/private/products/{id}/reviews/{reviewId}",
+			"/auth/products/{id}/reviews/{reviewId}" }, method = RequestMethod.PUT)
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
 	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
