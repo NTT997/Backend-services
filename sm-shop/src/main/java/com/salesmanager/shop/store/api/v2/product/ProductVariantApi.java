@@ -105,6 +105,8 @@ public class ProductVariantApi {
 			throw new UnauthorizedException();
 		}
 
+		System.out.println("da vao ham update");
+		
 		userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN,
 				Constants.GROUP_ADMIN_CATALOGUE, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()));
 

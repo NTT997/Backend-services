@@ -18,6 +18,7 @@ import com.salesmanager.core.business.constants.Constants;
 import com.salesmanager.core.business.exception.ServiceException;
 import com.salesmanager.core.business.services.catalog.product.ProductService;
 import com.salesmanager.core.business.services.catalog.product.availability.ProductAvailabilityService;
+import com.salesmanager.core.business.services.catalog.product.price.ProductPriceService;
 import com.salesmanager.core.business.services.reference.language.LanguageService;
 import com.salesmanager.core.model.catalog.product.availability.ProductAvailability;
 import com.salesmanager.core.model.catalog.product.price.ProductPrice;
@@ -41,10 +42,129 @@ public class PersistableProductPriceMapper implements Mapper<PersistableProductP
 	@Autowired
 	private ProductAvailabilityService productAvailabilityService;
 
+	// huy
+	@Autowired
+	private ProductPriceService productPriceService;
+
+//	@Override
+//	public ProductPrice convert(PersistableProductPrice source, MerchantStore store, Language language) {
+//		return merge(source, new ProductPrice(), store, language);
+//	}
+
 	@Override
 	public ProductPrice convert(PersistableProductPrice source, MerchantStore store, Language language) {
-		return merge(source, new ProductPrice(), store, language);
+		ProductPrice productPrice;
+		if (source.getId() != null) {
+			productPrice = productPriceService.getById(source.getId());
+		} else {
+			productPrice = new ProductPrice();
+		}
+
+		return merge(source, productPrice, store, language);
 	}
+
+//	@Override
+//	public ProductPrice merge(PersistableProductPrice source, ProductPrice destination, MerchantStore store,
+//			Language language) {
+//
+//		Validate.notNull(source, "PersistableProductPrice cannot be null");
+//		Validate.notNull(source.getSku(), "Product sku cannot be null");
+//
+//		try {
+//			if (destination == null) {
+//				destination = new ProductPrice();
+//			}
+//			
+//			destination.setId(source.getId());
+//
+//			/**
+//			 * Get product availability and verify the existing br-pa-1.0.0
+//			 * 
+//			 * Cannot have multiple default price for the same product availability Default
+//			 * price can be edited but cannot create new default price
+//			 */
+//
+//			ProductAvailability availability = null;
+//
+//			if (isPositive(source.getProductAvailabilityId())) {
+//				Optional<ProductAvailability> avail = productAvailabilityService
+//						.getById(source.getProductAvailabilityId(), store);
+//				if (avail.isEmpty()) {
+//					throw new ConversionRuntimeException(
+//							"Product availability with id [" + source.getProductAvailabilityId() + "] was not found");
+//				}
+//				availability = avail.get();
+//
+//			} else {
+//
+//				// get an existing product availability
+//				List<ProductAvailability> existing = productAvailabilityService.getBySku(source.getSku(), store);
+//
+//				if (!CollectionUtils.isEmpty(existing)) {
+//					// find default availability
+//					Optional<ProductAvailability> avail = existing.stream()
+//							.filter(a -> a.getRegion() != null && a.getRegion().equals(Constants.ALL_REGIONS))
+//							.findAny();
+//					if (avail.isPresent()) {
+//						availability = avail.get();
+//
+//						// if default price exist for sku exit
+//						if (source.isDefaultPrice()) {
+//							Optional<ProductPrice> defaultPrice = availability.getPrices().stream()
+//									.filter(p -> p.isDefaultPrice()).findAny();
+//							if (defaultPrice.isPresent()) {
+//								//throw new ConversionRuntimeException(
+//								//		"Default Price already exist for product with sku [" + source.getSku() + "]");
+//								destination = defaultPrice.get();
+//							}
+//						}
+//					}
+//				}
+//
+//			}
+//
+//			if (availability == null) {
+//
+//				com.salesmanager.core.model.catalog.product.Product product = productService.getBySku(source.getSku(),
+//						store, language);
+//				if (product == null) {
+//					throw new ConversionRuntimeException("Product with sku [" + source.getSku()
+//							+ "] not found for MerchantStore [" + store.getCode() + "]");
+//				}
+//
+//				availability = new ProductAvailability();
+//				availability.setProduct(product);
+//				availability.setRegion(Constants.ALL_REGIONS);
+//			}
+//
+//			destination.setProductAvailability(availability);
+//			destination.setDefaultPrice(source.isDefaultPrice());
+//			destination.setProductPriceAmount(source.getPrice());
+//			destination.setCode(source.getCode());
+//			destination.setProductPriceSpecialAmount(source.getDiscountedPrice());
+//			if (source.getDiscountStartDate() != null) {
+//				Date startDate = DateUtil.getDate(source.getDiscountStartDate());
+//
+//				destination.setProductPriceSpecialStartDate(startDate);
+//			}
+//			if (source.getDiscountEndDate() != null) {
+//				Date endDate = DateUtil.getDate(source.getDiscountEndDate());
+//
+//				destination.setProductPriceSpecialEndDate(endDate);
+//			}
+//			availability.getPrices().add(destination);
+//			destination.setProductAvailability(availability);
+//			destination.setDescriptions(this.getProductPriceDescriptions(destination, source.getDescriptions(), store));
+//
+//			
+//			destination.setDefaultPrice(source.isDefaultPrice());
+//
+//		} catch (Exception e) {
+//
+//			throw new ConversionRuntimeException(e);
+//		}
+//		return destination;
+//	}
 
 	@Override
 	public ProductPrice merge(PersistableProductPrice source, ProductPrice destination, MerchantStore store,
@@ -53,99 +173,72 @@ public class PersistableProductPriceMapper implements Mapper<PersistableProductP
 		Validate.notNull(source, "PersistableProductPrice cannot be null");
 		Validate.notNull(source.getSku(), "Product sku cannot be null");
 
+		System.out.println("source.getId price: " + source.getId());
+		
 		try {
-			if (destination == null) {
-				destination = new ProductPrice();
-			}
-			
-			destination.setId(source.getId());
-
-			/**
-			 * Get product availability and verify the existing br-pa-1.0.0
-			 * 
-			 * Cannot have multiple default price for the same product availability Default
-			 * price can be edited but cannot create new default price
-			 */
-
+			// Step 1: Xác định Availability
 			ProductAvailability availability = null;
 
 			if (isPositive(source.getProductAvailabilityId())) {
-				Optional<ProductAvailability> avail = productAvailabilityService
-						.getById(source.getProductAvailabilityId(), store);
-				if (avail.isEmpty()) {
-					throw new ConversionRuntimeException(
-							"Product availability with id [" + source.getProductAvailabilityId() + "] was not found");
-				}
-				availability = avail.get();
-
+				availability = productAvailabilityService.getById(source.getProductAvailabilityId(), store)
+						.orElseThrow(() -> new ConversionRuntimeException("Product availability with id ["
+								+ source.getProductAvailabilityId() + "] was not found"));
 			} else {
-
-				// get an existing product availability
 				List<ProductAvailability> existing = productAvailabilityService.getBySku(source.getSku(), store);
 
-				if (!CollectionUtils.isEmpty(existing)) {
-					// find default availability
-					Optional<ProductAvailability> avail = existing.stream()
-							.filter(a -> a.getRegion() != null && a.getRegion().equals(Constants.ALL_REGIONS))
-							.findAny();
-					if (avail.isPresent()) {
-						availability = avail.get();
+				availability = existing.stream().filter(a -> Constants.ALL_REGIONS.equals(a.getRegion())).findFirst()
+						.orElse(null);
 
-						// if default price exist for sku exit
-						if (source.isDefaultPrice()) {
-							Optional<ProductPrice> defaultPrice = availability.getPrices().stream()
-									.filter(p -> p.isDefaultPrice()).findAny();
-							if (defaultPrice.isPresent()) {
-								//throw new ConversionRuntimeException(
-								//		"Default Price already exist for product with sku [" + source.getSku() + "]");
-								destination = defaultPrice.get();
-							}
-						}
+				if (availability != null && source.isDefaultPrice()) {
+					Optional<ProductPrice> defaultPrice = availability.getPrices().stream()
+							.filter(ProductPrice::isDefaultPrice).findFirst();
+					if (defaultPrice.isPresent()) {
+						// Gán lại vào destination để update đúng bản ghi
+						destination = defaultPrice.get();
 					}
 				}
-
 			}
 
 			if (availability == null) {
-
-				com.salesmanager.core.model.catalog.product.Product product = productService.getBySku(source.getSku(),
-						store, language);
+				var product = productService.getBySku(source.getSku(), store, language);
 				if (product == null) {
 					throw new ConversionRuntimeException("Product with sku [" + source.getSku()
 							+ "] not found for MerchantStore [" + store.getCode() + "]");
 				}
-
 				availability = new ProductAvailability();
 				availability.setProduct(product);
 				availability.setRegion(Constants.ALL_REGIONS);
 			}
 
+			// Step 2: Gán thông tin vào destination (gồm cả ID cũ nếu có)
+			destination.setId(source.getId());
 			destination.setProductAvailability(availability);
 			destination.setDefaultPrice(source.isDefaultPrice());
 			destination.setProductPriceAmount(source.getPrice());
 			destination.setCode(source.getCode());
 			destination.setProductPriceSpecialAmount(source.getDiscountedPrice());
-			if (source.getDiscountStartDate() != null) {
-				Date startDate = DateUtil.getDate(source.getDiscountStartDate());
 
-				destination.setProductPriceSpecialStartDate(startDate);
+			if (source.getDiscountStartDate() != null) {
+				destination.setProductPriceSpecialStartDate(DateUtil.getDate(source.getDiscountStartDate()));
 			}
 			if (source.getDiscountEndDate() != null) {
-				Date endDate = DateUtil.getDate(source.getDiscountEndDate());
-
-				destination.setProductPriceSpecialEndDate(endDate);
+				destination.setProductPriceSpecialEndDate(DateUtil.getDate(source.getDiscountEndDate()));
 			}
-			availability.getPrices().add(destination);
-			destination.setProductAvailability(availability);
-			destination.setDescriptions(this.getProductPriceDescriptions(destination, source.getDescriptions(), store));
 
-			
-			destination.setDefaultPrice(source.isDefaultPrice());
+			destination.setDescriptions(getProductPriceDescriptions(destination, source.getDescriptions(), store));
+
+			// Step 3: Chỉ add nếu chưa có trong list
+			final Long destinationId = destination.getId();
+			boolean exists = availability.getPrices().stream()
+					.anyMatch(p -> p.getId() != null && p.getId().equals(destinationId));
+			if (!exists) {
+				availability.getPrices().add(destination);
+			}
 
 		} catch (Exception e) {
-
 			throw new ConversionRuntimeException(e);
 		}
+
 		return destination;
 	}
 

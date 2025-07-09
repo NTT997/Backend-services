@@ -75,6 +75,7 @@ public class CustomerNewsletterApi {
       @Valid @RequestBody PersistableCustomer customer,
       HttpServletRequest request,
       HttpServletResponse response) {
+	  customerFacade.update(email, customer, null);
     throw new UnsupportedOperationException();
   }
 

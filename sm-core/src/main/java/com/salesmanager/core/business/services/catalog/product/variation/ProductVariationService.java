@@ -26,4 +26,7 @@ public interface ProductVariationService extends SalesManagerEntityService<Long,
 	
 	List<ProductVariation> getByIds(List<Long> ids, MerchantStore store);
 
+
+	
+
 }

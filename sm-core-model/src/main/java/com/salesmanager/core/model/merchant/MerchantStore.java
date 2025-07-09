@@ -423,5 +423,9 @@ public class MerchantStore extends SalesManagerEntity<Integer, MerchantStore> im
 	public void setRetailer(Boolean retailer) {
 		this.retailer = retailer;
 	}
-
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return this.storename;
+	}
 }

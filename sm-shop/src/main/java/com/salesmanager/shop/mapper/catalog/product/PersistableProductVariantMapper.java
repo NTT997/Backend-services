@@ -47,17 +47,23 @@ public class PersistableProductVariantMapper implements Mapper<PersistableProduc
 		//
 		Long productVariation = source.getVariation();
 		Long productVariationValue = source.getVariationValue();
-		
+				
 		String productVariationCode = source.getVariationCode();
 		String productVariationValueCode = source.getVariationValueCode();
 		
 		Optional<ProductVariation> variation = null;
 		Optional<ProductVariation> variationValue = null;
-		
+			
+		System.out.println("Merged Variant ID: " + destination.getId());
+		System.out.println("Availabilities count: " + destination.getAvailabilities().size());
+		destination.getAvailabilities().forEach(a -> System.out.println("Availability ID: " + a.getId()));
+
+				
 		if(StringUtils.isEmpty(productVariationCode)) {
 		
 			variation = productVariationService.getById(store, productVariation);
 			if(productVariationValue != null) {
+								
 				variationValue = productVariationService.getById(store, productVariationValue);
 				if(variationValue.isEmpty()) {
 					throw new ResourceNotFoundException("ProductVaritionValue [" + productVariationValue + "] + not found for store [" + store.getCode() + "]");
@@ -117,34 +123,58 @@ public class PersistableProductVariantMapper implements Mapper<PersistableProduc
 		/**
 		 * Inventory
 		 */
+		Product product = null;
+
+		if(source.getProductId() != null && source.getProductId().longValue() > 0) {
+		    product = productService.findOne(source.getProductId(), store);
+
+		    if(product == null) {
+		        throw new ResourceNotFoundException("Product [" + source.getId() + "] + not found for store [" + store.getCode() + "]");
+		    }
+
+		    if(product.getMerchantStore().getId() != store.getId()) {
+		        throw new ResourceNotFoundException("Product [" + source.getId() + "] + not found for store [" + store.getCode() + "]");
+		    }
+
+		    if(product.getSku() != null && product.getSku().equals(source.getSku())) {
+		        throw new OperationNotAllowedException("Product variant sku [" + source.getSku() + "] + must be different than product instance sku [" + product.getSku() + "]");
+		    }
+
+		    destination.setProduct(product);
+		}
+
+		
+		
 		if(source.getInventory() != null) {
 			ProductAvailability availability = persistableProductAvailabilityMapper.convert(source.getInventory(), store, language);
 			availability.setProductVariant(destination);
+			
+		    availability.setProduct(destination.getProduct()); //huy
+
+			
 			destination.getAvailabilities().add(availability);
 		}
 		
-		
-		Product product = null;
-				
-		if(source.getProductId() != null && source.getProductId().longValue() > 0) {
-			product = productService.findOne(source.getProductId(), store);
-			
-			if(product == null) {
-				throw new ResourceNotFoundException("Product [" + source.getId() + "] + not found for store [" + store.getCode() + "]");
-			}
-
-			if(product.getMerchantStore().getId() != store.getId()) {
-				throw new ResourceNotFoundException("Product [" + source.getId() + "] + not found for store [" + store.getCode() + "]");
-			}
-			
-			if(product.getSku() != null && product.getSku().equals(source.getSku())) {
-				throw new OperationNotAllowedException("Product variant sku [" + source.getSku() + "] + must be different than product instance sku [" + product.getSku() + "]");
-			}
-			
-			destination.setProduct(product);
-			
-			
-		}
+					
+//		if(source.getProductId() != null && source.getProductId().longValue() > 0) {
+//			product = productService.findOne(source.getProductId(), store);
+//			
+//			if(product == null) {
+//				throw new ResourceNotFoundException("Product [" + source.getId() + "] + not found for store [" + store.getCode() + "]");
+//			}
+//
+//			if(product.getMerchantStore().getId() != store.getId()) {
+//				throw new ResourceNotFoundException("Product [" + source.getId() + "] + not found for store [" + store.getCode() + "]");
+//			}
+//			
+//			if(product.getSku() != null && product.getSku().equals(source.getSku())) {
+//				throw new OperationNotAllowedException("Product variant sku [" + source.getSku() + "] + must be different than product instance sku [" + product.getSku() + "]");
+//			}
+//			
+//			destination.setProduct(product);
+//			
+//			
+//		}
 
 
 		

@@ -3,9 +3,11 @@ package com.salesmanager.shop.mapper.catalog.product;
 import java.util.Date;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.salesmanager.core.business.constants.Constants;
+import com.salesmanager.core.business.services.catalog.product.availability.ProductAvailabilityService;
 import com.salesmanager.core.model.catalog.product.availability.ProductAvailability;
 import com.salesmanager.core.model.catalog.product.price.ProductPrice;
 import com.salesmanager.core.model.catalog.product.price.ProductPriceDescription;
@@ -13,17 +15,40 @@ import com.salesmanager.core.model.merchant.MerchantStore;
 import com.salesmanager.core.model.reference.language.Language;
 import com.salesmanager.shop.mapper.Mapper;
 import com.salesmanager.shop.model.catalog.product.product.PersistableProductInventory;
+import com.salesmanager.shop.store.api.exception.ResourceNotFoundException;
 import com.salesmanager.shop.store.api.exception.ServiceRuntimeException;
 import com.salesmanager.shop.utils.DateUtil;
 
 @Component
 public class PersistableProductAvailabilityMapper implements Mapper<PersistableProductInventory, ProductAvailability> {
+	
+	@Autowired
+	private ProductAvailabilityService productAvailService; //huy
+	
+//	@Override
+//	public ProductAvailability convert(PersistableProductInventory source, MerchantStore store, Language language) {
+//		return this.merge(source, new ProductAvailability(), store, language);
+//	}
 
 	@Override
 	public ProductAvailability convert(PersistableProductInventory source, MerchantStore store, Language language) {
-		return this.merge(source, new ProductAvailability(), store, language);
+	    ProductAvailability availability;
+	    System.out.println("source.getId: " + source.getId());
+	    
+	    if (source.getId() != null) {
+	        availability = productAvailService.getById(source.getId());
+
+	        if (availability == null) {
+	            throw new ResourceNotFoundException("ProductAvailability ID [" + source.getId() + "] not found");
+	        }
+	    } else {
+	        availability = new ProductAvailability();
+	    }
+
+	    return this.merge(source, availability, store, language);
 	}
 
+	
 	@Override
 	public ProductAvailability merge(PersistableProductInventory source, ProductAvailability destination,
 			MerchantStore store, Language language) {
