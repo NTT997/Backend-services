@@ -52,4 +52,27 @@ public class CustomerReviewRoute {
 							.uri("http://localhost:8080"))	
 				.build();
 	}
+	
+	@Bean
+	public RouteLocator routingAuthCustomerReview(RouteLocatorBuilder builder) {
+		return builder
+				.routes()
+					.route("auth-customer-review-create", r -> r
+						.path("/customer-auth/customer-review/{id}/reviews")
+						.and()
+						.method(HttpMethod.POST)
+						.filters(f -> f
+								.rewritePath("/customer-auth/customer-review/(?<id>[^/]+)/reviews", "/api/v1/auth/customers/${id}/reviews")
+								.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config())))
+						.uri("http://localhost:8080"))			
+					.route("auth-customer-review-manage", r -> r
+							.path("/customer-auth/customer-review/{id}/reviews/{reviewid}")
+							.and()
+							.method(HttpMethod.PUT, HttpMethod.DELETE)
+							.filters(f -> f
+									.rewritePath("/customer-auth/customer-review/(?<id>[^/]+)/reviews/(?<reviewid>[^/]+)", "/api/v1/auth/customers/${id}/reviews/${reviewid}")
+									.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config())))
+							.uri("http://localhost:8080"))	
+				.build();
+	}
 }

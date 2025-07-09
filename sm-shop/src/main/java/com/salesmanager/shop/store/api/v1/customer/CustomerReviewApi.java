@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -61,8 +62,9 @@ public class CustomerReviewApi {
    * @return
    * @throws Exception
    */
-  @PostMapping("/private/customers/{id}/reviews")
+  @PostMapping({"/private/customers/{id}/reviews", "/auth/customers/{id}/reviews"})
   @ResponseStatus(HttpStatus.CREATED)
+//  @PreAuthorize("hasAuthority('AUTH_CUSTOMER')")
   @ApiImplicitParams({
       @ApiImplicitParam(name = "store", dataType = "string", defaultValue = "DEFAULT"),
       @ApiImplicitParam(name = "lang", dataType = "string", defaultValue = "en")
@@ -85,7 +87,7 @@ public class CustomerReviewApi {
     return customerFacade.getAllCustomerReviewsByReviewed(id, merchantStore, language);
   }
 
-	@PutMapping("/private/customers/{id}/reviews/{reviewid}")
+	@PutMapping({"/private/customers/{id}/reviews/{reviewId}", "/auth/customers/{id}/reviews/{reviewId}"})
   public PersistableCustomerReview update(
       @PathVariable final Long id,
       @PathVariable final Long reviewId,
@@ -95,7 +97,7 @@ public class CustomerReviewApi {
       return customerFacade.updateCustomerReview(id, reviewId, review, merchantStore, language);
 	}
 
-  @DeleteMapping("/private/customers/{id}/reviews/{reviewId}")
+  @DeleteMapping({"/private/customers/{id}/reviews/{reviewId}", "/auth/customers/{id}/reviews/{reviewId}"})
   public void delete(
       @PathVariable final Long id,
       @PathVariable final Long reviewId,
