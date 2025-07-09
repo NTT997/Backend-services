@@ -214,11 +214,13 @@ public class PaymentServiceImpl implements PaymentService {
 			String moduleCode = configuration.getModuleCode();
 			PaymentModule module = paymentModules.get(moduleCode);
 			if(module==null) {
+				System.out.println(module);
 				throw new ServiceException("Payment module " + moduleCode + " does not exist");
 			}
 			module.validateModuleConfiguration(configuration, store);
 			
 		} catch (IntegrationException ie) {
+			System.out.println("PRINT INTEGRATIONEXCEPTION IE"+ie);
 			throw ie;
 		}
 		

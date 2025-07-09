@@ -5,7 +5,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 
+import org.hibernate.Hibernate;
 import org.jsoup.helper.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,15 +71,18 @@ public class SearchFacadeImpl implements SearchFacade {
 	 */
 	@Override
 	@Async
+	@Transactional
 	public void indexAllData(MerchantStore store) throws Exception {
 		List<Product> products = productService.listByStore(store);
-
+		System.out.print(store.toString());
+		System.out.println("product listed by store: "+products.toString()+products.size());
 		products.stream().forEach(p -> {
+			Hibernate.initialize(p.getVariants());//force to retrive the product variant
 			try {
-				searchService.index(store, p);
+					searchService.index(store, p);
 			} catch (ServiceException e) {
-				throw new RuntimeException("Exception while indexing products", e);
-			}
+				throw new RuntimeException("Exception while indexing products"+ e);
+		}
 		});
 
 	}
@@ -99,6 +104,7 @@ public class SearchFacadeImpl implements SearchFacade {
 		
 		try {
 			LOGGER.debug("Search " + query);
+			System.out.println("PRINTLINE 102 AT SEARCH REQUEST");
 			SearchRequest searchRequest = new SearchRequest();
 			searchRequest.setLanguage(languageCode);
 			searchRequest.setSearchString(query);

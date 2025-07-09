@@ -29,9 +29,16 @@ public class ProductV2Route {
 								f -> f.rewritePath("/public/v2/products/(?<segment>.*)", "/api/v2/products/${segment}"))
 								.uri("http://localhost:8080"))
 				.route("product-v2",
-						r -> r.path("/public/v2/product/**").and().method(HttpMethod.GET).filters(
+						r -> r.path("/public/v2/product/**").and().method(HttpMethod.GET, HttpMethod.POST).filters(
 								f -> f.rewritePath("/public/v2/product/(?<segment>.*)", "/api/v2/product/${segment}"))
 								.uri("http://localhost:8080"))
+				.route("product-variation-v2",
+						r -> r.path("/public/v2/category/**")
+							  .and()
+							  .method(HttpMethod.GET)
+							  .filters(f -> f.rewritePath("/public/v2/category/(?<segment>.*)", "/api/v2/category/${segment}"))
+							  .uri("http://localhost:8080")
+				)
 				.build();
 	}
 

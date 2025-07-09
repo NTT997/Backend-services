@@ -117,8 +117,8 @@ public class PaymentApi {
 			
 			paymentService.savePaymentModuleConfiguration(integrationConfiguration, merchantStore);
 		} catch (ServiceException e) {
-			LOGGER.error("Error getting payment modules", e);
-			throw new ServiceRuntimeException("Error saving payment module", e);
+			LOGGER.error("Error getting payment modules"+ e);
+			throw new ServiceRuntimeException("Error saving payment module"+e);
 		}
 
 	}

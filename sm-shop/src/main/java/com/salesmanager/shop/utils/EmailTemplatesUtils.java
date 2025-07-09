@@ -314,6 +314,7 @@ public class EmailTemplatesUtils {
 			   /** issue with putting that elsewhere **/ 
 		       LOGGER.info( "Sending email to store owner" );
 		       try {
+			
 
 		           Map<String, String> templateTokens = emailUtils.createEmailObjectsMap(contextPath, merchantStore, messages, storeLocale);
 		           

@@ -9,6 +9,8 @@ public class PersistableProductPrice extends ProductPriceEntity {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	private Long id; //huy
 
 	private String sku;
 	private Long productAvailabilityId;
@@ -38,5 +40,14 @@ public class PersistableProductPrice extends ProductPriceEntity {
 	public void setSku(String sku) {
 		this.sku = sku;
 	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+	
 
 }
