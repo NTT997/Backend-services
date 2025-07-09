@@ -8,6 +8,8 @@ public class PersistableProductInventory implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
+	private Long id; //huy
+	
 	private String sku;
 	private int quantity = 0;
 	private PersistableProductPrice price;
@@ -28,6 +30,12 @@ public class PersistableProductInventory implements Serializable {
 	}
 	public void setPrice(PersistableProductPrice price) {
 		this.price = price;
+	}
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 }
