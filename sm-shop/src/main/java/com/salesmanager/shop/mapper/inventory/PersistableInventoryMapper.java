@@ -56,7 +56,7 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
 		return merge(source, availability, store, language);
 
 	}
-
+	
 	@Override
 	public ProductAvailability merge(PersistableInventory source, ProductAvailability destination, MerchantStore store,
 			Language language) {

@@ -83,7 +83,7 @@ public class ProductVariationServiceImpl extends
 	public List<ProductVariation> getByIds(List<Long> ids, MerchantStore store) {
 		return productVariationRepository.findByIds(store.getId(), ids);
 	}
-
+	
 
 
 }
