@@ -399,13 +399,13 @@ public class OrderApi {
 	 * @param language
 	 * @return
 	 */
-	@RequestMapping(value = { "/cart/{code}/checkout" }, method = RequestMethod.POST)
+	@RequestMapping(value = { "/cart/{shoppingCartCode}/checkout" }, method = RequestMethod.POST)
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
 	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "string", defaultValue = "DEFAULT"),
 			@ApiImplicitParam(name = "lang", dataType = "string", defaultValue = "en") })
 	public ReadableOrderConfirmation checkout(
-			@PathVariable final String code,//shopping cart
+			@PathVariable final String shoppingCartCode,//shopping cart
 			@Valid @RequestBody PersistableAnonymousOrder order,//order
 			@ApiIgnore MerchantStore merchantStore,
 			@ApiIgnore Language language) {
@@ -415,10 +415,10 @@ public class OrderApi {
 
 		ShoppingCart cart;
 		try {
-			cart = shoppingCartService.getByCode(code, merchantStore);
+			cart = shoppingCartService.getByCode(shoppingCartCode, merchantStore);
 
 			if (cart == null) {
-				throw new ResourceNotFoundException("Cart code " + code + " does not exist");
+				throw new ResourceNotFoundException("Cart code " + shoppingCartCode + " does not exist");
 			}
 
 			//security password validation
