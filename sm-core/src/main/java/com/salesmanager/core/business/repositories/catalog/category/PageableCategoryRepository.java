@@ -13,6 +13,5 @@ public interface PageableCategoryRepository extends PagingAndSortingRepository<C
       countQuery = "select  count(c) from Category c join c.descriptions cd join c.merchantStore cm where cm.id=?1 and cd.language.id=?2 and (cd.name like %?3% or ?3 is null)")
   Page<Category> listByStore(Integer storeId, Integer languageId, String name, Pageable pageable);
 
-  
 
 }
