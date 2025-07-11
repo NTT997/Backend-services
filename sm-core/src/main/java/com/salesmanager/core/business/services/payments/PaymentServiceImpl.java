@@ -192,17 +192,18 @@ public class PaymentServiceImpl implements PaymentService {
 			MerchantConfiguration merchantConfiguration = merchantConfigurationService.getMerchantConfiguration(Constants.PAYMENT_MODULES, store);
 			if(merchantConfiguration!=null) {
 				
-				System.out.println("merchantConfiguaration: " + merchantConfiguration.toString() );
+				System.out.println("merchantConfiguaration: " + merchantConfiguration.getKey() + ", id: " + merchantConfiguration.getId() );
 				
 				if(!StringUtils.isBlank(merchantConfiguration.getValue())) {
 					
-					String decrypted = encryption.decrypt(merchantConfiguration.getValue());
-					modules = ConfigurationModulesLoader.loadIntegrationConfigurations(decrypted);
+//					String decrypted = encryption.decrypt(merchantConfiguration.getValue());
+//					modules = ConfigurationModulesLoader.loadIntegrationConfigurations(decrypted);
 					
+					modules = ConfigurationModulesLoader.loadIntegrationConfigurations(merchantConfiguration.getValue());
 					
 				}
 			}
-			System.out.println("modules: " + modules); // return {}
+			System.out.println("modules: " + modules); 
 			
 			return modules;
 		

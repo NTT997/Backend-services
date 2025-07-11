@@ -5,6 +5,8 @@ import java.util.List;
 import com.salesmanager.core.business.exception.ServiceException;
 import com.salesmanager.core.business.services.common.generic.SalesManagerEntityService;
 import com.salesmanager.core.model.merchant.MerchantStore;
+import com.salesmanager.core.model.reference.language.Language;
+import com.salesmanager.core.model.system.IntegrationConfiguration;
 import com.salesmanager.core.model.system.MerchantConfig;
 import com.salesmanager.core.model.system.MerchantConfiguration;
 import com.salesmanager.core.model.system.MerchantConfigurationType;
@@ -26,6 +28,10 @@ public interface MerchantConfigurationService extends
 			throws ServiceException;
 
 	void saveMerchantConfig(MerchantConfig config, MerchantStore store)
+			throws ServiceException;
+	
+	//huy - save with key = PAYMENT
+	void saveMerchantConfig(List<IntegrationConfiguration> listIntegrationConfiguration, MerchantStore store, Language language)
 			throws ServiceException;
 
 }

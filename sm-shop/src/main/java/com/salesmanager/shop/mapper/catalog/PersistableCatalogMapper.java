@@ -19,8 +19,6 @@ public class PersistableCatalogMapper implements Mapper<PersistableCatalog, Cata
 
 	@Override
 	public Catalog merge(PersistableCatalog source, Catalog destination, MerchantStore store, Language language) {
-		
-		
 		destination.setCode(source.getCode());
 		destination.setDefaultCatalog(source.isDefaultCatalog());
 		destination.setId(source.getId());

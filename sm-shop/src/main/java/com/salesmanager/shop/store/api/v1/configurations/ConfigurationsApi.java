@@ -2,15 +2,20 @@ package com.salesmanager.shop.store.api.v1.configurations;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.salesmanager.core.model.merchant.MerchantStore;
 import com.salesmanager.core.model.reference.language.Language;
 import com.salesmanager.shop.model.configuration.ReadableConfiguration;
+import com.salesmanager.shop.model.system.PersistableIntegrationConfiguration;
+import com.salesmanager.shop.store.controller.system.MerchantConfigurationFacade;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -27,15 +32,17 @@ import springfox.documentation.annotations.ApiIgnore;
 		@Tag(name = "Configurations management", description = "Configurations management for modules") })
 public class ConfigurationsApi {
 
+	@Autowired
+	private MerchantConfigurationFacade merchantConfigurationFacade;
 	
 	/** Configurations of modules */
+	//api init confirguration payment
 	@PostMapping("/private/configurations/payment")
 	@ApiOperation(httpMethod = "POST", value = "Manages payment configurations", notes = "Requires administration access", produces = "application/json", response = Void.class)
 	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "string", defaultValue = "DEFAULT") })
-	public Void create(@ApiIgnore MerchantStore merchantStore, @ApiIgnore Language language) {
+	public void create(@RequestBody @Valid List<PersistableIntegrationConfiguration> configs, @ApiIgnore MerchantStore merchantStore, @ApiIgnore Language language) {
 		
-		return null;
-
+		merchantConfigurationFacade.saveConfiguratation(configs, merchantStore, language);
 	}
 
 	/** Configurations of payment modules */
