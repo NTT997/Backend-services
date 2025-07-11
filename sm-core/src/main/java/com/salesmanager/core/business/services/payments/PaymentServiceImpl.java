@@ -184,11 +184,15 @@ public class PaymentServiceImpl implements PaymentService {
 	@Override
 	public Map<String,IntegrationConfiguration> getPaymentModulesConfigured(MerchantStore store) throws ServiceException {
 		
+		System.out.println("ham getPaymentModulesConfigured");
+		
 		try {
 		
 			Map<String,IntegrationConfiguration> modules = new HashMap<String,IntegrationConfiguration>();
 			MerchantConfiguration merchantConfiguration = merchantConfigurationService.getMerchantConfiguration(Constants.PAYMENT_MODULES, store);
 			if(merchantConfiguration!=null) {
+				
+				System.out.println("merchantConfiguaration: " + merchantConfiguration.toString() );
 				
 				if(!StringUtils.isBlank(merchantConfiguration.getValue())) {
 					
@@ -198,6 +202,8 @@ public class PaymentServiceImpl implements PaymentService {
 					
 				}
 			}
+			System.out.println("modules: " + modules); // return {}
+			
 			return modules;
 		
 		} catch (Exception e) {
@@ -737,6 +743,53 @@ public class PaymentServiceImpl implements PaymentService {
 		return module.initTransaction(store, customer, amount, payment, configuration, integrationModule);
 	}
 
+//	@Override
+//	public Transaction initTransaction(Customer customer, Payment payment, MerchantStore store) throws ServiceException {
+//
+//		Validate.notNull(store);
+//		Validate.notNull(payment);
+//		Validate.notNull(payment.getAmount());
+//		
+//		payment.setCurrency(store.getCurrency());
+//		
+//		BigDecimal amount = payment.getAmount();
+//		
+//		//huy
+//		System.out.println("payment: " + payment.getPaymentType() + payment.getTransactionType() + payment.getModuleName());
+//		//----
+//
+//		//must have a shipping module configured
+//		Map<String, IntegrationConfiguration> modules = this.getPaymentModulesConfigured(store);
+//		System.out.println("modules: " + modules);
+//		if(modules==null){
+//			throw new ServiceException("No payment module configured");
+//		}
+//		
+//		IntegrationConfiguration configuration = modules.get(payment.getModuleName());
+//		
+//		if(configuration==null) {
+//			throw new ServiceException("Payment module " + payment.getModuleName() + " is not configured");
+//		}
+//		
+//		if(!configuration.isActive()) {
+//			throw new ServiceException("Payment module " + payment.getModuleName() + " is not active");
+//		}
+//		
+//		PaymentModule module = this.paymentModules.get(payment.getModuleName());
+//		
+//		if(module==null) {
+//			throw new ServiceException("Payment module " + payment.getModuleName() + " does not exist");
+//		}
+//		
+//		IntegrationModule integrationModule = getPaymentMethodByCode(store,payment.getModuleName());
+//		
+//		Transaction transaction = module.initTransaction(store, customer, amount, payment, configuration, integrationModule);
+//		
+//		transactionService.save(transaction);
+//
+//		return transaction;
+//	}
+
 	@Override
 	public Transaction initTransaction(Customer customer, Payment payment, MerchantStore store) throws ServiceException {
 
@@ -747,9 +800,14 @@ public class PaymentServiceImpl implements PaymentService {
 		payment.setCurrency(store.getCurrency());
 		
 		BigDecimal amount = payment.getAmount();
+		
+		//huy
+		System.out.println("payment: " + payment.getPaymentType() + payment.getTransactionType() + payment.getModuleName());
+		//----
 
 		//must have a shipping module configured
 		Map<String, IntegrationConfiguration> modules = this.getPaymentModulesConfigured(store);
+		System.out.println("modules: " + modules);
 		if(modules==null){
 			throw new ServiceException("No payment module configured");
 		}
@@ -778,8 +836,6 @@ public class PaymentServiceImpl implements PaymentService {
 
 		return transaction;
 	}
-
-
 	
 
 
