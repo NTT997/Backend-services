@@ -19,7 +19,7 @@ public class OrderPaymentResourceRoute {
 	public RouteLocator routingPublicOrderPaymentResource(RouteLocatorBuilder builder) {
 		return builder.routes().route("public-order-resource", r -> r
 				.path("/public/order-resource/cart/{code}/payment/init").and().method(HttpMethod.POST).filters(f -> f
-						.rewritePath("/public/cart/(?<code>[^/]+)/payment/init", "/api/v1/cart/${code}/payment/init"))
+						.rewritePath("/public/order-resource/cart/(?<code>[^/]+)/payment/init", "/api/v1/cart/${code}/payment/init"))
 				.uri("http://localhost:8080")).build();
 
 	}
