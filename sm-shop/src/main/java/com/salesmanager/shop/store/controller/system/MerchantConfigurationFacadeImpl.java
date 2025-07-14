@@ -42,10 +42,10 @@ import com.salesmanager.shop.store.api.exception.ServiceRuntimeException;
 public class MerchantConfigurationFacadeImpl implements MerchantConfigurationFacade {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MerchantConfigurationFacadeImpl.class);
-	
+
 	@Autowired
 	private PersistableIntegrationConfigMapper configMapper;
-	
+
 	@Autowired
 	private ReadableMerchantConfigurationMapper merchantConfigMapper;
 
@@ -116,45 +116,67 @@ public class MerchantConfigurationFacadeImpl implements MerchantConfigurationFac
 	}
 
 	// huy--------------
-		@Override
-		public void saveConfiguratation(List<PersistableIntegrationConfiguration> configs, MerchantStore merchantStore, Language language) {
-			Validate.notNull(configs);
-			Validate.notNull(merchantStore);
-			Validate.notNull(language);
-			
-			List<IntegrationConfiguration> listIntegrationConfiguration = new ArrayList<>();
-			
-			for(PersistableIntegrationConfiguration config: configs) {
-				IntegrationConfiguration integrationConfiguration = configMapper.convert(config, merchantStore, language);
-				listIntegrationConfiguration.add(integrationConfiguration);
-			}
-			
-			try {
-				merchantConfigurationService.saveMerchantConfig(listIntegrationConfiguration, merchantStore, language);
-			} catch (ServiceException e) {
-				throw new ServiceRuntimeException(e);
-			}	
-	
-		}
-		
-		@Override
-		public ReadableMerchantConfiguration getListPaymentConfig(MerchantStore merchantStore, Language language) {
-			Validate.notNull(merchantStore);
-			Validate.notNull(language); 
-						
-			try {
-				MerchantConfiguration merchantConfig = merchantConfigurationService.getMerchantConfiguration("PAYMENT", merchantStore);
-				
-				if(merchantConfig != null) { 
-					return merchantConfigMapper.convert(merchantConfig, merchantStore, language);
-				}
-				
-				else return null;
-			}
-			catch (ServiceException e) {
-				throw new ServiceRuntimeException(e);
-			}
+	@Override
+	public void saveConfiguratation(List<PersistableIntegrationConfiguration> configs, MerchantStore merchantStore,
+			Language language) {
+		Validate.notNull(configs);
+		Validate.notNull(merchantStore);
+		Validate.notNull(language);
+
+		List<IntegrationConfiguration> listIntegrationConfiguration = new ArrayList<>();
+
+		for (PersistableIntegrationConfiguration config : configs) {
+			IntegrationConfiguration integrationConfiguration = configMapper.convert(config, merchantStore, language);
+			listIntegrationConfiguration.add(integrationConfiguration);
 		}
 
-	//-------------------
+		try {
+			merchantConfigurationService.saveMerchantConfig(listIntegrationConfiguration, merchantStore, language);
+		} catch (ServiceException e) {
+			throw new ServiceRuntimeException(e);
+		}
+
+	}
+
+	@Override
+	public ReadableMerchantConfiguration getListPaymentConfig(MerchantStore merchantStore, Language language) {
+		Validate.notNull(merchantStore);
+		Validate.notNull(language);
+
+		try {
+			MerchantConfiguration merchantConfig = merchantConfigurationService.getMerchantConfiguration("PAYMENT",
+					merchantStore);
+
+			if (merchantConfig != null) {
+				return merchantConfigMapper.convert(merchantConfig, merchantStore, language);
+			}
+
+			else
+				return null;
+		} catch (ServiceException e) {
+			throw new ServiceRuntimeException(e);
+		}
+	}
+
+	@Override
+	public ReadableMerchantConfiguration getListShippingConfiguration(MerchantStore merchantStore, Language language) {
+		Validate.notNull(merchantStore);
+		Validate.notNull(language);
+
+		try {
+			MerchantConfiguration merchantConfig = merchantConfigurationService.getMerchantConfiguration("SHIPPING",
+					merchantStore);
+
+			if (merchantConfig != null) {
+				return merchantConfigMapper.convert(merchantConfig, merchantStore, language);
+			}
+
+			else
+				return null;
+		} catch (ServiceException e) {
+			throw new ServiceRuntimeException(e);
+		}
+	}
+
+	// -------------------
 }

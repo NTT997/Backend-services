@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.salesmanager.core.model.merchant.MerchantStore;
 import com.salesmanager.core.model.reference.language.Language;
-import com.salesmanager.core.model.system.MerchantConfiguration;
-import com.salesmanager.shop.model.configuration.ReadableConfiguration;
 import com.salesmanager.shop.model.system.PersistableIntegrationConfiguration;
 import com.salesmanager.shop.model.system.ReadableMerchantConfiguration;
 import com.salesmanager.shop.store.controller.system.MerchantConfigurationFacade;
@@ -70,15 +68,25 @@ public class ConfigurationsApi {
 
 	}
 
+//	/** Configurations of shipping modules */
+//	@GetMapping("/private/configurations/shipping")
+//	@ApiOperation(httpMethod = "GET", value = "List shipping configurations summary", notes = "Requires administration access", produces = "application/json", response = List.class)
+//	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "string", defaultValue = "DEFAULT") })
+//	public List<ReadableConfiguration> listShippingConfigurations(@ApiIgnore MerchantStore merchantStore,
+//			@ApiIgnore Language language) {
+//		// return customerFacade.create(customer, merchantStore, language);
+//		return null;
+//
+//	}
+
 	/** Configurations of shipping modules */
 	@GetMapping("/private/configurations/shipping")
 	@ApiOperation(httpMethod = "GET", value = "List shipping configurations summary", notes = "Requires administration access", produces = "application/json", response = List.class)
 	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "string", defaultValue = "DEFAULT") })
-	public List<ReadableConfiguration> listShippingConfigurations(@ApiIgnore MerchantStore merchantStore,
+	public ReadableMerchantConfiguration listShippingConfigurations(@ApiIgnore MerchantStore merchantStore,
 			@ApiIgnore Language language) {
-		// return customerFacade.create(customer, merchantStore, language);
-		return null;
+		return merchantConfigurationFacade.getListShippingConfiguration(merchantStore, language);
 
 	}
-
+	
 }
