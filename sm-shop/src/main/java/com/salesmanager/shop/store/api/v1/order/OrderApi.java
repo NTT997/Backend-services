@@ -443,8 +443,7 @@ public class OrderApi {
 
 			order.setShoppingCartId(cart.getId());
 
-			Order modelOrder = orderFacade.processOrder(order, customer, merchantStore, language,
-					LocaleUtils.getLocale(language));
+			Order modelOrder = orderFacade.processOrder(order, customer, merchantStore, language, LocaleUtils.getLocale(language));
 			Long orderId = modelOrder.getId();
 			//populate order confirmation
 			order.setId(orderId);

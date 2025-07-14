@@ -146,7 +146,12 @@ public class OrderServiceImpl  extends SalesManagerEntityServiceImpl<Long, Order
     	//first process payment
     	Transaction processTransaction = paymentService.processPayment(customer, store, payment, items, order);
 
-    	if(order.getOrderHistory()==null || order.getOrderHistory().size()==0 || order.getStatus()==null) {
+//    	if(order.getOrderHistory()==null || order.getOrderHistory().size()==0 || order.getStatus()==null) 
+    	
+    	boolean invalidHistory = order.getOrderHistory().isEmpty()
+    		    || order.getOrderHistory().stream().allMatch(h -> h.getStatus() == null);
+    	if(invalidHistory || order.getStatus() == null)
+    	{
     		OrderStatus status = order.getStatus();
     		if(status==null) {
     			status = OrderStatus.ORDERED;
