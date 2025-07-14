@@ -5,97 +5,178 @@ import static com.salesmanager.shop.constants.Constants.KEY_GOOGLE_ANALYTICS_URL
 import static com.salesmanager.shop.constants.Constants.KEY_INSTAGRAM_URL;
 import static com.salesmanager.shop.constants.Constants.KEY_PINTEREST_PAGE_URL;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.jsoup.helper.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import com.salesmanager.core.business.exception.ServiceException;
 import com.salesmanager.core.business.services.system.MerchantConfigurationService;
 import com.salesmanager.core.model.merchant.MerchantStore;
 import com.salesmanager.core.model.reference.language.Language;
+import com.salesmanager.core.model.system.IntegrationConfiguration;
 import com.salesmanager.core.model.system.MerchantConfig;
 import com.salesmanager.core.model.system.MerchantConfiguration;
+import com.salesmanager.core.model.system.MerchantConfigurationType;
+import com.salesmanager.shop.mapper.configuration.PersistableIntegrationConfigMapper;
+import com.salesmanager.shop.mapper.configuration.ReadableMerchantConfigurationMapper;
+import com.salesmanager.shop.model.configuration.ReadableConfiguration;
 import com.salesmanager.shop.model.system.Configs;
+import com.salesmanager.shop.model.system.PersistableIntegrationConfiguration;
+import com.salesmanager.shop.model.system.ReadableMerchantConfiguration;
 import com.salesmanager.shop.store.api.exception.ServiceRuntimeException;
-
 
 @Service
 public class MerchantConfigurationFacadeImpl implements MerchantConfigurationFacade {
 
-  private static final Logger LOGGER = LoggerFactory
-      .getLogger(MerchantConfigurationFacadeImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(MerchantConfigurationFacadeImpl.class);
 
-  @Inject
-  private MerchantConfigurationService merchantConfigurationService;
+	@Autowired
+	private PersistableIntegrationConfigMapper configMapper;
 
-  @Value("${config.displayShipping}")
-  private String displayShipping;
+	@Autowired
+	private ReadableMerchantConfigurationMapper merchantConfigMapper;
 
-  @Override
-  public Configs getMerchantConfig(MerchantStore merchantStore, Language language) {
+	@Inject
+	private MerchantConfigurationService merchantConfigurationService;
 
-    MerchantConfig configs = getMerchantConfig(merchantStore);
+	@Value("${config.displayShipping}")
+	private String displayShipping;
 
-    Configs readableConfig = new Configs();
-    readableConfig.setAllowOnlinePurchase(configs.isAllowPurchaseItems());
-    readableConfig.setDisplaySearchBox(configs.isDisplaySearchBox());
-    readableConfig.setDisplayContactUs(configs.isDisplayContactUs());
+	@Override
+	public Configs getMerchantConfig(MerchantStore merchantStore, Language language) {
 
-    readableConfig.setDisplayCustomerSection(configs.isDisplayCustomerSection());
-    readableConfig.setDisplayAddToCartOnFeaturedItems(configs.isDisplayAddToCartOnFeaturedItems());
-    readableConfig.setDisplayCustomerAgreement(configs.isDisplayCustomerAgreement());
-    readableConfig.setDisplayPagesMenu(configs.isDisplayPagesMenu());
+		MerchantConfig configs = getMerchantConfig(merchantStore);
 
-    Optional<String> facebookConfigValue = getConfigValue(KEY_FACEBOOK_PAGE_URL, merchantStore);
-    facebookConfigValue.ifPresent(readableConfig::setFacebook);
+		Configs readableConfig = new Configs();
+		readableConfig.setAllowOnlinePurchase(configs.isAllowPurchaseItems());
+		readableConfig.setDisplaySearchBox(configs.isDisplaySearchBox());
+		readableConfig.setDisplayContactUs(configs.isDisplayContactUs());
 
-    Optional<String> googleConfigValue = getConfigValue(KEY_GOOGLE_ANALYTICS_URL, merchantStore);
-    googleConfigValue.ifPresent(readableConfig::setGa);
+		readableConfig.setDisplayCustomerSection(configs.isDisplayCustomerSection());
+		readableConfig.setDisplayAddToCartOnFeaturedItems(configs.isDisplayAddToCartOnFeaturedItems());
+		readableConfig.setDisplayCustomerAgreement(configs.isDisplayCustomerAgreement());
+		readableConfig.setDisplayPagesMenu(configs.isDisplayPagesMenu());
 
-    Optional<String> instagramConfigValue = getConfigValue(KEY_INSTAGRAM_URL, merchantStore);
-    instagramConfigValue.ifPresent(readableConfig::setInstagram);
+		Optional<String> facebookConfigValue = getConfigValue(KEY_FACEBOOK_PAGE_URL, merchantStore);
+		facebookConfigValue.ifPresent(readableConfig::setFacebook);
 
+		Optional<String> googleConfigValue = getConfigValue(KEY_GOOGLE_ANALYTICS_URL, merchantStore);
+		googleConfigValue.ifPresent(readableConfig::setGa);
 
-    Optional<String> pinterestConfigValue = getConfigValue(KEY_PINTEREST_PAGE_URL, merchantStore);
-    pinterestConfigValue.ifPresent(readableConfig::setPinterest);
+		Optional<String> instagramConfigValue = getConfigValue(KEY_INSTAGRAM_URL, merchantStore);
+		instagramConfigValue.ifPresent(readableConfig::setInstagram);
 
-    readableConfig.setDisplayShipping(false);
-    try {
-      if(!StringUtils.isBlank(displayShipping)) {
-        readableConfig.setDisplayShipping(Boolean.valueOf(displayShipping));
-      }
-    } catch(Exception e) {
-      LOGGER.error("Cannot parse value of " + displayShipping);
-    }
+		Optional<String> pinterestConfigValue = getConfigValue(KEY_PINTEREST_PAGE_URL, merchantStore);
+		pinterestConfigValue.ifPresent(readableConfig::setPinterest);
 
-    return readableConfig;
-  }
+		readableConfig.setDisplayShipping(false);
+		try {
+			if (!StringUtils.isBlank(displayShipping)) {
+				readableConfig.setDisplayShipping(Boolean.valueOf(displayShipping));
+			}
+		} catch (Exception e) {
+			LOGGER.error("Cannot parse value of " + displayShipping);
+		}
 
-  private MerchantConfig getMerchantConfig(MerchantStore merchantStore) {
-    try{
-      return merchantConfigurationService.getMerchantConfig(merchantStore);
-    } catch (ServiceException e){
-      throw new ServiceRuntimeException(e);
-    }
-  }
+		return readableConfig;
+	}
 
-  private Optional<String> getConfigValue(String keyContant, MerchantStore merchantStore) {
-    return getMerchantConfiguration(keyContant, merchantStore)
-        .map(MerchantConfiguration::getValue);
-  }
+	private MerchantConfig getMerchantConfig(MerchantStore merchantStore) {
+		try {
+			return merchantConfigurationService.getMerchantConfig(merchantStore);
+		} catch (ServiceException e) {
+			throw new ServiceRuntimeException(e);
+		}
+	}
 
-  private Optional<MerchantConfiguration> getMerchantConfiguration(String key, MerchantStore merchantStore) {
-    try{
-      return Optional.ofNullable(merchantConfigurationService.getMerchantConfiguration(key, merchantStore));
-    } catch (ServiceException e) {
-      throw new ServiceRuntimeException(e);
-    }
+	private Optional<String> getConfigValue(String keyContant, MerchantStore merchantStore) {
+		return getMerchantConfiguration(keyContant, merchantStore).map(MerchantConfiguration::getValue);
+	}
 
-  }
+	private Optional<MerchantConfiguration> getMerchantConfiguration(String key, MerchantStore merchantStore) {
+		try {
+			return Optional.ofNullable(merchantConfigurationService.getMerchantConfiguration(key, merchantStore));
+		} catch (ServiceException e) {
+			throw new ServiceRuntimeException(e);
+		}
+
+	}
+
+	// huy--------------
+	@Override
+	public void saveConfiguratation(List<PersistableIntegrationConfiguration> configs, MerchantStore merchantStore,
+			Language language) {
+		Validate.notNull(configs);
+		Validate.notNull(merchantStore);
+		Validate.notNull(language);
+
+		List<IntegrationConfiguration> listIntegrationConfiguration = new ArrayList<>();
+
+		for (PersistableIntegrationConfiguration config : configs) {
+			IntegrationConfiguration integrationConfiguration = configMapper.convert(config, merchantStore, language);
+			listIntegrationConfiguration.add(integrationConfiguration);
+		}
+
+		try {
+			merchantConfigurationService.saveMerchantConfig(listIntegrationConfiguration, merchantStore, language);
+		} catch (ServiceException e) {
+			throw new ServiceRuntimeException(e);
+		}
+
+	}
+
+	@Override
+	public ReadableMerchantConfiguration getListPaymentConfig(MerchantStore merchantStore, Language language) {
+		Validate.notNull(merchantStore);
+		Validate.notNull(language);
+
+		try {
+			MerchantConfiguration merchantConfig = merchantConfigurationService.getMerchantConfiguration("PAYMENT",
+					merchantStore);
+
+			if (merchantConfig != null) {
+				return merchantConfigMapper.convert(merchantConfig, merchantStore, language);
+			}
+
+			else
+				return null;
+		} catch (ServiceException e) {
+			throw new ServiceRuntimeException(e);
+		}
+	}
+
+	@Override
+	public ReadableMerchantConfiguration getListShippingConfiguration(MerchantStore merchantStore, Language language) {
+		Validate.notNull(merchantStore);
+		Validate.notNull(language);
+
+		try {
+			MerchantConfiguration merchantConfig = merchantConfigurationService.getMerchantConfiguration("SHIPPING",
+					merchantStore);
+
+			if (merchantConfig != null) {
+				return merchantConfigMapper.convert(merchantConfig, merchantStore, language);
+			}
+
+			else
+				return null;
+		} catch (ServiceException e) {
+			throw new ServiceRuntimeException(e);
+		}
+	}
+
+	// -------------------
 }

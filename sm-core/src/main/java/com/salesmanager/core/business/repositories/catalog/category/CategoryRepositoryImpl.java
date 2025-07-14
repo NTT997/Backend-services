@@ -99,10 +99,14 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
 		
 		
 		StringBuilder qs = new StringBuilder();
-		qs.append("select category from Product product ");
+//		qs.append("select category from Product product ");
+//		qs.append("inner join product.categories category inner join product.merchantStore pm ");
+//		qs.append("where product.id=:id and pm.id=:mid ");
+//		qs.append("group by category.id");
+		
+		qs.append("select distinct category from Product product ");
 		qs.append("inner join product.categories category inner join product.merchantStore pm ");
 		qs.append("where product.id=:id and pm.id=:mid ");
-		qs.append("group by category.id");
 		
     	String hql = qs.toString();
 		Query q = this.em.createQuery(hql);
