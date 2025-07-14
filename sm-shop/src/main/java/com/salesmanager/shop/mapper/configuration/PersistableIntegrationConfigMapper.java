@@ -8,6 +8,7 @@ import com.salesmanager.core.model.system.IntegrationConfiguration;
 import com.salesmanager.shop.mapper.Mapper;
 import com.salesmanager.shop.model.system.PersistableIntegrationConfiguration;
 
+//huy
 @Component
 public class PersistableIntegrationConfigMapper implements Mapper<PersistableIntegrationConfiguration, IntegrationConfiguration> {
 

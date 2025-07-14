@@ -12,6 +12,8 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.jsoup.helper.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,9 +29,13 @@ import com.salesmanager.core.model.reference.language.Language;
 import com.salesmanager.core.model.system.IntegrationConfiguration;
 import com.salesmanager.core.model.system.MerchantConfig;
 import com.salesmanager.core.model.system.MerchantConfiguration;
+import com.salesmanager.core.model.system.MerchantConfigurationType;
 import com.salesmanager.shop.mapper.configuration.PersistableIntegrationConfigMapper;
+import com.salesmanager.shop.mapper.configuration.ReadableMerchantConfigurationMapper;
+import com.salesmanager.shop.model.configuration.ReadableConfiguration;
 import com.salesmanager.shop.model.system.Configs;
 import com.salesmanager.shop.model.system.PersistableIntegrationConfiguration;
+import com.salesmanager.shop.model.system.ReadableMerchantConfiguration;
 import com.salesmanager.shop.store.api.exception.ServiceRuntimeException;
 
 @Service
@@ -39,6 +45,9 @@ public class MerchantConfigurationFacadeImpl implements MerchantConfigurationFac
 	
 	@Autowired
 	private PersistableIntegrationConfigMapper configMapper;
+	
+	@Autowired
+	private ReadableMerchantConfigurationMapper merchantConfigMapper;
 
 	@Inject
 	private MerchantConfigurationService merchantConfigurationService;
@@ -106,7 +115,7 @@ public class MerchantConfigurationFacadeImpl implements MerchantConfigurationFac
 
 	}
 
-	// huy
+	// huy--------------
 		@Override
 		public void saveConfiguratation(List<PersistableIntegrationConfiguration> configs, MerchantStore merchantStore, Language language) {
 			Validate.notNull(configs);
@@ -123,9 +132,29 @@ public class MerchantConfigurationFacadeImpl implements MerchantConfigurationFac
 			try {
 				merchantConfigurationService.saveMerchantConfig(listIntegrationConfiguration, merchantStore, language);
 			} catch (ServiceException e) {
-				e.printStackTrace();
+				throw new ServiceRuntimeException(e);
 			}	
 	
 		}
+		
+		@Override
+		public ReadableMerchantConfiguration getListPaymentConfig(MerchantStore merchantStore, Language language) {
+			Validate.notNull(merchantStore);
+			Validate.notNull(language); 
+						
+			try {
+				MerchantConfiguration merchantConfig = merchantConfigurationService.getMerchantConfiguration("PAYMENT", merchantStore);
+				
+				if(merchantConfig != null) { 
+					return merchantConfigMapper.convert(merchantConfig, merchantStore, language);
+				}
+				
+				else return null;
+			}
+			catch (ServiceException e) {
+				throw new ServiceRuntimeException(e);
+			}
+		}
 
+	//-------------------
 }
