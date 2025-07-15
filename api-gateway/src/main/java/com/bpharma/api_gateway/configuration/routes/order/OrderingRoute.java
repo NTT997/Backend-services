@@ -55,7 +55,7 @@ public class OrderingRoute {
 								.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config())))
 						.uri("http://localhost:8080"))
 				.route("private-ordering-manage",
-						r -> r.path("/private/ordering/orders/**").and().method(HttpMethod.PUT, HttpMethod.DELETE)
+						r -> r.path("/private/ordering/orders/**").and().method(HttpMethod.PUT, HttpMethod.PATCH, HttpMethod.GET)
 								.filters(f -> f
 										.rewritePath("/private/ordering/orders/(?<segment>.*)",
 												"/api/v1/private/orders/${segment}")

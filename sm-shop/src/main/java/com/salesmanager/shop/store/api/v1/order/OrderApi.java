@@ -13,6 +13,8 @@ import javax.validation.Valid;
 
 import com.salesmanager.core.business.services.order.OrderService;
 import com.salesmanager.core.model.order.orderstatus.OrderStatus;
+import com.salesmanager.core.model.order.orderstatus.OrderStatusRequest;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.helper.Validate;
@@ -498,7 +500,8 @@ public class OrderApi {
 			@ApiImplicitParam(name = "lang", dataType = "string", defaultValue = "en") })
 	public void updateOrderStatus(
 			@PathVariable final Long id,
-			@Valid @RequestBody String status,
+			@Valid @RequestBody OrderStatusRequest statusRequest,
+//			@Valid @RequestBody String status,
 			@ApiIgnore MerchantStore merchantStore,
 			@ApiIgnore Language language) {
 
@@ -511,8 +514,8 @@ public class OrderApi {
 			throw new GenericRuntimeException("412", "Order not found [" + id + "]");
 		}
 
-		OrderStatus statusEnum = OrderStatus.valueOf(status);
-
+//		OrderStatus statusEnum = OrderStatus.valueOf(status);
+		OrderStatus statusEnum = OrderStatus.valueOf(statusRequest.getStatus());
 		orderFacade.updateOrderStatus(order, statusEnum, merchantStore);
 		return;
 	}
