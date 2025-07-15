@@ -129,13 +129,20 @@ public class OrderApi {
 			return null;
 		}
 
+//		if (start == null) {
+//			start = new Integer(0);
+//		}
+//		if (count == null) {
+//			count = new Integer(100);
+//		}
+
 		if (start == null) {
-			start = new Integer(0);
+			start = Integer.valueOf(0);
 		}
 		if (count == null) {
-			count = new Integer(100);
+			count = Integer.valueOf(100);
 		}
-
+		
 		ReadableCustomer readableCustomer = new ReadableCustomer();
 		ReadableCustomerPopulator customerPopulator = new ReadableCustomerPopulator();
 		customerPopulator.populate(customer, readableCustomer, merchantStore, language);
