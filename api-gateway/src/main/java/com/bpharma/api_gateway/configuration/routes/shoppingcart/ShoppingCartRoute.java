@@ -11,8 +11,8 @@ import com.bpharma.api_gateway.filters.JwtAuthFilter;
 
 @Configuration
 public class ShoppingCartRoute {
-    // @Autowired
-	// private JwtAuthFilter jwtAuthFilter;
+     @Autowired
+	 private JwtAuthFilter jwtAuthFilter;
 	
     @Bean
     public RouteLocator shoppingRoutes(RouteLocatorBuilder builder) {
@@ -25,4 +25,30 @@ public class ShoppingCartRoute {
         			    .uri("http://localhost:8080"))       		    		
                 .build();
     }
+    
+    @Bean
+    public RouteLocator routingAuthCart(RouteLocatorBuilder builder) {
+        return builder.routes()
+        		.route("auth-shopping-cart", r -> r
+        			    .path("/auth/customer/cart")
+        			    .and()
+        			    .method(HttpMethod.GET)
+        			    .filters(f -> f
+        			    		.rewritePath("/auth/customer/cart", "/api/v1/auth/customer/cart")
+        			    		.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config()))
+        			    )
+        			    .uri("http://localhost:8080"))    
+        		
+        		.route("auth-shopping-cart-create", r -> r
+        			    .path("/auth/cart")
+        			    .and()
+        			    .method(HttpMethod.POST)
+        			    .filters(f -> f
+        			    		.rewritePath("/auth/cart", "/api/v1/auth/cart")
+        			    		.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config()))
+        			    )
+        			    .uri("http://localhost:8080")) 
+        		.build();
+    }
+
 }

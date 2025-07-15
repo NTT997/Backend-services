@@ -27,6 +27,8 @@ import io.swagger.annotations.SwaggerDefinition;
 import io.swagger.annotations.Tag;
 import springfox.documentation.annotations.ApiIgnore;
 
+//huy
+
 @RestController
 @RequestMapping(value = "/api/v1")
 @Api(tags = { "Configurations management" })
