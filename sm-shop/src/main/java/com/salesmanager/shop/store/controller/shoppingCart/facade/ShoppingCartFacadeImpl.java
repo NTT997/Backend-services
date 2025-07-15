@@ -778,6 +778,8 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 			}
 		}
 	}
+	
+	
 
 	@Override
 	// KEEP

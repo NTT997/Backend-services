@@ -19,7 +19,7 @@ public class PersistableShoppingCartItem implements Serializable {
 	private String product;// or product sku (instance or product)
 	private int quantity;
 	private String promoCode;
-	private List<ProductAttribute> attributes;
+	private List<ProductAttribute> attributes; //list id của product atttributes
 	
 	
 	public String getPromoCode() {

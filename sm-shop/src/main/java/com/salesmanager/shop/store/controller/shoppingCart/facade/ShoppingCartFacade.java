@@ -14,7 +14,7 @@ import com.salesmanager.shop.model.shoppingcart.ShoppingCartItem;
 import org.springframework.lang.Nullable;
 
 import java.util.List;
-import java.util.Optional;
+
 
 /**
  * </p>Shopping cart Facade which provide abstraction layer between

@@ -12,15 +12,12 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.jsoup.helper.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 
 import com.salesmanager.core.business.exception.ServiceException;
 import com.salesmanager.core.business.services.system.MerchantConfigurationService;
@@ -29,10 +26,8 @@ import com.salesmanager.core.model.reference.language.Language;
 import com.salesmanager.core.model.system.IntegrationConfiguration;
 import com.salesmanager.core.model.system.MerchantConfig;
 import com.salesmanager.core.model.system.MerchantConfiguration;
-import com.salesmanager.core.model.system.MerchantConfigurationType;
 import com.salesmanager.shop.mapper.configuration.PersistableIntegrationConfigMapper;
 import com.salesmanager.shop.mapper.configuration.ReadableMerchantConfigurationMapper;
-import com.salesmanager.shop.model.configuration.ReadableConfiguration;
 import com.salesmanager.shop.model.system.Configs;
 import com.salesmanager.shop.model.system.PersistableIntegrationConfiguration;
 import com.salesmanager.shop.model.system.ReadableMerchantConfiguration;
