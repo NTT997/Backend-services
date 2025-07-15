@@ -72,6 +72,10 @@ public class ModuleConfigurationServiceImpl extends SalesManagerEntityServiceImp
 			if (modules == null) {
 				modules = moduleConfigurationRepository.findByModule(module);
 				// set json objects
+				if (modules == null) {
+					modules = List.of(); // empty list fallback
+				}
+
 				for (IntegrationModule mod : modules) {
 
 					String regions = mod.getRegions();
@@ -131,19 +135,17 @@ public class ModuleConfigurationServiceImpl extends SalesManagerEntityServiceImp
 						IntegrationModule m = new IntegrationModule();
 						m.setCode(mod.getUniqueCode());
 						m.setModule(Constants.PAYMENT_MODULES);
-						
-						
-						if(CollectionUtils.isNotEmpty(mod.getSupportedCountry())) {
+
+						if (CollectionUtils.isNotEmpty(mod.getSupportedCountry())) {
 							m.setRegions(mod.getSupportedCountry().toString());
 							m.setRegionsSet(new HashSet<String>(mod.getSupportedCountry()));
 						}
-						
-						if(!StringUtils.isBlank(mod.getLogo())) {
-							m.setBinaryImage(mod.getLogo());//base 64
+
+						if (!StringUtils.isBlank(mod.getLogo())) {
+							m.setBinaryImage(mod.getLogo());// base 64
 						}
-						
-						
-						if(StringUtils.isNotBlank(mod.getConfigurable())) {
+
+						if (StringUtils.isNotBlank(mod.getConfigurable())) {
 							m.setConfigurable(mod.getConfigurable());
 						}
 
@@ -156,11 +158,11 @@ public class ModuleConfigurationServiceImpl extends SalesManagerEntityServiceImp
 
 		} catch (Exception e) {
 			LOGGER.error("getIntegrationModules()", e);
+			modules = List.of();
 		}
 		return modules;
 
 	}
-
 
 	@Override
 	public void createOrUpdateModule(String json) throws ServiceException {

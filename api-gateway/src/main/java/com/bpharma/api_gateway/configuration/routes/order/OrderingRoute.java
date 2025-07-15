@@ -16,51 +16,51 @@ public class OrderingRoute {
 	private JwtAuthFilter jwtAuthFilter;
 
 	@Bean
-	public RouteLocator routingPublicReview(RouteLocatorBuilder builder) {
-		return builder.routes().route("ordering-public",
+	public RouteLocator routingPublicOrdering(RouteLocatorBuilder builder) {
+		return builder.routes().route("public-ordering-create",
 				r -> r.path("/public/ordering/cart/{code}/checkout").and().method(HttpMethod.POST).filters(f -> f
-						.rewritePath("/public/ordering/cart/(?<id>[^/]+)/checkout", "/api/v1/product/${id}/reviews"))
+						.rewritePath("/public/ordering/cart/(?<code>[^/]+)/checkout", "/api/v1/cart/${code}/checkout"))
 						.uri("http://localhost:8080"))
 				.build();
 
 	}
 
 	@Bean
-	public RouteLocator routingAuthOrderingReview(RouteLocatorBuilder builder) {
-		return builder.routes().route("auth-product-preview-create",
-				r -> r.path("/customer-auth/product-review/{id}/reviews").and().method(HttpMethod.POST)
+	public RouteLocator routingAuthOrdering(RouteLocatorBuilder builder) {
+		return builder.routes().route("auth-ordering-create",
+				r -> r.path("/customer-auth/ordering/cart/{code}/checkout").and().method(HttpMethod.POST)
 						.filters(f -> f
-								.rewritePath("/customer-auth/product-review/(?<id>[^/]+)/reviews",
-										"/api/v1/auth/products/${id}/reviews")
+								.rewritePath("/customer-auth/ordering/cart/(?<code>[^/]+)/checkout",
+										"/api/v1/auth/cart/${code}/checkout")
 								.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config())))
 						.uri("http://localhost:8080"))
-				.route("auth-product-preview-manage", r -> r
-						.path("/customer-auth/product-review/{id}/reviews/{reviewid}").and()
-						.method(HttpMethod.PUT, HttpMethod.DELETE)
+				.route("auth-ordering-list", r -> r.path("/customer-auth/ordering/orders").and().method(HttpMethod.GET)
+						.filters(f -> f.rewritePath("/customer-auth/ordering/orders", "/api/v1/auth/orders")
+								.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config())))
+						.uri("http://localhost:8080"))
+				.route("auth-ordering-get", r -> r.path("/customer-auth/ordering/orders/{id}").and()
+						.method(HttpMethod.GET)
 						.filters(f -> f
-								.rewritePath("/customer-auth/product-review/(?<id>[^/]+)/reviews/(?<reviewid>[^/]+)",
-										"/api/v1/auth/products/${id}/reviews/${reviewid}")
+								.rewritePath("/customer-auth/ordering/cart/(?<id>[^/]+)", "/api/v1/auth/orders/{id}")
 								.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config())))
 						.uri("http://localhost:8080"))
 				.build();
 	}
 
 	@Bean
-	public RouteLocator routingPrivateOrderingReview(RouteLocatorBuilder builder) {
-		return builder.routes().route("private-product-review-create",
-				r -> r.path("/private/product-review/{id}/reviews").and().method(HttpMethod.POST)
-						.filters(f -> f
-								.rewritePath("/private/product-review/(?<id>[^/]+)/reviews",
-										"/api/v1/private/products/${id}/reviews")
+	public RouteLocator routingPrivateOrdering(RouteLocatorBuilder builder) {
+		return builder.routes()
+				.route("private-ordering-list", r -> r.path("/private/ordering/orders").and().method(HttpMethod.GET)
+						.filters(f -> f.rewritePath("/private/ordering/orders", "/api/v1/private/orders")
 								.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config())))
 						.uri("http://localhost:8080"))
-				.route("private-product-preview-manage", r -> r.path("/private/product-review/{id}/reviews/{reviewid}")
-						.and().method(HttpMethod.PUT, HttpMethod.DELETE)
-						.filters(f -> f
-								.rewritePath("/private/product-review/(?<id>[^/]+)/reviews/(?<reviewid>[^/]+)",
-										"/api/v1/private/products/${id}/reviews/${reviewid}")
-								.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config())))
-						.uri("http://localhost:8080"))
+				.route("private-ordering-manage",
+						r -> r.path("/private/ordering/orders/**").and().method(HttpMethod.PUT, HttpMethod.DELETE)
+								.filters(f -> f
+										.rewritePath("/private/ordering/orders/(?<segment>.*)",
+												"/api/v1/private/orders/${segment}")
+										.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config())))
+								.uri("http://localhost:8080"))
 				.build();
 	}
 }

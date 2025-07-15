@@ -404,21 +404,47 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
 		}
 	}
 	
+//	public Product getBySku(String productCode, MerchantStore merchant) throws ServiceException {
+//
+//		try {
+//			List<Object> products = productRepository.findBySku(productCode, merchant.getId());
+//			if(products.isEmpty()) {
+//				throw new ServiceException("Cannot get product with sku [" + productCode + "]");
+//			}
+//			BigInteger id = (BigInteger) products.get(0);
+//			return this.findOne(id.longValue(), merchant);
+//		} catch (Exception e) {
+//			throw new ServiceException("Cannot get product with sku [" + productCode + "]", e);
+//		}
+//		
+//
+//
+//	}
+	
 	public Product getBySku(String productCode, MerchantStore merchant) throws ServiceException {
+	    try {
+	        List<Object> products = productRepository.findBySku(productCode, merchant.getId());
+	        
+	        if (products.isEmpty()) {
+	            throw new ServiceException("Cannot get product with sku [" + productCode + "]");
+	        }
 
-		try {
-			List<Object> products = productRepository.findBySku(productCode, merchant.getId());
-			if(products.isEmpty()) {
-				throw new ServiceException("Cannot get product with sku [" + productCode + "]");
-			}
-			BigInteger id = (BigInteger) products.get(0);
-			return this.findOne(id.longValue(), merchant);
-		} catch (Exception e) {
-			throw new ServiceException("Cannot get product with sku [" + productCode + "]", e);
-		}
-		
+	        Object idObj = products.get(0);
+	        Long id;
 
+	        if (idObj instanceof BigInteger) {
+	            id = ((BigInteger) idObj).longValue();
+	        } else if (idObj instanceof Number) {
+	            id = ((Number) idObj).longValue();
+	        } else {
+	            throw new ServiceException("Unexpected ID type: " + idObj.getClass().getName());
+	        }
 
+	        return this.findOne(id, merchant);
+
+	    } catch (Exception e) {
+	        throw new ServiceException("Cannot get product with sku [" + productCode + "]", e);
+	    }
 	}
 
 	@Override

@@ -146,7 +146,12 @@ public class OrderServiceImpl  extends SalesManagerEntityServiceImpl<Long, Order
     	//first process payment
     	Transaction processTransaction = paymentService.processPayment(customer, store, payment, items, order);
 
-    	if(order.getOrderHistory()==null || order.getOrderHistory().size()==0 || order.getStatus()==null) {
+//    	if(order.getOrderHistory()==null || order.getOrderHistory().size()==0 || order.getStatus()==null) 
+    	
+    	boolean invalidHistory = order.getOrderHistory().isEmpty()
+    		    || order.getOrderHistory().stream().allMatch(h -> h.getStatus() == null);
+    	if(invalidHistory || order.getStatus() == null)
+    	{
     		OrderStatus status = order.getStatus();
     		if(status==null) {
     			status = OrderStatus.ORDERED;
@@ -194,7 +199,8 @@ public class OrderServiceImpl  extends SalesManagerEntityServiceImpl<Long, Order
         Set<OrderProduct> products = order.getOrderProducts();
         for(OrderProduct orderProduct : products) {
             orderProduct.getProductQuantity();
-            Product p = productService.getById(orderProduct.getId());
+//            Product p = productService.getById(orderProduct.getId());
+            Product p = productService.getBySku(orderProduct.getSku(), store);
             if(p == null)
                 throw new ServiceException(ServiceException.EXCEPTION_INVENTORY_MISMATCH);
             for(ProductAvailability availability : p.getAvailabilities()) {
