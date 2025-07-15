@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -93,6 +94,7 @@ public class ShoppingCartApi {
 	 */
 	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping(value = "/auth/cart")
+	@PreAuthorize("hasAuthority('AUTH_CUSTOMER')")
 	@ApiOperation(httpMethod = "POST", value = "Add product to AUTH shopping cart ")
 	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
 			@ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en") })

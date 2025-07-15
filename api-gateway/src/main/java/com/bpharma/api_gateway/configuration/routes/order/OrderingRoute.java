@@ -41,7 +41,7 @@ public class OrderingRoute {
 				.route("auth-ordering-get", r -> r.path("/customer-auth/ordering/orders/{id}").and()
 						.method(HttpMethod.GET)
 						.filters(f -> f
-								.rewritePath("/customer-auth/ordering/cart/(?<id>[^/]+)", "/api/v1/auth/orders/{id}")
+								.rewritePath("/customer-auth/ordering/orders/(?<id>[^/]+)", "/api/v1/auth/orders/${id}")
 								.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config())))
 						.uri("http://localhost:8080"))
 				.build();
@@ -55,7 +55,7 @@ public class OrderingRoute {
 								.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config())))
 						.uri("http://localhost:8080"))
 				.route("private-ordering-manage",
-						r -> r.path("/private/ordering/orders/**").and().method(HttpMethod.PUT, HttpMethod.PATCH, HttpMethod.GET)
+						r -> r.path("/private/ordering/orders/**").and().method(HttpMethod.PUT, HttpMethod.PATCH, HttpMethod.GET, HttpMethod.POST)
 								.filters(f -> f
 										.rewritePath("/private/ordering/orders/(?<segment>.*)",
 												"/api/v1/private/orders/${segment}")
