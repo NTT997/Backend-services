@@ -199,7 +199,8 @@ public class OrderServiceImpl  extends SalesManagerEntityServiceImpl<Long, Order
         Set<OrderProduct> products = order.getOrderProducts();
         for(OrderProduct orderProduct : products) {
             orderProduct.getProductQuantity();
-            Product p = productService.getById(orderProduct.getId());
+//            Product p = productService.getById(orderProduct.getId());
+            Product p = productService.getBySku(orderProduct.getSku(), store);
             if(p == null)
                 throw new ServiceException(ServiceException.EXCEPTION_INVENTORY_MISMATCH);
             for(ProductAvailability availability : p.getAvailabilities()) {
