@@ -13,6 +13,8 @@ import javax.validation.Valid;
 
 import com.salesmanager.core.business.services.order.OrderService;
 import com.salesmanager.core.model.order.orderstatus.OrderStatus;
+import com.salesmanager.core.model.order.orderstatus.OrderStatusRequest;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.helper.Validate;
@@ -127,13 +129,20 @@ public class OrderApi {
 			return null;
 		}
 
+//		if (start == null) {
+//			start = new Integer(0);
+//		}
+//		if (count == null) {
+//			count = new Integer(100);
+//		}
+
 		if (start == null) {
-			start = new Integer(0);
+			start = Integer.valueOf(0);
 		}
 		if (count == null) {
-			count = new Integer(100);
+			count = Integer.valueOf(100);
 		}
-
+		
 		ReadableCustomer readableCustomer = new ReadableCustomer();
 		ReadableCustomerPopulator customerPopulator = new ReadableCustomerPopulator();
 		customerPopulator.populate(customer, readableCustomer, merchantStore, language);
@@ -399,13 +408,13 @@ public class OrderApi {
 	 * @param language
 	 * @return
 	 */
-	@RequestMapping(value = { "/cart/{code}/checkout" }, method = RequestMethod.POST)
+	@RequestMapping(value = { "/cart/{shoppingCartCode}/checkout" }, method = RequestMethod.POST)
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
 	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "string", defaultValue = "DEFAULT"),
 			@ApiImplicitParam(name = "lang", dataType = "string", defaultValue = "en") })
 	public ReadableOrderConfirmation checkout(
-			@PathVariable final String code,//shopping cart
+			@PathVariable final String shoppingCartCode,//shopping cart
 			@Valid @RequestBody PersistableAnonymousOrder order,//order
 			@ApiIgnore MerchantStore merchantStore,
 			@ApiIgnore Language language) {
@@ -415,10 +424,10 @@ public class OrderApi {
 
 		ShoppingCart cart;
 		try {
-			cart = shoppingCartService.getByCode(code, merchantStore);
+			cart = shoppingCartService.getByCode(shoppingCartCode, merchantStore);
 
 			if (cart == null) {
-				throw new ResourceNotFoundException("Cart code " + code + " does not exist");
+				throw new ResourceNotFoundException("Cart code " + shoppingCartCode + " does not exist");
 			}
 
 			//security password validation
@@ -443,8 +452,7 @@ public class OrderApi {
 
 			order.setShoppingCartId(cart.getId());
 
-			Order modelOrder = orderFacade.processOrder(order, customer, merchantStore, language,
-					LocaleUtils.getLocale(language));
+			Order modelOrder = orderFacade.processOrder(order, customer, merchantStore, language, LocaleUtils.getLocale(language));
 			Long orderId = modelOrder.getId();
 			//populate order confirmation
 			order.setId(orderId);
@@ -499,7 +507,8 @@ public class OrderApi {
 			@ApiImplicitParam(name = "lang", dataType = "string", defaultValue = "en") })
 	public void updateOrderStatus(
 			@PathVariable final Long id,
-			@Valid @RequestBody String status,
+			@Valid @RequestBody OrderStatusRequest statusRequest,
+//			@Valid @RequestBody String status,
 			@ApiIgnore MerchantStore merchantStore,
 			@ApiIgnore Language language) {
 
@@ -512,8 +521,8 @@ public class OrderApi {
 			throw new GenericRuntimeException("412", "Order not found [" + id + "]");
 		}
 
-		OrderStatus statusEnum = OrderStatus.valueOf(status);
-
+//		OrderStatus statusEnum = OrderStatus.valueOf(status);
+		OrderStatus statusEnum = OrderStatus.valueOf(statusRequest.getStatus());
 		orderFacade.updateOrderStatus(order, statusEnum, merchantStore);
 		return;
 	}

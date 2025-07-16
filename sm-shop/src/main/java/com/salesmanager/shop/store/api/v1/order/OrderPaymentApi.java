@@ -103,8 +103,15 @@ public class OrderPaymentApi {
 		Payment paymentModel = new Payment();
 
 		populator.populate(payment, paymentModel, merchantStore, language);
+		
+		
+		Customer anonymousCustomer = new Customer();
+		anonymousCustomer.setAnonymous(true);
+		anonymousCustomer.setMerchantStore(merchantStore);
+		anonymousCustomer.setDefaultLanguage(language);
 
-		Transaction transactionModel = paymentService.initTransaction(null, paymentModel, merchantStore);
+
+		Transaction transactionModel = paymentService.initTransaction(anonymousCustomer, paymentModel, merchantStore);
 
 		ReadableTransaction transaction = new ReadableTransaction();
 		ReadableTransactionPopulator trxPopulator = new ReadableTransactionPopulator();
