@@ -120,20 +120,65 @@ public class ShoppingCartApi {
 
 	// ----------------
 
-	@PutMapping(value = "/cart/{code}")
+//	@PutMapping(value = "/cart/{code}")
+//	@ApiOperation(httpMethod = "PUT", value = "Add to an existing shopping cart or modify an item quantity", notes = "No customer ID in scope. Modify cart for non authenticated users, as simple as {\"product\":1232,\"quantity\":0} for instance will remove item 1234 from cart", produces = "application/json", response = ReadableShoppingCart.class)
+//	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
+//			@ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en") })
+//	public ResponseEntity<ReadableShoppingCart> modifyCart(@PathVariable String code,
+//			@Valid @RequestBody PersistableShoppingCartItem shoppingCartItem, @ApiIgnore MerchantStore merchantStore,
+//			@ApiIgnore Language language, HttpServletResponse response) {
+//
+//		try {
+//			ReadableShoppingCart cart = shoppingCartFacade.modifyCart(code, shoppingCartItem, merchantStore, language);
+//
+//			if (cart == null) {
+//				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//			}
+//
+//			return new ResponseEntity<>(cart, HttpStatus.CREATED);
+//
+//		} catch (Exception e) {
+//			if (e instanceof ResourceNotFoundException) {
+//				throw (ResourceNotFoundException) e;
+//			} else {
+//				throw new ServiceRuntimeException(e);
+//			}
+//
+//		}
+//	}
+	
+	@PutMapping(value = { "/cart/{code}", "/auth/cart/{code}" })
 	@ApiOperation(httpMethod = "PUT", value = "Add to an existing shopping cart or modify an item quantity", notes = "No customer ID in scope. Modify cart for non authenticated users, as simple as {\"product\":1232,\"quantity\":0} for instance will remove item 1234 from cart", produces = "application/json", response = ReadableShoppingCart.class)
 	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
 			@ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en") })
 	public ResponseEntity<ReadableShoppingCart> modifyCart(@PathVariable String code,
 			@Valid @RequestBody PersistableShoppingCartItem shoppingCartItem, @ApiIgnore MerchantStore merchantStore,
-			@ApiIgnore Language language, HttpServletResponse response) {
+			@ApiIgnore Language language, HttpServletResponse response, HttpServletRequest request) {
 
 		try {
-			ReadableShoppingCart cart = shoppingCartFacade.modifyCart(code, shoppingCartItem, merchantStore, language);
-
+			ReadableShoppingCart cart = shoppingCartFacade.getByCode(code, merchantStore, language);
+			
 			if (cart == null) {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}
+			Principal principal = request.getUserPrincipal();
+
+			if (principal == null) {
+				if (cart.getCustomer() != null) {
+					response.sendError(401, "Unauthorized");
+				}
+			}
+
+			else {
+				String username = principal.getName();
+				Customer customer = customerFacade.getCustomerByUserName(username, merchantStore);
+
+				if (customer.getId() != cart.getCustomer()) {
+					response.sendError(403, "Forbidden");
+				}
+			}
+
+			cart = shoppingCartFacade.modifyCart(code, shoppingCartItem, merchantStore, language);
 
 			return new ResponseEntity<>(cart, HttpStatus.CREATED);
 
