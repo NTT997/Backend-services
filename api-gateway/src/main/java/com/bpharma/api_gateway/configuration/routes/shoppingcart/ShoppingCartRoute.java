@@ -48,6 +48,16 @@ public class ShoppingCartRoute {
         			    		.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config()))
         			    )
         			    .uri("http://localhost:8080")) 
+        		
+        		.route("auth-shopping-cart-put", r -> r
+        			    .path("/auth/cart/{code}")
+        			    .and()
+        			    .method(HttpMethod.PUT)
+        			    .filters(f -> f
+        			    		.rewritePath("/auth/cart/(?<code>[^/]+)", "/api/v1/auth/cart/${code}")
+        			    		.filter(jwtAuthFilter.apply(new JwtAuthFilter.Config()))
+        			    )
+        			    .uri("http://localhost:8080")) 
         		.build();
     }
 

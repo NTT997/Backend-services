@@ -1,6 +1,7 @@
 package com.salesmanager.shop.populator.order.transaction;
 
 import org.apache.commons.lang3.Validate;
+import org.springframework.stereotype.Component;
 
 import com.salesmanager.core.business.exception.ConversionException;
 import com.salesmanager.core.business.services.catalog.pricing.PricingService;
@@ -12,7 +13,7 @@ import com.salesmanager.core.model.reference.language.Language;
 import com.salesmanager.shop.model.order.transaction.ReadableTransaction;
 import com.salesmanager.shop.utils.DateUtil;
 
-
+@Component
 public class ReadableTransactionPopulator extends AbstractDataPopulator<Transaction, ReadableTransaction> {
 
 	
