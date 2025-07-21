@@ -386,6 +386,8 @@ public class OrderPaymentApi {
 
 			// Populate the response
 			ReadableTransactionPopulator trxPopulator = new ReadableTransactionPopulator();
+			trxPopulator.setOrderService(orderService);
+			trxPopulator.setPricingService(pricingService);
 			return trxPopulator.populate(refundedTx, null, merchantStore, language);
 
 

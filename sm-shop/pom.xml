@@ -2,7 +2,8 @@
 
 <project
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -22,6 +23,12 @@
 	</properties>
 
 	<dependencies>
+
+		<dependency>
+			<groupId>com.thoughtworks.xstream</groupId>
+			<artifactId>xstream</artifactId>
+			<version>1.4.20</version> <!-- bản mới, hỗ trợ Java 17+ tốt hơn -->
+		</dependency>
 
 		<dependency>
 			<groupId>com.shopizer</groupId>
@@ -71,7 +78,8 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/commons-collections/commons-collections -->
+		<!--
+		https://mvnrepository.com/artifact/commons-collections/commons-collections -->
 		<!-- For Tiles -->
 		<dependency>
 			<groupId>commons-collections</groupId>
@@ -119,7 +127,8 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-rng-simple -->
+		<!--
+		https://mvnrepository.com/artifact/org.apache.commons/commons-rng-simple -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-rng-simple</artifactId>
