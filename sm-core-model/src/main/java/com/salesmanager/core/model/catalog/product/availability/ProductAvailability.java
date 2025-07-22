@@ -106,6 +106,11 @@ public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailab
 	@Temporal(TemporalType.DATE)
 	@Column(name = "DATE_AVAILABLE")
 	private Date productDateAvailable;
+	
+	@NotNull
+	@Temporal(TemporalType.DATE)
+	@Column(name = "EXPIRATION_DATE", nullable = true)
+	private Date expirationDate;
 
 	@Column(name = "REGION")
 	private String region = SchemaConstant.ALL_REGIONS;
@@ -167,6 +172,14 @@ public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailab
 
 	public void setProductDateAvailable(Date productDateAvailable) {
 		this.productDateAvailable = CloneUtils.clone(productDateAvailable);
+	}
+
+	public Date getExpirationDate() {
+		return expirationDate;
+	}
+
+	public void setExpirationDate(Date expirationDate) {
+		this.expirationDate = expirationDate;
 	}
 
 	public String getRegion() {
