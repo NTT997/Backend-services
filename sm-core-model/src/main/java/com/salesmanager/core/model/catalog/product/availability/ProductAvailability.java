@@ -109,7 +109,7 @@ public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailab
 	
 	@NotNull
 	@Temporal(TemporalType.DATE)
-	@Column(name = "EXPIRATION_DATE", nullable = true)
+	@Column(name = "EXPIRATION_DATE", nullable = false)
 	private Date expirationDate;
 
 	@Column(name = "REGION")

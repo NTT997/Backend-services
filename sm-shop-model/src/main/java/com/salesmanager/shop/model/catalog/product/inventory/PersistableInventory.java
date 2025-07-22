@@ -14,6 +14,8 @@ public class PersistableInventory extends InventoryEntity {
 	private String store;
 	@NotNull
 	private Long productId;
+	@NotNull
+	private String expirationDate;
 	private Long variant;
 	private List<PersistableProductPrice> prices;
 
@@ -39,6 +41,14 @@ public class PersistableInventory extends InventoryEntity {
 
 	public void setProductId(Long productId) {
 		this.productId = productId;
+	}
+
+	public String getExpirationDate() {
+		return expirationDate;
+	}
+
+	public void setExpirationDate(String expirationDate) {
+		this.expirationDate = expirationDate;
 	}
 
 	public Long getVariant() {

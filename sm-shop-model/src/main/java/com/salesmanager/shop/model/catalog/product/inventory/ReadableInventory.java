@@ -13,6 +13,7 @@ public class ReadableInventory extends InventoryEntity {
 	 */
 	private static final long serialVersionUID = 1L;
 	private String creationDate;
+	private String expirationDate;
 
 	private ReadableMerchantStore store;
 	private String sku;
@@ -41,6 +42,14 @@ public class ReadableInventory extends InventoryEntity {
 
 	public void setCreationDate(String creationDate) {
 		this.creationDate = creationDate;
+	}
+	
+	public String getExpirationDate() {
+		return expirationDate;
+	}
+
+	public void setExpirationDate(String expirationDate) {
+		this.expirationDate = expirationDate;
 	}
 
 	public String getSku() {
