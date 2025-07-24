@@ -170,7 +170,8 @@ public class TransactionServiceImpl  extends SalesManagerEntityServiceImpl<Long,
 						finalTransactions.put(TransactionType.REFUND.name(),transaction);
 						continue;
 					}
-				} else {
+				} 
+				else {
 					finalTransactions.put(TransactionType.REFUND.name(),transaction);
 					continue;
 				}

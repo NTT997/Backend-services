@@ -7,6 +7,7 @@ public enum OrderStatus {
 	DELIVERED("delivered"),
 	REFUNDED("refunded"),
 	CANCELED("canceled"),
+	PARTIALLY_REFUNDED("partially_refunded"),
 	;
 	
 	private String value;

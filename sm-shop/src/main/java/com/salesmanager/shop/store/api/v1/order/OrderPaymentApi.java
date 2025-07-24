@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -41,12 +42,15 @@ import com.salesmanager.core.business.services.shoppingcart.ShoppingCartService;
 import com.salesmanager.core.model.customer.Customer;
 import com.salesmanager.core.model.merchant.MerchantStore;
 import com.salesmanager.core.model.order.Order;
+import com.salesmanager.core.model.order.orderproduct.OrderProduct;
 import com.salesmanager.core.model.payments.Payment;
+import com.salesmanager.core.model.payments.PaymentType;
 import com.salesmanager.core.model.payments.Transaction;
 import com.salesmanager.core.model.payments.TransactionType;
 import com.salesmanager.core.model.reference.language.Language;
 import com.salesmanager.core.model.shoppingcart.ShoppingCart;
 import com.salesmanager.shop.constants.Constants;
+import com.salesmanager.shop.model.order.PersistableOrderProduct;
 import com.salesmanager.shop.model.order.transaction.PersistablePayment;
 import com.salesmanager.shop.model.order.transaction.ReadableTransaction;
 import com.salesmanager.shop.model.order.v0.ReadableOrderList;
@@ -331,33 +335,126 @@ public class OrderPaymentApi {
 		return null;
 	}
 
+//	/**
+//	 * Refund payment
+//	 * 
+//	 * @param id
+//	 * @param merchantStore
+//	 * @param language
+//	 * @return
+//	 */
+//	@RequestMapping(value = { "/private/orders/{id}/refund" }, method = RequestMethod.POST)
+//	@ResponseStatus(HttpStatus.OK)
+//	@ResponseBody
+//	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
+//			@ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en") })
+//	public ReadableTransaction refundPayment(@PathVariable Long id,
+//			@RequestParam(name = "amount", required = false) BigDecimal amount, @ApiIgnore MerchantStore merchantStore,
+//			@ApiIgnore Language language, HttpServletRequest request, HttpServletResponse response) {
+//		try {
+//			// Authorize the user
+//			String user = authorizationUtils.authenticatedUser();
+//			
+//			authorizationUtils.authorizeUser(user, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN,
+//					Constants.GROUP_ADMIN_ORDER, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()),
+//					merchantStore);
+//
+//			// Validate the order
+//			Order order = orderService.getById(id);
+//			if (order == null) {
+//				response.sendError(HttpStatus.NOT_FOUND.value(), "Order id " + id + " does not exist");
+//				return null;
+//			}
+//
+//			// Validate the customer
+//			Customer customer = customerService.getById(order.getCustomerId());
+//			if (customer == null) {
+//				response.sendError(HttpStatus.NOT_FOUND.value(),
+//						"Order id " + id + " contains an invalid customer " + order.getCustomerId());
+//				return null;
+//			}
+//
+//			// Check for refundable transaction
+//			Transaction refundableTransaction = transactionService.getRefundableTransaction(order);
+//			if (refundableTransaction == null) {
+//				response.sendError(HttpStatus.NOT_FOUND.value(), "No refundable transaction found for order id " + id);
+//				return null;
+//			}
+//
+//			// 4) Determine refund amount
+//			BigDecimal total = order.getTotal();
+//			BigDecimal refund = (amount != null && amount.compareTo(BigDecimal.ZERO) > 0) ? amount : total;
+//			Validate.isTrue(refund.compareTo(total) <= 0, "Refund amount exceeds order total");
+//
+//			// Process the refund
+//			Transaction refundedTx = paymentService.processRefund(order, customer, merchantStore, refund);
+//
+//			// Populate the response
+//			ReadableTransactionPopulator trxPopulator = new ReadableTransactionPopulator();
+//			trxPopulator.setOrderService(orderService);
+//			trxPopulator.setPricingService(pricingService);
+//			return trxPopulator.populate(refundedTx, null, merchantStore, language);
+//
+//
+//		} catch (ServiceException e) {
+//			LOGGER.error("Error while processing refund for order id " + id, e);
+//			try {
+//				response.sendError(503, "Error while processing refund: " + e.getMessage());
+//			} catch (Exception ignore) {
+//				// Ignore IO exceptions during response writing
+//			}
+//			return null;
+//		} catch (Exception e) {
+//			LOGGER.error("Unexpected error while processing refund for order id " + id, e);
+//			try {
+//				response.sendError(500, "Unexpected error while processing refund: " + e.getMessage());
+//			} catch (Exception ignore) {
+//				// Ignore IO exceptions during response writing
+//			}
+//			return null;
+//		}
+//
+//	}
+//	
 	/**
-	 * Refund payment
-	 * 
+	 * @author DucHuy
 	 * @param id
+	 * @param amount
 	 * @param merchantStore
 	 * @param language
+	 * @param request
+	 * @param response
 	 * @return
 	 */
-	@RequestMapping(value = { "/private/orders/{id}/refund" }, method = RequestMethod.POST)
+	@RequestMapping(value = { "/private/orders/{id}/partial-refund" }, method = RequestMethod.POST)
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
 	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
 			@ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en") })
-	public ReadableTransaction refundPayment(@PathVariable Long id,
+	public ReadableTransaction partialRefundPayment(@PathVariable Long id,
 			@RequestParam(name = "amount", required = false) BigDecimal amount, @ApiIgnore MerchantStore merchantStore,
+			@RequestBody List<PersistableOrderProduct> listOrderProduct,
 			@ApiIgnore Language language, HttpServletRequest request, HttpServletResponse response) {
 		try {
 			// Authorize the user
 			String user = authorizationUtils.authenticatedUser();
+			
 			authorizationUtils.authorizeUser(user, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN,
 					Constants.GROUP_ADMIN_ORDER, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()),
 					merchantStore);
 
 			// Validate the order
-			Order order = orderService.getById(id);
+			Order order = orderService.getById(id); 
+						
 			if (order == null) {
 				response.sendError(HttpStatus.NOT_FOUND.value(), "Order id " + id + " does not exist");
+				return null;
+			}
+			
+			System.out.println("order: " + order.toString());
+			
+			if(order != null && order.getPaymentType().equals(PaymentType.MONEYORDER)) {
+				response.sendError(HttpStatus.BAD_REQUEST.value(), "Youcr order cant be refund because of payment type MONEY ORDER");
 				return null;
 			}
 
@@ -375,6 +472,37 @@ public class OrderPaymentApi {
 				response.sendError(HttpStatus.NOT_FOUND.value(), "No refundable transaction found for order id " + id);
 				return null;
 			}
+			
+			//convert productOrder from listProductOrder DTO -> communicate with service layer
+			List<OrderProduct> refundListOrderProduct = new ArrayList<>();
+			if(order.getOrderProducts() != null && !listOrderProduct.isEmpty()) {
+				
+				for(PersistableOrderProduct pop : listOrderProduct) {
+					
+					for(OrderProduct op : order.getOrderProducts()) {
+						
+						if(pop.getSku().equals(op.getSku()) && pop.getOrderedQuantity() <= op.getProductQuantity()) {
+							
+							OrderProduct refundItem = new OrderProduct();
+							refundItem.setSku(op.getSku());
+							refundItem.setProductQuantity(pop.getOrderedQuantity());
+							refundItem.setPrices(op.getPrices());
+
+							System.out.println("refundItem: " + refundItem.getProductQuantity() + refundItem.getSku());
+							
+							refundListOrderProduct.add(refundItem);
+							
+							System.out.println(refundListOrderProduct.toString());
+							
+						}
+						else {
+							System.out.println("sai");
+						}
+					}
+				}
+			}
+			System.out.println("refundListOrderProduct: " + refundListOrderProduct);
+			
 
 			// 4) Determine refund amount
 			BigDecimal total = order.getTotal();
@@ -382,7 +510,7 @@ public class OrderPaymentApi {
 			Validate.isTrue(refund.compareTo(total) <= 0, "Refund amount exceeds order total");
 
 			// Process the refund
-			Transaction refundedTx = paymentService.processRefund(order, customer, merchantStore, refund);
+			Transaction refundedTx = paymentService.processRefund(order, customer, merchantStore, refund, refundListOrderProduct);
 
 			// Populate the response
 			ReadableTransactionPopulator trxPopulator = new ReadableTransactionPopulator();

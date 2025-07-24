@@ -1,5 +1,6 @@
 package com.salesmanager.core.business.repositories.catalog.product.price;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -34,7 +35,17 @@ public interface ProductPriceRepository extends JpaRepository<ProductPrice, Long
 			+ "join fetch pa.product pap " + "left join fetch pa.productVariant ppi "
 			+ "where pap.sku=?1 or ppi.sku=?1 and pm.code=?2")
 	List<ProductPrice> findByProduct(String sku, String store);
-
+	
+	//huy
+	@Query("select distinct p from ProductPrice p " +
+		       "left join fetch p.productAvailability pa " +
+		       "left join fetch pa.merchantStore pm " +
+		       "where p.code = ?1 and p.productPriceSpecialStartDate = ?2 and p.productPriceSpecialEndDate = ?3")
+		ProductPrice findByCodeAndDurationDate(String priceCode, Date startDate, Date endDate);
+	
+	//----------------
+	
+	
 	@Query(value = "select distinct p from ProductPrice p " + "left join fetch p.productAvailability pa "
 			+ "left join fetch pa.merchantStore pm " + "left join fetch p.descriptions pd "
 			+ "join fetch pa.product pap " + "left join fetch pa.productVariant ppi "

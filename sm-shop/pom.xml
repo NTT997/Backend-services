@@ -150,6 +150,11 @@
 			<artifactId>passay</artifactId>
 			<version>1.6.0</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>com.oracle.database.jdbc</groupId>
+			<artifactId>ojdbc8</artifactId>
+		</dependency>
 
 	</dependencies>
 

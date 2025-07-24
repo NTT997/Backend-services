@@ -5,7 +5,6 @@ import java.util.List;
 import com.salesmanager.core.business.exception.ServiceException;
 import com.salesmanager.core.business.services.common.generic.SalesManagerEntityService;
 import com.salesmanager.core.model.catalog.product.Product;
-import com.salesmanager.core.model.catalog.product.variant.ProductVariant;
 import com.salesmanager.core.model.customer.Customer;
 import com.salesmanager.core.model.merchant.MerchantStore;
 import com.salesmanager.core.model.shipping.ShippingProduct;
@@ -21,6 +20,8 @@ public interface ShoppingCartService extends SalesManagerEntityService<Long, Sho
 	ShoppingCart getById(Long id, MerchantStore store) throws ServiceException;
 
 	ShoppingCart getByCode(String code, MerchantStore store) throws ServiceException;
+	
+	ShoppingCart getByOrderId(Long orderId, MerchantStore store) throws ServiceException;
 
 
 	/**

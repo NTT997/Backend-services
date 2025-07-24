@@ -8,6 +8,7 @@ import com.salesmanager.core.business.exception.ServiceException;
 import com.salesmanager.core.model.customer.Customer;
 import com.salesmanager.core.model.merchant.MerchantStore;
 import com.salesmanager.core.model.order.Order;
+import com.salesmanager.core.model.order.orderproduct.OrderProduct;
 import com.salesmanager.core.model.payments.CreditCardType;
 import com.salesmanager.core.model.payments.Payment;
 import com.salesmanager.core.model.payments.PaymentMethod;
@@ -26,7 +27,9 @@ public interface PaymentService {
 			MerchantStore store) throws ServiceException;
 	
 	Transaction processPayment(Customer customer, MerchantStore store, Payment payment, List<ShoppingCartItem> items, Order order) throws ServiceException;
-	Transaction processRefund(Order order, Customer customer, MerchantStore store, BigDecimal amount) throws ServiceException;
+	
+	
+	Transaction processRefund(Order order, Customer customer, MerchantStore store, BigDecimal amount, List<OrderProduct> listOrderProduct) throws ServiceException;
 
 	/**
 	 * Get a specific Payment module by payment type CREDITCART, MONEYORDER ...

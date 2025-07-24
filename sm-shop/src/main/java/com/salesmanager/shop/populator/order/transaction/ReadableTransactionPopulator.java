@@ -1,6 +1,7 @@
 package com.salesmanager.shop.populator.order.transaction;
 
 import org.apache.commons.lang3.Validate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.salesmanager.core.business.exception.ConversionException;
@@ -16,8 +17,8 @@ import com.salesmanager.shop.utils.DateUtil;
 @Component
 public class ReadableTransactionPopulator extends AbstractDataPopulator<Transaction, ReadableTransaction> {
 
-	
 	private OrderService orderService;
+	
 	private PricingService pricingService;
 	
 	@Override

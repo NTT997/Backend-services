@@ -544,6 +544,9 @@ public class CustomerFacadeImpl implements CustomerFacade {
 
 		LOG.info("About to persist customer to database.");
 		customerService.saveOrUpdate(customerModel);
+		
+		System.out.println(customerModel);
+		
 		return customerModel;
 	}
 

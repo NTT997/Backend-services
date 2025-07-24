@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -141,7 +142,8 @@ public class OrderServiceImpl  extends SalesManagerEntityServiceImpl<Long, Order
     			order.setIpAddress(ipAddress);
     		}
     	}
-
+    	
+    	
 
     	//first process payment
     	Transaction processTransaction = paymentService.processPayment(customer, store, payment, items, order);
@@ -204,13 +206,33 @@ public class OrderServiceImpl  extends SalesManagerEntityServiceImpl<Long, Order
             if(p == null)
                 throw new ServiceException(ServiceException.EXCEPTION_INVENTORY_MISMATCH);
             for(ProductAvailability availability : p.getAvailabilities()) {
-                int qty = availability.getProductQuantity();
-                if(qty < orderProduct.getProductQuantity()) {
-                    //throw new ServiceException(ServiceException.EXCEPTION_INVENTORY_MISMATCH);
-                	LOGGER.error("APP-BACKEND [" + ServiceException.EXCEPTION_INVENTORY_MISMATCH + "]");
-                }
-                qty = qty - orderProduct.getProductQuantity();
-                availability.setProductQuantity(qty);
+            	
+            	//check product variant trong cart de update quantity dung
+            	for(ShoppingCartItem cartItem : items) {
+            		
+            		if(availability.getProductVariant() == null && cartItem.getVariant() == null) {
+            			
+            			int qty = availability.getProductQuantity();
+            			if(qty < orderProduct.getProductQuantity()) {
+            				LOGGER.error("APP-BACKEND [" + ServiceException.EXCEPTION_INVENTORY_MISMATCH + "]");
+            			}
+            			qty = qty - orderProduct.getProductQuantity();
+            			availability.setProductQuantity(qty);
+            		}
+            		
+            		else if(availability.getProductVariant() != null 
+            		        && Objects.equals(cartItem.getVariant(), availability.getProductVariant().getId())) {
+            			
+                        int qty = availability.getProductQuantity();
+                        if(qty < orderProduct.getProductQuantity()) {
+                            //throw new ServiceException(ServiceException.EXCEPTION_INVENTORY_MISMATCH);
+                        	LOGGER.error("APP-BACKEND [" + ServiceException.EXCEPTION_INVENTORY_MISMATCH + "]");
+                        }
+                        qty = qty - orderProduct.getProductQuantity();
+                        availability.setProductQuantity(qty);
+            		}
+            	}
+
             }
             productService.update(p);
         }
