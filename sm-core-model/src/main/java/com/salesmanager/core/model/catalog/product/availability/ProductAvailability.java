@@ -25,6 +25,7 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.salesmanager.core.constants.SchemaConstant;
 import com.salesmanager.core.model.catalog.product.Product;
@@ -108,6 +109,7 @@ public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailab
 	private Date productDateAvailable;
 	
 	@NotNull
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	@Temporal(TemporalType.DATE)
 	@Column(name = "EXPIRATION_DATE", nullable = false)
 	private Date expirationDate;

@@ -1,6 +1,7 @@
 package com.salesmanager.shop.model.catalog.product.inventory;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.salesmanager.shop.model.catalog.product.ReadableProductPrice;
@@ -13,7 +14,7 @@ public class ReadableInventory extends InventoryEntity {
 	 */
 	private static final long serialVersionUID = 1L;
 	private String creationDate;
-	private String expirationDate;
+	private Date expirationDate;
 
 	private ReadableMerchantStore store;
 	private String sku;
@@ -44,11 +45,11 @@ public class ReadableInventory extends InventoryEntity {
 		this.creationDate = creationDate;
 	}
 	
-	public String getExpirationDate() {
+	public Date getExpirationDate() {
 		return expirationDate;
 	}
 
-	public void setExpirationDate(String expirationDate) {
+	public void setExpirationDate(Date expirationDate) {
 		this.expirationDate = expirationDate;
 	}
 

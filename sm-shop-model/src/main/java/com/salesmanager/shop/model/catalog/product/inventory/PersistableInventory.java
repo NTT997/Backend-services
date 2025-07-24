@@ -1,5 +1,6 @@
 package com.salesmanager.shop.model.catalog.product.inventory;
 
+import java.util.Date;
 import java.util.List;
 import com.salesmanager.shop.model.catalog.product.PersistableProductPrice;
 
@@ -15,7 +16,7 @@ public class PersistableInventory extends InventoryEntity {
 	@NotNull
 	private Long productId;
 	@NotNull
-	private String expirationDate;
+	private Date expirationDate;
 	private Long variant;
 	private List<PersistableProductPrice> prices;
 
@@ -43,11 +44,11 @@ public class PersistableInventory extends InventoryEntity {
 		this.productId = productId;
 	}
 
-	public String getExpirationDate() {
+	public Date getExpirationDate() {
 		return expirationDate;
 	}
 
-	public void setExpirationDate(String expirationDate) {
+	public void setExpirationDate(Date expirationDate) {
 		this.expirationDate = expirationDate;
 	}
 

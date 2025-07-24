@@ -56,7 +56,15 @@ public class PersistableProductAvailabilityMapper implements Mapper<PersistableP
 		try {
 
 			destination.setRegion(Constants.ALL_REGIONS);
-
+			/*
+			 * Tho
+			 * */			
+			destination.setMerchantStore(store);
+			destination.setSku(source.getSku());
+			destination.setExpirationDate(source.getExpiration());
+			/*
+			 * Tho
+			 * */
 			destination.setProductQuantity(source.getQuantity());
 			destination.setProductQuantityOrderMin(1);
 			destination.setProductQuantityOrderMax(1);
