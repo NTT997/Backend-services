@@ -565,7 +565,7 @@ public class PaymentServiceImpl implements PaymentService {
 			// 1. data: product variant, product availability, product
 			ShoppingCart cart = shoppingCartService.getByOrderId(order.getId(), store);
 			
-			for(OrderProduct orderProduct : listOrderProduct) {
+			for(OrderProduct orderProduct : listOrderProduct)  {
 				Product product = productService.getBySku(orderProduct.getSku(), store);
 				
 				if(product != null) {
