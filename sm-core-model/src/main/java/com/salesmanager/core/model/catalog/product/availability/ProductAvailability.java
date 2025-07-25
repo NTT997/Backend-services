@@ -25,6 +25,7 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.salesmanager.core.constants.SchemaConstant;
 import com.salesmanager.core.model.catalog.product.Product;
@@ -106,6 +107,12 @@ public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailab
 	@Temporal(TemporalType.DATE)
 	@Column(name = "DATE_AVAILABLE")
 	private Date productDateAvailable;
+	
+	@NotNull
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	@Temporal(TemporalType.DATE)
+	@Column(name = "EXPIRATION_DATE", nullable = false)
+	private Date expirationDate;
 
 	@Column(name = "REGION")
 	private String region = SchemaConstant.ALL_REGIONS;
@@ -167,6 +174,14 @@ public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailab
 
 	public void setProductDateAvailable(Date productDateAvailable) {
 		this.productDateAvailable = CloneUtils.clone(productDateAvailable);
+	}
+
+	public Date getExpirationDate() {
+		return expirationDate;
+	}
+
+	public void setExpirationDate(Date expirationDate) {
+		this.expirationDate = expirationDate;
 	}
 
 	public String getRegion() {
