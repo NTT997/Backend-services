@@ -359,8 +359,6 @@ public class StripePayment implements PaymentModule {
 			
 			String amnt = productPriceUtils.getAdminFormatedAmount(store, amount);
 			
-			System.out.println("amount: " + amnt);
-			
 			Stripe.apiKey = apiKey;
 			
 			//stripe does not support floating point
