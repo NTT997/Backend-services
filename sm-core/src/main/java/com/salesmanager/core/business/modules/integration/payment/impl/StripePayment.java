@@ -145,9 +145,11 @@ public class StripePayment implements PaymentModule {
 			//stripe does not support floating point
 			//so amnt * 100 or remove floating point
 			//553.47 = 55347
-			
-			String strAmount = String.valueOf(amnt);
+			String strAmount;
+			strAmount = String.valueOf(amnt);
 			strAmount = strAmount.replace(".","");
+			
+			//---------------
 			
 			Map<String, Object> chargeParams = new HashMap<String, Object>();
 			chargeParams.put("amount", strAmount);
@@ -173,6 +175,8 @@ public class StripePayment implements PaymentModule {
 			transaction.getTransactionDetails().put("TRNAPPROVED", ch.getStatus());
 			transaction.getTransactionDetails().put("TRNORDERNUMBER", ch.getId());
 			transaction.getTransactionDetails().put("MESSAGETEXT", null);
+			
+			System.out.println("amount in transaction: " + transaction.getAmount() + " - " +payment.getCurrency().getCode());
 			
 		} catch (Exception e) {
 			

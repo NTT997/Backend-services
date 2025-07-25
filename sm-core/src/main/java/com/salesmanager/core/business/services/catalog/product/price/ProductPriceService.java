@@ -1,5 +1,6 @@
 package com.salesmanager.core.business.services.catalog.product.price;
 
+import java.util.Date;
 import java.util.List;
 
 import com.salesmanager.core.business.exception.ServiceException;
@@ -20,5 +21,6 @@ public interface ProductPriceService extends SalesManagerEntityService<Long, Pro
 	
 	List<ProductPrice> findByInventoryId(Long productInventoryId, String sku, MerchantStore store);
 	
+	ProductPrice findByCodeAndDurationDate(String priceCode, Date startDate, Date endDate);
 
 }

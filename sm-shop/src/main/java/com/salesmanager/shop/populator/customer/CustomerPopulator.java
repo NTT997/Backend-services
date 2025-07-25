@@ -4,6 +4,7 @@ package com.salesmanager.shop.populator.customer;
 import java.math.BigDecimal;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.jgroups.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +68,12 @@ public class CustomerPopulator extends
 			  target.setPassword(passwordEncoder.encode(source.getPassword()));
 			  target.setNick(source.getUserName());
 			  target.setAnonymous(false);
+			}
+			
+			if(StringUtils.isBlank(source.getPassword())) {
+				target.setAnonymous(true);
+			    target.setNick(UUID.randomUUID().toString());
+				target.setPassword(null);
 			}
 
 			if(source.getBilling() != null) {

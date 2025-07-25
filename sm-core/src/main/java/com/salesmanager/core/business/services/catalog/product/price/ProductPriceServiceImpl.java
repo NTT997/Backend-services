@@ -2,6 +2,7 @@ package com.salesmanager.core.business.services.catalog.product.price;
 
 
 
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -71,6 +72,11 @@ public class ProductPriceServiceImpl extends SalesManagerEntityServiceImpl<Long,
 	public List<ProductPrice> findByInventoryId(Long productInventoryId, String sku, MerchantStore store) {
 
 		return productPriceRepository.findByProductInventoty(sku, productInventoryId, store.getCode());
+	}
+
+	@Override
+	public ProductPrice findByCodeAndDurationDate(String priceCode, Date startDate, Date endDate) {
+		return productPriceRepository.findByCodeAndDurationDate(priceCode, startDate, endDate);
 	}
 	
 

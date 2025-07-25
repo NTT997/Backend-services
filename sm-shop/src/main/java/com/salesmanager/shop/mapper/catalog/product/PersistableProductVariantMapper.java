@@ -44,13 +44,24 @@ public class PersistableProductVariantMapper implements Mapper<PersistableProduc
 	public ProductVariant merge(PersistableProductVariant source, ProductVariant destination, MerchantStore store,
 			Language language) {
 		
-		//
+	
 		Long productVariation = source.getVariation();
 		Long productVariationValue = source.getVariationValue();
 				
-		String productVariationCode = source.getVariationCode();
-		String productVariationValueCode = source.getVariationValueCode();
+		//get Product Sku
+		Product p = productService.getById(source.getProductId());
+		String productVariationCode;
+		String productVariationValueCode;
 		
+		if(p!=null) {
+			productVariationCode = p.getSku() + "-" + source.getVariationCode() ;
+			productVariationValueCode = p.getSku() + "-" + source.getVariationValueCode();
+		}
+		else {
+			productVariationCode = source.getVariationCode();
+			productVariationValueCode = source.getVariationValueCode();
+		}
+
 		Optional<ProductVariation> variation = null;
 		Optional<ProductVariation> variationValue = null;
 			

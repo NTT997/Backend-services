@@ -104,13 +104,8 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
 		{
 
 			List<ProductVariation> variations = productVariationService.getByIds(Arrays.asList(productVariant.getVariation(),productVariant.getVariationValue()), store);
-			
-			System.out.println("variations: " + variations.toString());
-			
+						
 			boolean differentOption = variations.stream().map(i -> i.getProductOption().getCode()).distinct().count() > 1;
-			
-			System.out.println("ket qua: " + differentOption);
-			
 			
 			if(!differentOption) {
 				throw new ConstraintException("Product option of instance.variant and instance.variantValue must be different");

@@ -14,6 +14,7 @@ import com.salesmanager.core.model.catalog.product.price.FinalPrice;
 import com.salesmanager.core.model.common.UserContext;
 import com.salesmanager.core.model.customer.Customer;
 import com.salesmanager.core.model.merchant.MerchantStore;
+import com.salesmanager.core.model.order.Order;
 import com.salesmanager.core.model.shipping.ShippingProduct;
 import com.salesmanager.core.model.shoppingcart.ShoppingCart;
 import com.salesmanager.core.model.shoppingcart.ShoppingCartAttributeItem;
@@ -508,6 +509,12 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
 		}
 
+	}
+
+	@Override
+	public ShoppingCart getByOrderId(Long orderId, MerchantStore store) throws ServiceException {
+		
+		return shoppingCartRepository.findByOrderId(orderId, store);
 	}
 
 }
