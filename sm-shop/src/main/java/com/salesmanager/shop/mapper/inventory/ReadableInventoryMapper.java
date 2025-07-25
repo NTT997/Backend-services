@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.salesmanager.core.business.exception.ConversionException;
-import com.salesmanager.core.business.exception.ServiceException;
 import com.salesmanager.core.business.services.catalog.pricing.PricingService;
 import com.salesmanager.core.model.catalog.product.availability.ProductAvailability;
 import com.salesmanager.core.model.catalog.product.price.FinalPrice;
@@ -58,6 +57,9 @@ public class ReadableInventoryMapper implements Mapper<ProductAvailability, Read
 			destination.setRegion(source.getRegion());
 			destination.setRegionVariant(source.getRegionVariant());
 			destination.setStore(store(store, language));
+			
+			destination.setExpirationDate(source.getExpirationDate()); //Tho
+			
 			if (source.getAvailable() != null) {
 				if (source.getProductDateAvailable() != null) {
 					boolean isAfter = LocalDate.parse(DateUtil.getPresentDate())

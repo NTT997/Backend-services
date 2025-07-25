@@ -111,6 +111,8 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
 			destination.setAvailable(source.isAvailable());
 			destination.setOwner(source.getOwner());
 
+			destination.setExpirationDate(source.getExpirationDate()); //Tho
+			
 			String region = getRegion(source);
 			destination.setRegion(region);
 

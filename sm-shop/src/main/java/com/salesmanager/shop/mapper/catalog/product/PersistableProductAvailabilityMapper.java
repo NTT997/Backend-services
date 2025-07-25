@@ -21,10 +21,10 @@ import com.salesmanager.shop.utils.DateUtil;
 
 @Component
 public class PersistableProductAvailabilityMapper implements Mapper<PersistableProductInventory, ProductAvailability> {
-	
+
 	@Autowired
-	private ProductAvailabilityService productAvailService; //huy
-	
+	private ProductAvailabilityService productAvailService; // huy
+
 //	@Override
 //	public ProductAvailability convert(PersistableProductInventory source, MerchantStore store, Language language) {
 //		return this.merge(source, new ProductAvailability(), store, language);
@@ -32,23 +32,22 @@ public class PersistableProductAvailabilityMapper implements Mapper<PersistableP
 
 	@Override
 	public ProductAvailability convert(PersistableProductInventory source, MerchantStore store, Language language) {
-	    ProductAvailability availability;
-	    System.out.println("source.getId: " + source.getId());
-	    
-	    if (source.getId() != null) {
-	        availability = productAvailService.getById(source.getId());
+		ProductAvailability availability;
+		System.out.println("source.getId: " + source.getId());
 
-	        if (availability == null) {
-	            throw new ResourceNotFoundException("ProductAvailability ID [" + source.getId() + "] not found");
-	        }
-	    } else {
-	        availability = new ProductAvailability();
-	    }
+		if (source.getId() != null && source.getId().longValue() > 0) {
+			availability = productAvailService.getById(source.getId());
 
-	    return this.merge(source, availability, store, language);
+			if (availability == null) {
+				throw new ResourceNotFoundException("ProductAvailability ID [" + source.getId() + "] not found");
+			}
+		} else {
+			availability = new ProductAvailability();
+		}
+
+		return this.merge(source, availability, store, language);
 	}
 
-	
 	@Override
 	public ProductAvailability merge(PersistableProductInventory source, ProductAvailability destination,
 			MerchantStore store, Language language) {
@@ -56,7 +55,15 @@ public class PersistableProductAvailabilityMapper implements Mapper<PersistableP
 		try {
 
 			destination.setRegion(Constants.ALL_REGIONS);
-
+			/*
+			 * Tho
+			 */
+			destination.setMerchantStore(store);
+			destination.setSku(source.getSku());
+			destination.setExpirationDate(source.getExpiration());
+			/*
+			 * Tho
+			 */
 			destination.setProductQuantity(source.getQuantity());
 			destination.setProductQuantityOrderMin(1);
 			destination.setProductQuantityOrderMax(1);
@@ -99,12 +106,10 @@ public class PersistableProductAvailabilityMapper implements Mapper<PersistableP
 
 			}
 
-			
-
 		} catch (Exception e) {
 			throw new ServiceRuntimeException("An error occured while mapping product availability", e);
 		}
-		
+
 		return destination;
 	}
 
