@@ -487,22 +487,16 @@ public class OrderPaymentApi {
 							refundItem.setSku(op.getSku());
 							refundItem.setProductQuantity(pop.getOrderedQuantity());
 							refundItem.setPrices(op.getPrices());
-
-							System.out.println("refundItem: " + refundItem.getProductQuantity() + refundItem.getSku());
 							
 							refundListOrderProduct.add(refundItem);
-							
-							System.out.println(refundListOrderProduct.toString());
-							
+														
 						}
 						else {
 							System.out.println("sai");
 						}
 					}
 				}
-			}
-			System.out.println("refundListOrderProduct: " + refundListOrderProduct);
-			
+			}			
 
 			// 4) Determine refund amount
 			BigDecimal total = order.getTotal();

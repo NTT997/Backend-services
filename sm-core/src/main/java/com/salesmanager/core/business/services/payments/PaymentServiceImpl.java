@@ -560,6 +560,38 @@ public class PaymentServiceImpl implements PaymentService {
 			orderHistory.setStatus(OrderStatus.REFUNDED);
 			orderHistory.setDateAdded(new Date());
 			order.getOrderHistory().add(orderHistory);
+			
+			//update quantity in Product Availability
+			// 1. data: product variant, product availability, product
+			ShoppingCart cart = shoppingCartService.getByOrderId(order.getId(), store);
+			
+			for(OrderProduct orderProduct : listOrderProduct) {
+				Product product = productService.getBySku(orderProduct.getSku(), store);
+				
+				if(product != null) {
+					Set<ProductAvailability> listProductAvailability = product.getAvailabilities();
+					for(ProductAvailability pa : listProductAvailability) {
+						//duyet qua danh sach cart item de tim product variant
+						for(ShoppingCartItem cartItem : cart.getLineItems()) {
+							
+				            // Check trường hợp sản phẩm không có variant
+				            if (pa.getProductVariant() == null && cartItem.getVariant() == null) {
+				                int newQty = pa.getProductQuantity() + orderProduct.getProductQuantity();
+				                pa.setProductQuantity(newQty);
+				                productAvailabilityService.update(pa);
+				            }
+							
+							if(pa.getProductVariant() != null && Objects.equals(cartItem.getVariant(), pa.getProductVariant().getId())) {
+								int quantity = pa.getProductQuantity() + orderProduct.getProductQuantity();
+								pa.setProductQuantity(quantity);
+								productAvailabilityService.update(pa);
+							}
+
+						}
+					}
+				}
+
+			}
 
 			orderService.saveOrUpdate(order);
 		}
@@ -599,7 +631,6 @@ public class PaymentServiceImpl implements PaymentService {
 			//update quantity in Product Availability
 			// 1. data: product variant, product availability, product
 			ShoppingCart cart = shoppingCartService.getByOrderId(order.getId(), store);
-			System.out.println("cart: " + cart);
 			
 			for(OrderProduct orderProduct : listOrderProduct) {
 				Product product = productService.getBySku(orderProduct.getSku(), store);
