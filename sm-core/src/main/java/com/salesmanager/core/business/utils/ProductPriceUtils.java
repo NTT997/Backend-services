@@ -1,6 +1,7 @@
 package com.salesmanager.core.business.utils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Currency;
@@ -45,6 +46,7 @@ import com.salesmanager.core.model.order.orderproduct.OrderProduct;
 public class ProductPriceUtils {
 
 	private final static char DECIMALCOUNT = '2';
+	private final static char VN_DECIMALCOUNT = '0';
 	private final static char DECIMALPOINT = '.';
 	private final static char THOUSANDPOINT = ',';
 
@@ -257,12 +259,77 @@ public class ProductPriceUtils {
 			return "";
 		}
 
-		NumberFormat nf = NumberFormat.getInstance(Constants.DEFAULT_LOCALE);
+		Locale locale;
+		char decimalDigitCount;
+		String countryCode = store.getCountry() != null ? store.getCountry().getIsoCode() : Constants.DEFAULT_COUNTRY;
+		String languageCode = store.getDefaultLanguage() != null ? store.getDefaultLanguage().getCode()
+				: Constants.DEFAULT_LANGUAGE;
 
-		nf.setMaximumFractionDigits(Integer.parseInt(Character.toString(DECIMALCOUNT)));
-		nf.setMinimumFractionDigits(Integer.parseInt(Character.toString(DECIMALCOUNT)));
+		if ("VN".equalsIgnoreCase(countryCode)) {
+			locale = "en".equalsIgnoreCase(languageCode) ? Constants.VIETNAM_EN : Constants.VIETNAM_VI;
+			decimalDigitCount = VN_DECIMALCOUNT;
+		} else {
+			locale = Constants.DEFAULT_LOCALE;
+			decimalDigitCount = DECIMALCOUNT;
+		}
+
+		NumberFormat nf = NumberFormat.getInstance(locale);
+		int digits = Character.getNumericValue(decimalDigitCount);
+
+//		nf.setMaximumFractionDigits(Integer.parseInt(Character.toString(decimalDigitCount)));
+//		nf.setMinimumFractionDigits(Integer.parseInt(Character.toString(decimalDigitCount)));
+
+		nf.setMaximumFractionDigits(digits);
+		nf.setMinimumFractionDigits(digits);
 
 		return nf.format(amount);
+	}
+
+	/**
+	 * author Tho 
+	 * Stripe use case
+	 * 
+	 * Converts a major currency amount (e.g., 120.50) into minor units (e.g.,
+	 * 12050) for use with payment providers. For zero-decimal currencies like VND
+	 * or JPY, the original value is returned as-is.
+	 */
+	public String getAmountInMinorUnits(MerchantStore store, BigDecimal amount) {
+		if (amount == null) {
+			throw new IllegalArgumentException("Amount cannot be null");
+		}
+
+		String currencyCode = store.getCurrency().getCode();
+
+		if (isZeroDecimalCurrency(currencyCode)) {
+			// No need to multiply; e.g., 10000 VND stays as 10000
+			amount.setScale(0, RoundingMode.HALF_UP);
+		} else {
+			amount.multiply(BigDecimal.valueOf(100)).setScale(0, RoundingMode.HALF_UP);
+		}
+		return amount.toPlainString();
+	}
+	
+	
+	/**
+	 * author Tho 
+	 * Paypal use case
+	 * 
+	 */
+	public String getAmountInMajorUnits(MerchantStore store, BigDecimal amount) {
+	    if (amount == null) {
+	        throw new IllegalArgumentException("Amount cannot be null");
+	    }
+
+	    String currencyCode = store.getCurrency().getCode();
+	    int fractionDigits = isZeroDecimalCurrency(currencyCode) ? 0 : 2;
+
+	    BigDecimal majorAmount = amount.setScale(fractionDigits, RoundingMode.HALF_UP);
+	    return majorAmount.toPlainString();
+	}
+
+	private boolean isZeroDecimalCurrency(String currencyCode) {
+		// Extend this list based on business requirements
+		return Constants.ZERO_DECIMAL_CURRENCIES.contains(currencyCode.toUpperCase());
 	}
 
 	// Utility
