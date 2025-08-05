@@ -1,14 +1,13 @@
-package com.salesmanager.core.business.services.common.generic;
+package com.salesmanager.core.business.services.common.mongo_generic;
 
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-
+import org.springframework.data.mongodb.repository.MongoRepository;
 import com.salesmanager.core.business.exception.ServiceException;
 import com.salesmanager.core.business.mongo_repositories.users.GroupRepository;
-import com.salesmanager.core.model.generic.SalesManagerEntity;
+import com.salesmanager.core.business.mongo_repositories.users.UserRepository;
+import com.salesmanager.core.mongo_model.generic.SalesManagerEntity;
 
 /**
  * @param <T> entity type
@@ -22,10 +21,10 @@ public abstract class SalesManagerEntityServiceImpl<K extends Serializable & Com
 	private Class<E> objectClass;
 
 
-    private JpaRepository<E, K> repository;
+    private MongoRepository<E, K> repository;
     
 	@SuppressWarnings("unchecked")
-	public SalesManagerEntityServiceImpl(JpaRepository<E, K> repository) {
+	public SalesManagerEntityServiceImpl(MongoRepository<E, K> repository) {
 		ParameterizedType genericSuperclass = (ParameterizedType) getClass().getGenericSuperclass();
 		this.objectClass = (Class<E>) genericSuperclass.getActualTypeArguments()[1];
 		this.repository = repository;
@@ -66,7 +65,7 @@ public abstract class SalesManagerEntityServiceImpl<K extends Serializable & Com
 
 	
 	public void save(E entity) throws ServiceException {
-		repository.saveAndFlush(entity);
+		//repository.saveAndFlush(entity);
 	}
 	
 	public void saveAll(Iterable<E> entities) throws ServiceException {
@@ -91,7 +90,7 @@ public abstract class SalesManagerEntityServiceImpl<K extends Serializable & Com
 	
 	
 	public void flush() {
-		repository.flush();
+		//repository.flush();
 	}
 	
 
@@ -106,7 +105,8 @@ public abstract class SalesManagerEntityServiceImpl<K extends Serializable & Com
 	}
 	
 	protected E saveAndFlush(E entity) {
-		return repository.saveAndFlush(entity);
+		//return repository.saveAndFlush(entity);
+		return repository.save(entity);
 	}
 
 }
