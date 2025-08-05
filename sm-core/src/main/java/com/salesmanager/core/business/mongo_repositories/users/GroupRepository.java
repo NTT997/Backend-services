@@ -7,7 +7,7 @@ import java.util.Set;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import com.salesmanager.core.mongo_model.user.Group;
-import com.salesmanager.core.model.user.GroupType;
+
 
 public interface GroupRepository extends  MongoRepository<Group, Integer> {
 
