@@ -33,6 +33,7 @@
 		<dependency>
 			<groupId>com.shopizer</groupId>
 			<artifactId>sm-core</artifactId>
+			<version>3.2.5</version>
 		</dependency>
 
 		<dependency>

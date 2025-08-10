@@ -18,7 +18,6 @@ public class StoreRoute {
 	}
 
 	@Bean
-
 	public RouteLocator routingPublicStore(RouteLocatorBuilder builder) {
 	    return builder.routes()
 	        .route("store", r -> r
