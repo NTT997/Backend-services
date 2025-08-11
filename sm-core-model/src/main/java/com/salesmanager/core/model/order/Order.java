@@ -10,6 +10,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
@@ -30,6 +31,8 @@ import org.hibernate.annotations.Type;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.salesmanager.core.model.common.Billing;
 import com.salesmanager.core.model.common.Delivery;
+import com.salesmanager.core.model.common.audit.AuditSection;
+import com.salesmanager.core.model.common.audit.Auditable;
 import com.salesmanager.core.model.generic.SalesManagerEntity;
 import com.salesmanager.core.model.merchant.MerchantStore;
 import com.salesmanager.core.model.order.attributes.OrderAttribute;
@@ -43,7 +46,7 @@ import com.salesmanager.core.utils.CloneUtils;
 
 @Entity
 @Table (name="ORDERS")
-public class Order extends SalesManagerEntity<Long, Order> {
+public class Order extends SalesManagerEntity<Long, Order> implements Auditable{
 	
 	
 	/**
@@ -404,6 +407,20 @@ public class Order extends SalesManagerEntity<Long, Order> {
 
 	public void setShoppingCartCode(String shoppingCartCode) {
 		this.shoppingCartCode = shoppingCartCode;
+	}
+	
+	@Embedded
+	private AuditSection audit = new AuditSection();
+	
+	@Override
+	public AuditSection getAuditSection() {
+		return audit;
+	}
+
+	@Override
+	public void setAuditSection(AuditSection audit) {
+		// TODO Auto-generated method stub
+		this.audit = audit;
 	}
 
 }

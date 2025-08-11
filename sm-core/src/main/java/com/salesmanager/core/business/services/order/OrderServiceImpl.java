@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -33,11 +34,13 @@ import com.salesmanager.core.business.repositories.order.OrderRepository;
 import com.salesmanager.core.business.services.catalog.product.ProductService;
 import com.salesmanager.core.business.services.common.generic.SalesManagerEntityServiceImpl;
 import com.salesmanager.core.business.services.customer.CustomerService;
+import com.salesmanager.core.business.services.order.orderrequest.OrderRequestService;
 import com.salesmanager.core.business.services.order.ordertotal.OrderTotalService;
 import com.salesmanager.core.business.services.payments.PaymentService;
 import com.salesmanager.core.business.services.payments.TransactionService;
 import com.salesmanager.core.business.services.shipping.ShippingService;
 import com.salesmanager.core.business.services.shoppingcart.ShoppingCartService;
+import com.salesmanager.core.business.services.system.SystemConfigurationService;
 import com.salesmanager.core.business.services.tax.TaxService;
 import com.salesmanager.core.model.catalog.product.Product;
 import com.salesmanager.core.model.catalog.product.availability.ProductAvailability;
@@ -56,6 +59,9 @@ import com.salesmanager.core.model.order.OrderTotalType;
 import com.salesmanager.core.model.order.OrderTotalVariation;
 import com.salesmanager.core.model.order.OrderValueType;
 import com.salesmanager.core.model.order.orderproduct.OrderProduct;
+import com.salesmanager.core.model.order.orderrequest.OrderRequest;
+import com.salesmanager.core.model.order.orderrequest.OrderRequestApproval;
+import com.salesmanager.core.model.order.orderrequest.RequestApprovalStatus;
 import com.salesmanager.core.model.order.orderstatus.OrderStatus;
 import com.salesmanager.core.model.order.orderstatus.OrderStatusHistory;
 import com.salesmanager.core.model.payments.Payment;
@@ -65,6 +71,8 @@ import com.salesmanager.core.model.reference.language.Language;
 import com.salesmanager.core.model.shipping.ShippingConfiguration;
 import com.salesmanager.core.model.shoppingcart.ShoppingCart;
 import com.salesmanager.core.model.shoppingcart.ShoppingCartItem;
+import com.salesmanager.core.model.system.SystemConfigApprover;
+import com.salesmanager.core.model.system.SystemConfiguration;
 import com.salesmanager.core.model.tax.TaxItem;
 
 @Service("orderService")
@@ -101,6 +109,11 @@ public class OrderServiceImpl  extends SalesManagerEntityServiceImpl<Long, Order
 
     private final OrderRepository orderRepository;
 
+    @Inject
+	private OrderRequestService orderRequestService;
+
+    @Inject SystemConfigurationService systemConfigService ;
+    
     @Inject
     public OrderServiceImpl(OrderRepository orderRepository) {
         super(orderRepository);
@@ -142,11 +155,14 @@ public class OrderServiceImpl  extends SalesManagerEntityServiceImpl<Long, Order
     			order.setIpAddress(ipAddress);
     		}
     	}
-    	
-    	
 
     	//first process payment
+    	System.out.println("payment start");
+    	
     	Transaction processTransaction = paymentService.processPayment(customer, store, payment, items, order);
+    	
+    	System.out.println("payment success");
+
 
 //    	if(order.getOrderHistory()==null || order.getOrderHistory().size()==0 || order.getStatus()==null) 
     	
@@ -175,6 +191,56 @@ public class OrderServiceImpl  extends SalesManagerEntityServiceImpl<Long, Order
 
         order.setCustomerId(customer.getId());
         this.create(order);
+        
+        System.out.println("tao xong order");
+        
+        //tao order request
+        OrderRequest orderRequest = new OrderRequest();
+        orderRequest.setOrder(order); 
+        orderRequest.setCode("OR" + order.getId());
+        orderRequest.setCreatedAt(LocalDateTime.now());
+                
+        	//tim user updated
+        	orderRequest.setCreatedBy(null);
+        	//tim system config (Check dua vao gia se update auto sau)
+        	Long orderTotalConfig = order.getTotal()
+        									.divide(BigDecimal.valueOf(1000), RoundingMode.DOWN) //chia 100, lam tron xuong
+        									.longValue();
+        	SystemConfiguration orderConfig = systemConfigService.findConfigByTotal(orderTotalConfig);
+        	
+        	orderRequest.setSystemConfig(orderConfig);
+
+        	// Gán approvers : lay dua tren systemconfigApprover
+        	List<OrderRequestApproval> listOrderRequestApproval = new ArrayList<>();
+        	if(orderConfig.getApprovers() != null) {
+        		for( SystemConfigApprover approver : orderConfig.getApprovers() ) {
+        			
+        			OrderRequestApproval orderRequestApprover = new OrderRequestApproval();
+        			
+        			orderRequestApprover.setApprovedBy(approver.getApproverEmail());
+        			orderRequestApprover.setApprovedNotes(null);
+        			orderRequestApprover.setApprovedTime(null);
+        			orderRequestApprover.setOrderRequest(orderRequest);
+        			orderRequestApprover.setOrders(approver.getOrder());
+
+        	        // Nếu là approver đầu tiên thì set pending
+        	        if (approver.getOrder() == 0) {
+        	            orderRequestApprover.setStatus(RequestApprovalStatus.PENDING);
+        	        } else {
+        	            orderRequestApprover.setStatus(null);
+        	        }
+        			
+        			listOrderRequestApproval.add(orderRequestApprover);
+        		}
+        	}
+			orderRequest.setListOrderRequestApproval(listOrderRequestApproval);
+			
+        // Lưu vào DB
+        orderRequestService.createOrderRequest(orderRequest);
+
+		System.out.println("789");	
+
+        //-----------------
 
     	if(transaction!=null) {
     		transaction.setOrder(order);

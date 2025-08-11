@@ -58,6 +58,9 @@ public class PersistableProductAvailabilityMapper implements Mapper<PersistableP
 			/*
 			 * Tho
 			 */
+			
+			System.out.println("expi: " + source.getExpiration() );
+			
 			destination.setMerchantStore(store);
 			destination.setSku(source.getSku());
 			destination.setExpirationDate(source.getExpiration());
