@@ -8,5 +8,8 @@ public interface SystemConfigurationService extends
 		SalesManagerEntityService<Long, SystemConfiguration> {
 	
 	SystemConfiguration getByKey(String key) throws ServiceException;
+	
+	SystemConfiguration findConfigByTotal(long orderTotal) throws ServiceException;
+
 
 }

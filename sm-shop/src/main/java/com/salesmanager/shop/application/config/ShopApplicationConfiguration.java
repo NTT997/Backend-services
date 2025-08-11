@@ -32,11 +32,11 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import com.salesmanager.core.business.configuration.CoreApplicationConfiguration;
-import com.salesmanager.shop.filter.CorsFilter;
+//import com.salesmanager.shop.filter.CorsFilter;
 import com.salesmanager.shop.filter.XssFilter;
 import com.salesmanager.shop.utils.LabelUtils;
 
-@Configuration
+@Configuration	
 @ComponentScan({"com.salesmanager.shop"})
 @ServletComponentScan
 @Import({CoreApplicationConfiguration.class}) // import sm-core configurations
@@ -88,12 +88,12 @@ public class ShopApplicationConfiguration implements WebMvcConfigurer {
         .addPathPatterns("/customer/**");
      **/
 
-    registry
-        .addInterceptor(corsFilter())
-        // public services cors filter
-        .addPathPatterns("/services/**")
-        // REST api
-        .addPathPatterns("/api/**");
+//    registry
+//        .addInterceptor(corsFilter())
+//        // public services cors filter
+//        .addPathPatterns("/services/**")
+//        // REST api
+//        .addPathPatterns("/api/**");
 
   }
 
@@ -116,13 +116,12 @@ public class ShopApplicationConfiguration implements WebMvcConfigurer {
 	 * @Bean public StoreFilter storeFilter() { return new StoreFilter(); }
 	 */
 
-  @Bean
-  public CorsFilter corsFilter() {
-    return new CorsFilter();
-  }
+//  @Bean
+//  public CorsFilter corsFilter() {
+//    return new CorsFilter();
+//  }
 
 
-  @Bean
   public SessionLocaleResolver localeResolver() {
     SessionLocaleResolver slr = new SessionLocaleResolver();
     slr.setDefaultLocale(Locale.getDefault());

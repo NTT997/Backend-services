@@ -27,6 +27,11 @@ public class SystemConfigurationServiceImpl extends
 	public SystemConfiguration getByKey(String key) throws ServiceException {
 		return systemConfigurationReposotory.findByKey(key);
 	}
+
+	@Override
+	public SystemConfiguration findConfigByTotal(long orderTotal) throws ServiceException {
+		return systemConfigurationReposotory.findConfigByTotal(orderTotal);
+	}
 	
 
 

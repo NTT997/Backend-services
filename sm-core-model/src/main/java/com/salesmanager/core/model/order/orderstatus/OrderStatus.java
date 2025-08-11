@@ -3,6 +3,7 @@ package com.salesmanager.core.model.order.orderstatus;
 public enum OrderStatus {
 	
 	ORDERED("ordered"),
+	PROCESSING("processing"),
 	PROCESSED("processed"),
 	DELIVERED("delivered"),
 	REFUNDED("refunded"),

@@ -25,6 +25,14 @@ public class UserRoute {
 	            .filters(f -> f.rewritePath("/public/store/(?<segment>.*)", "/api/v1/store/${segment}"))
 	            .uri("http://localhost:8080") 
 	        )
+	        .route("user-login", r -> r
+	        		.path("/user/login")
+	        		.and()
+	        		.method(HttpMethod.POST)
+		            .filters(f -> f.rewritePath("/user/login", "/api/v1/private/login"))
+	        		.uri("http://localhost:8080") 
+	        )
+	        
 	        .build(); 
     }
     @Bean
