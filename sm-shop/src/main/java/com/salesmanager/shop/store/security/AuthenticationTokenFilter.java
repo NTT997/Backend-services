@@ -55,10 +55,10 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
     		origin = request.getHeader("origin");
     	}
     	//in flight
-    	response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS, DELETE, PATCH");
-    	response.setHeader("Access-Control-Allow-Origin", origin);
-    	response.setHeader("Access-Control-Allow-Headers", "X-Auth-Token, Content-Type, Authorization, Cache-Control, X-Requested-With");
-    	response.setHeader("Access-Control-Allow-Credentials", "true");
+//    	response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS, DELETE, PATCH");
+//    	response.setHeader("Access-Control-Allow-Origin", origin);
+//    	response.setHeader("Access-Control-Allow-Headers", "X-Auth-Token, Content-Type, Authorization, Cache-Control, X-Requested-With");
+//    	response.setHeader("Access-Control-Allow-Credentials", "true");
 
     	try {
     		

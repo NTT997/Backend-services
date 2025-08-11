@@ -10,6 +10,10 @@ public interface SystemConfigurationService extends
 		SalesManagerEntityService<Long, SystemConfiguration> {
 	
 	SystemConfiguration getByKey(String key) throws ServiceException;
+	
+	SystemConfiguration findConfigByTotal(long orderTotal) throws ServiceException;
+
+
 	List<SystemConfiguration> getAllConfigurations() throws ServiceException;
 	SystemConfiguration updateByKey(Long id, String value)throws ServiceException;		
 }
