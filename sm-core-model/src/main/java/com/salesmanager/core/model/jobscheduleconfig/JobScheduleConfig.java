@@ -13,7 +13,7 @@ import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
+import java.util.*;
 import com.salesmanager.core.model.generic.SalesManagerEntity;
 
 @Entity
@@ -67,17 +67,32 @@ public class JobScheduleConfig extends SalesManagerEntity<Long, JobScheduleConfi
         this.createdDate = new Date();
         this.lastUpdated = new Date();
     }
-    
+    private static final Map<String, String> CRON_MAP = new HashMap<>();
+
+    static {
+        CRON_MAP.put("0 0 * * * ?", "Every hour");
+        CRON_MAP.put("0 0 0 * * ?", "Every day at midnight");
+        CRON_MAP.put("0 0 12 * * ?", "Every day at noon");
+        CRON_MAP.put("0 0 0 ? * MON", "Every Monday at midnight");
+        CRON_MAP.put("0 0 0 1 * ?", "First day of every month at midnight");
+        // Add as many mappings as you want
+    }
+
+    public static String toHumanReadable(String cron) {
+        return CRON_MAP.getOrDefault(cron, cron);
+    }
+
     public JobScheduleConfig(String jobName, String cronExpression, Boolean enabled) {
         this();
         this.jobName = jobName;
         this.cronExpression = cronExpression;
         this.enabled = enabled;
+        this.description = toHumanReadable(cronExpression);
     }
     
     public JobScheduleConfig(String jobName, String cronExpression, Boolean enabled, String description) {
         this(jobName, cronExpression, enabled);
-        this.description = description;
+        this.description = toHumanReadable(cronExpression);
     }
     
     // Update last updated timestamp before persist/update

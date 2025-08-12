@@ -63,4 +63,8 @@ public interface JobScheduleConfigRepository extends JpaRepository<JobScheduleCo
     @Transactional
     @Query("UPDATE JobScheduleConfig j SET j.lastExecutionStatus = :status WHERE j.jobName = :jobName")
     int updateExecutionStatus(@Param("jobName") String jobName, @Param("status") String status);
+
+//    @Query("SELECT * FROM JobScheduleConfig ORDER BY jobName ASC")
+//    List<JobScheduleConfig> findAllJobs();
+
 }

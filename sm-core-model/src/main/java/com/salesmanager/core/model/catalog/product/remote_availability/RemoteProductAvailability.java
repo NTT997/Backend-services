@@ -1,4 +1,4 @@
-package com.salesmanager.core.model.catalog.product.availability;
+package com.salesmanager.core.model.catalog.product.remote_availability;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -31,6 +31,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.salesmanager.core.constants.SchemaConstant;
 import com.salesmanager.core.model.catalog.product.Product;
 import com.salesmanager.core.model.catalog.product.ProductDimensions;
+import com.salesmanager.core.model.catalog.product.availability.ProductAvailability;
 import com.salesmanager.core.model.catalog.product.price.ProductPrice;
 import com.salesmanager.core.model.catalog.product.variant.ProductVariant;
 import com.salesmanager.core.model.common.audit.AuditSection;
@@ -39,7 +40,7 @@ import com.salesmanager.core.model.generic.SalesManagerEntity;
 import com.salesmanager.core.model.merchant.MerchantStore;
 import com.salesmanager.core.utils.CloneUtils;
 @Entity
-@Table(name = "PRODUCT_AVAILABILITY",
+@Table(name = "REMOTE4_PRODUCT_AVAILABILITY",
 uniqueConstraints= @UniqueConstraint(columnNames = {"MERCHANT_ID", "PRODUCT_ID", "PRODUCT_VARIANT", "REGION_VARIANT"}),
 indexes = 
 	{ 
@@ -60,7 +61,7 @@ indexes =
  * @author carlsamson
  *
  */
-public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailability> implements Auditable {
+public class RemoteProductAvailability extends SalesManagerEntity<Long, RemoteProductAvailability> implements Auditable {
 
 	/**
 	* 
@@ -73,12 +74,12 @@ public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailab
 	@Id
 	@Column(name = "PRODUCT_AVAIL_ID", unique = true, nullable = false)
 	@TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT", pkColumnValue = "PRODUCT_AVAIL_SEQ_NEXT_VAL")
-	@GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+	//@GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
 	private Long id;
 
 	@JsonIgnore
 	@ManyToOne(targetEntity = Product.class)
-	@JoinColumn(name = "PRODUCT_ID", nullable = false)
+	@JoinColumn(name = "PRODUCT_ID", nullable = true)
 	private Product product;
 
 	/** Specific retailer store **/
@@ -108,11 +109,11 @@ public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailab
 	@Column(name = "DATE_AVAILABLE")
 	private Date productDateAvailable;
 	
-	@NotNull
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-	@Temporal(TemporalType.DATE)
-	@Column(name = "EXPIRATION_DATE", nullable = false)
-	private Date expirationDate;
+	 @NotNull
+	 @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	 @Temporal(TemporalType.DATE)
+	 @Column(name = "EXPIRATION_DATE", nullable = true)
+	 private Date expirationDate;
 
 	@Column(name = "REGION")
 	private String region = SchemaConstant.ALL_REGIONS;
@@ -140,7 +141,14 @@ public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailab
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "productAvailability", cascade = CascadeType.ALL)
 	private Set<ProductPrice> prices = new HashSet<ProductPrice>();
-	
+	public RemoteProductAvailability(Long availabilityId,int quantity,Long productId){
+		long avai = availabilityId;
+		long prID = productId;
+		this.id = avai;
+		this.productQuantity = quantity;
+		this.expirationDate = new Date();
+		this.product = new Product(productId);
+	}
 
 	@Transient
 	public ProductPrice defaultPrice() {
@@ -152,47 +160,12 @@ public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailab
 		return new ProductPrice();
 	}
 
-	public ProductAvailability() {
+	public RemoteProductAvailability() {
 	}
 
-	public ProductAvailability(Product product, MerchantStore store) {
+	public RemoteProductAvailability(Product product, MerchantStore store) {
 		this.product = product;
 		this.merchantStore = store;
-	}
-	public ProductAvailability(int availabilityId,int quantity,int productId){
-		long avai = availabilityId;
-		long prID = productId;
-		this.id = avai;
-		this.productQuantity = quantity;
-		this.product = new Product(prID);
-	}
-	
-
-
-	public ProductAvailability(Long id, Product product, MerchantStore merchantStore, ProductVariant productVariant,
-			@Pattern(regexp = "^[a-zA-Z0-9_]*$") String sku, ProductDimensions dimensions,
-			@NotNull Integer productQuantity, Date productDateAvailable, @NotNull Date expirationDate, String region,
-			String regionVariant, String owner, boolean productStatus, boolean productIsAlwaysFreeShipping,
-			Boolean available, Integer productQuantityOrderMin, Integer productQuantityOrderMax,
-			Set<ProductPrice> prices) {
-		this.id = id;
-		this.product = product;
-		this.merchantStore = merchantStore;
-		this.productVariant = productVariant;
-		this.sku = sku;
-		this.dimensions = dimensions;
-		this.productQuantity = productQuantity;
-		this.productDateAvailable = productDateAvailable;
-		this.expirationDate = expirationDate;
-		this.region = region;
-		this.regionVariant = regionVariant;
-		this.owner = owner;
-		this.productStatus = productStatus;
-		this.productIsAlwaysFreeShipping = productIsAlwaysFreeShipping;
-		this.available = available;
-		this.productQuantityOrderMin = productQuantityOrderMin;
-		this.productQuantityOrderMax = productQuantityOrderMax;
-		this.prices = prices;
 	}
 
 	public Integer getProductQuantity() {
@@ -216,7 +189,7 @@ public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailab
 	}
 
 	public void setExpirationDate(Date expirationDate) {
-		this.expirationDate = expirationDate;
+	 	this.expirationDate = expirationDate;
 	}
 
 	public String getRegion() {

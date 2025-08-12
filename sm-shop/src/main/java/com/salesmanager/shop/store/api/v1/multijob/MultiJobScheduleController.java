@@ -28,7 +28,7 @@ public class MultiJobScheduleController {
     // Get all jobs configuration
     @GetMapping
     public ResponseEntity<List<JobScheduleConfig>> getAllSchedules() {
-        List<JobScheduleConfig> configs = scheduleConfigService.getAllEnabledJobs();
+        List<JobScheduleConfig> configs = scheduleConfigService.getAllJobs();
         return ResponseEntity.ok(configs);
     }
     
@@ -40,7 +40,7 @@ public class MultiJobScheduleController {
     }
     
     // Update job schedule and enable status
-    @PostMapping("/{jobName}")
+    @GetMapping("/update/{jobName}")
     public ResponseEntity<JobScheduleConfig> updateScheduleConfig(
             @PathVariable String jobName,
             @RequestParam String cronExpression,
@@ -49,7 +49,7 @@ public class MultiJobScheduleController {
         try {
             // Validate cron expression
             new CronTrigger(cronExpression);
-            
+            System.out.println("PRINT LINE 52 AT CONTROLLER");
             JobScheduleConfig config = scheduleConfigService.saveOrUpdateScheduleConfig(
                 jobName, cronExpression, enabled);
             

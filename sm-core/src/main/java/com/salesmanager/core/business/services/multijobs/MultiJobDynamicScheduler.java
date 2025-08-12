@@ -1,20 +1,35 @@
 package com.salesmanager.core.business.services.multijobs;
-import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.TaskScheduler;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.ws.rs.core.MediaType;
+
+import com.salesmanager.core.business.exception.ServiceException;
+import com.salesmanager.core.business.services.catalog.remote_inventory.RemoteProductInventoryService;
 import com.salesmanager.core.business.services.system.ScheduleConfigService;
+import com.salesmanager.core.model.catalog.product.availability.ProductAvailability;
 import com.salesmanager.core.model.jobscheduleconfig.JobScheduleConfig;
+
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+
 import java.util.Date;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+
+
+import org.kie.soup.commons.util.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -30,16 +45,20 @@ public class MultiJobDynamicScheduler {
     @Autowired
     private ScheduleConfigService scheduleConfigService;
     
+    @Autowired
+    private RemoteProductInventoryService remoteProductInventoryService;
+
     // Store multiple scheduled tasks
     private Map<String, ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
     private Map<String, String> currentCronExpressions = new ConcurrentHashMap<>();
     
     // Define all your jobs here
     private static final List<JobDefinition> JOB_DEFINITIONS = Arrays.asList(
-        new JobDefinition("order", "0 0 2 * * ?", true),           // 2AM daily
-        new JobDefinition("cleanup", "0 */5 * * * ?", true),       // Every 5 minutes
-        new JobDefinition("backup", "0 0 1 * * ?", true),          // 1AM daily
-        new JobDefinition("report", "0 0 */6 * * ?", true)         // Every 6 hours
+//        new JobDefinition("order", "0 0 2 * * ?", true),           // 2AM daily
+//        new JobDefinition("cleanup", "0 */5 * * * ?", true),       // Every 5 minutes
+        new JobDefinition("inventory", "0 */1 * * * ?", true),       // Every 5 minutes,
+//        new JobDefinition("backup", "0 0 1 * * ?", true),          // 1AM daily
+        new JobDefinition("pull_product_job", "0 0 */6 * * ?", true)         // Every 6 hours
     );
     
     @PostConstruct
@@ -117,8 +136,8 @@ public class MultiJobDynamicScheduler {
                 
                 // Route to appropriate job execution method based on job name
                 switch (jobName.toLowerCase()) {
-                    case "order":
-                        performOrderJob();
+                    case "inventory":
+                        performInventoryJob();
                         break;
                     case "cleanup":
                         performCleanupJob();
@@ -126,7 +145,7 @@ public class MultiJobDynamicScheduler {
                     case "backup":
                         performBackupJob();
                         break;
-                    case "report":
+                    case "pull_product_job":
                         performReportJob();
                         break;
                     default:
@@ -147,21 +166,74 @@ public class MultiJobDynamicScheduler {
         }
     }
     
-    // Individual job execution methods
-    private void performOrderJob() {
-        logger.info("Performing order processing job...");
-        System.out.println("Performing order processing job...");
+//    // Individual job execution methods
+//    private void performInventoryJob() throws ServiceException {
+//        logger.info("Performing inventory sync processing job...");
+//        System.out.println("Performing inventory processing job...");
+//        try {
+//            Thread.sleep(2000); // Simulate order processing work
+//            System.out.println("Inventory processing job completed");
+//            List<ProductAvailability>productAvailabilities = new ArrayList<>();
+//            ProductAvailability prod1 = new ProductAvailability(1,30,1);
+//            RestTemplate restTemplate = new RestTemplate();//use for external call
+//            
+//            //ProductAvailability prod2 = new ProductAvailability(250,50,250);
+//            //api/v1/public/remote-availability/sync-data
+//            //productAvailabilities.add(prod2);
+//            productAvailabilities.add(prod1);
+//            remoteProductInventoryService.syncDataFromLocalToRemoteService(productAvailabilities);
+//            logger.info("Inventory processing job completed");
+//        } catch (InterruptedException e) {
+//            Thread.currentThread().interrupt();
+//            System.out.println("Inventory job was interrupted");
+//            logger.warn("Inventory job was interrupted");
+//        }
+//    }
+ // Individual job execution methods
+    private void performInventoryJob() throws ServiceException {
+        logger.info("Performing inventory sync processing job...");
+        System.out.println("Performing inventory processing job...");
         try {
             Thread.sleep(2000); // Simulate order processing work
-            System.out.println("Order processing job completed");
-            logger.info("Order processing job completed");
+            System.out.println("Inventory processing job completed");
+
+            // Prepare data
+            List<ProductAvailability> productAvailabilities = new ArrayList<>();
+            ProductAvailability prod1 = new ProductAvailability(1, 30, 1);
+            productAvailabilities.add(prod1);
+
+            // REST call setup
+            RestTemplate restTemplate = new RestTemplate();
+            String apiUrl = "http://localhost:8080/api/v1/public/remote-availability/sync-data";
+
+            // Wrap the request
+            HttpEntity requestEntity = new HttpEntity(productAvailabilities);
+
+            // Send POST request
+            ResponseEntity<String> response = restTemplate.postForEntity(apiUrl, requestEntity, String.class);
+
+            // Log result
+            if (response.getStatusCode().is2xxSuccessful()) {
+                logger.info("Inventory sync POST request successful: " + response.getBody());
+            } else {
+                logger.warn("Inventory sync POST request failed: " + response.getStatusCode());
+            }
+
+            logger.info("Inventory processing job completed");
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            System.out.println("Order job was interrupted");
-            logger.warn("Order job was interrupted");
+            System.out.println("Inventory job was interrupted");
+            logger.warn("Inventory job was interrupted");
+        } catch (Exception e) {
+            logger.error("Error performing inventory job", e);
         }
     }
-    
+
+    private List<ProductAvailability> List() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'List'");
+    }
+
     private void performCleanupJob() {
         logger.info("Performing cleanup job...");
         System.out.println("Performing cleanup job...");
@@ -191,16 +263,41 @@ public class MultiJobDynamicScheduler {
     }
     
     private void performReportJob() {
-        logger.info("Performing report generation job...");
-        System.out.println("Performing report generation job...");
+        logger.info("Performing pull product generation job...");
+        System.out.println("Performing pull product generation job...");
         try {
-            Thread.sleep(1500); // Simulate report generation work
-            System.out.println("Report generation job completed");
-            logger.info("Report generation job completed");
+            Thread.sleep(2000); // Simulate order processing work
+            System.out.println("Inventory processing job completed");
+
+            // Prepare data
+            List<ProductAvailability> productAvailabilities = new ArrayList<>();
+            ProductAvailability prod1 = new ProductAvailability(1, 30, 1);
+            productAvailabilities.add(prod1);
+
+            // REST call setup
+            RestTemplate restTemplate = new RestTemplate();
+            String apiUrl = "https://www.cakewaibackend.id.vn/api/public/products";
+
+            // Send GET request
+            ResponseEntity<String> response = restTemplate.getForEntity(apiUrl,String.class);
+
+            // Log result
+            if (response.getStatusCode().is2xxSuccessful()) {
+                logger.info("pull product successfully: " + response.getBody());
+                System.out.println("\n==============================================================================\n");
+                System.out.println(response.getBody());
+                System.out.println("\n==============================================================================\n");
+            } else {
+                logger.warn("Inventory sync GET request failed: " + response.getStatusCode());
+            }
+
+            logger.info("Products pulling job completed");
+            System.out.println("Products pulling job completed");
+            logger.info("Products pulling job completed");
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            System.out.println("Report job was interrupted");
-            logger.warn("Report job was interrupted");
+            System.out.println("Pulling job was interrupted");
+            logger.warn("Pulling job was interrupted");
         }
     }
     
@@ -268,7 +365,21 @@ public class MultiJobDynamicScheduler {
         ScheduledFuture<?> task = scheduledTasks.get(jobName);
         return task != null && !task.isCancelled();
     }
-    
+    private static final Map<String, String> CRON_MAP = new HashMap<>();
+
+    static {
+        CRON_MAP.put("0 0 * * * ?", "Every hour");
+        CRON_MAP.put("0 0 0 * * ?", "Every day at midnight");
+        CRON_MAP.put("0 0 12 * * ?", "Every day at noon");
+        CRON_MAP.put("0 0 0 ? * MON", "Every Monday at midnight");
+        CRON_MAP.put("0 0 0 1 * ?", "First day of every month at midnight");
+        // Add as many mappings as you want
+    }
+
+    public static String toHumanReadable(String cron) {
+        return CRON_MAP.getOrDefault(cron, cron);
+    }
+
     // Inner class for job definition
     private static class JobDefinition {
         private final String name;
@@ -279,6 +390,7 @@ public class MultiJobDynamicScheduler {
             this.name = name;
             this.defaultCron = defaultCron;
             this.defaultEnabled = defaultEnabled;
+            
         }
         
         public String getName() { return name; }

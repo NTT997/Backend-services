@@ -38,6 +38,8 @@ public interface ScheduleConfigService extends SalesManagerEntityService<Long, J
 
     public JobScheduleConfig saveScheduleConfig(JobScheduleConfig config);
 
+    public List<JobScheduleConfig> getAllJobs();
+
     // public void disableAllJobs();
 
     // public void enableAllJobs();
