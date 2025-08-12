@@ -20,7 +20,6 @@ public class PersistableOrder extends Order {
 	private Long shippingQuote;
 	@JsonIgnore
 	private Long shoppingCartId;
-	@JsonIgnore
 	private Long customerId;
 	
 	
