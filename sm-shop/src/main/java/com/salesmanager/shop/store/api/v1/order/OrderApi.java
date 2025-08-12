@@ -33,12 +33,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.salesmanager.core.business.services.customer.CustomerService;
 import com.salesmanager.core.business.services.shoppingcart.ShoppingCartService;
+import com.salesmanager.core.business.services.user.UserService;
 import com.salesmanager.core.model.customer.Customer;
 import com.salesmanager.core.model.merchant.MerchantStore;
 import com.salesmanager.core.model.order.Order;
 import com.salesmanager.core.model.order.OrderCriteria;
 import com.salesmanager.core.model.reference.language.Language;
 import com.salesmanager.core.model.shoppingcart.ShoppingCart;
+import com.salesmanager.core.model.user.User;
 import com.salesmanager.shop.constants.Constants;
 import com.salesmanager.shop.model.customer.PersistableCustomer;
 import com.salesmanager.shop.model.customer.ReadableCustomer;
@@ -75,6 +77,9 @@ public class OrderApi {
 
 	@Inject
 	private CustomerService customerService;
+	
+	@Inject
+	private UserService userService;
 
 	@Inject
 	private OrderFacade orderFacade;
@@ -400,6 +405,76 @@ public class OrderApi {
 		}
 	}
 
+	
+	/**
+	 * Action for performing a checkout on a given shopping cart
+	 *
+	 * @param id
+	 * @param order
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = { "/private/cart/{code}/checkout" }, method = RequestMethod.POST)
+	@ResponseStatus(HttpStatus.OK)
+	@ResponseBody
+	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "string", defaultValue = "DEFAULT"),
+			@ApiImplicitParam(name = "lang", dataType = "string", defaultValue = "en") })
+	public ReadableOrderConfirmation privateCheckout(
+			@PathVariable final String code, //shopping cart
+			@Valid @RequestBody PersistableOrder order, // order
+			@ApiIgnore MerchantStore merchantStore,
+			@ApiIgnore Language language,
+			HttpServletRequest request,
+			HttpServletResponse response, Locale locale) throws Exception {
+
+		try {
+			Principal principal = request.getUserPrincipal();
+			String userName = principal.getName();
+
+			User user = userService.getByUserName(userName);
+
+			if (user == null) {
+				response.sendError(401, "Error while performing checkout private admin not authorized");
+				return null;
+			}
+			
+			Customer customer = customerService.getById(order.getCustomerId());
+			if(customer == null) {
+				response.sendError(400, "Cant find any customer");
+				return null;
+			}
+			
+
+			ShoppingCart cart = shoppingCartService.getByCode(code, merchantStore);
+			if (cart == null) {
+				throw new ResourceNotFoundException("Cart code " + code + " does not exist");
+			}
+
+			order.setShoppingCartId(cart.getId());
+			order.setCustomerId(user.getId());//That is an existing customer purchasing
+
+			Order modelOrder = orderFacade.processOrder(order, customer, merchantStore, language, locale);
+			Long orderId = modelOrder.getId();
+			modelOrder.setId(orderId);
+
+
+			return orderFacadeV1.orderConfirmation(modelOrder, customer, merchantStore, language);
+
+
+
+		} catch (Exception e) {
+			LOGGER.error("Error while processing checkout", e);
+			try {
+				response.sendError(503, "Error while processing checkout " + e.getMessage());
+			} catch (Exception ignore) {
+			}
+			return null;
+		}
+	}
+	
+	
 	/**
 	 * Main checkout resource that will complete the order flow
 	 * @param code

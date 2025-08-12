@@ -46,6 +46,26 @@ public class OrderingRoute {
 						.uri("http://localhost:8080"))
 				.build();
 	}
+	
+	//admin checkout order
+	@Bean
+	public RouteLocator routingPrivateOrderingCheckout(RouteLocatorBuilder builder) {
+	    return builder.routes()
+	        .route("private-ordering-checkout", r -> r
+	            .path("/private/ordering/cart/{code}/checkout")
+	            .and()
+	            .method(HttpMethod.POST)
+	            .filters(f -> f
+	                .rewritePath(
+	                    "/private/ordering/cart/(?<code>[^/]+)/checkout",
+	                    "/api/v1/private/cart/${code}/checkout"
+	                )
+	                .filter(jwtAuthFilter.apply(new JwtAuthFilter.Config()))
+	            )
+	            .uri("http://localhost:8080")
+	        )
+	        .build();
+	}
 
 	@Bean
 	public RouteLocator routingPrivateOrdering(RouteLocatorBuilder builder) {
@@ -63,4 +83,5 @@ public class OrderingRoute {
 								.uri("http://localhost:8080"))
 				.build();
 	}
+	
 }
