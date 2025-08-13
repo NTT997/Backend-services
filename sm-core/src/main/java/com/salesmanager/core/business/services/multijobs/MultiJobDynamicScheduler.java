@@ -9,6 +9,7 @@ import javax.annotation.PreDestroy;
 import javax.ws.rs.core.MediaType;
 
 import com.salesmanager.core.business.exception.ServiceException;
+import com.salesmanager.core.business.services.catalog.inventory.ProductInventoryService;
 import com.salesmanager.core.business.services.catalog.remote_inventory.RemoteProductInventoryService;
 import com.salesmanager.core.business.services.system.ScheduleConfigService;
 import com.salesmanager.core.model.catalog.product.availability.ProductAvailability;
@@ -28,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-
+import org.hibernate.Hibernate;
 import org.kie.soup.commons.util.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +48,10 @@ public class MultiJobDynamicScheduler {
     
     @Autowired
     private RemoteProductInventoryService remoteProductInventoryService;
+    
+    @Autowired 
+    private ProductInventoryService localProductInventoryService;
+    
 
     // Store multiple scheduled tasks
     private Map<String, ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
@@ -189,30 +194,26 @@ public class MultiJobDynamicScheduler {
 //            logger.warn("Inventory job was interrupted");
 //        }
 //    }
- // Individual job execution methods
+    // Individual job execution methods
     private void performInventoryJob() throws ServiceException {
         logger.info("Performing inventory sync processing job...");
         System.out.println("Performing inventory processing job...");
         try {
-            Thread.sleep(2000); // Simulate order processing work
+            Thread.sleep(2000); 
             System.out.println("Inventory processing job completed");
 
-            // Prepare data
-            List<ProductAvailability> productAvailabilities = new ArrayList<>();
-            ProductAvailability prod1 = new ProductAvailability(1, 30, 1);
-            productAvailabilities.add(prod1);
+            List<ProductAvailability>productAvailabilities = new ArrayList<>();
 
-            // REST call setup
+            System.out.println("TONG SO LUONG SAN PHAM: "+productAvailabilities.size());
+            productAvailabilities.forEach(System.out::println);
+
             RestTemplate restTemplate = new RestTemplate();
             String apiUrl = "http://localhost:8080/api/v1/public/remote-availability/sync-data";
-
-            // Wrap the request
+           
             HttpEntity requestEntity = new HttpEntity(productAvailabilities);
 
-            // Send POST request
             ResponseEntity<String> response = restTemplate.postForEntity(apiUrl, requestEntity, String.class);
 
-            // Log result
             if (response.getStatusCode().is2xxSuccessful()) {
                 logger.info("Inventory sync POST request successful: " + response.getBody());
             } else {
@@ -225,7 +226,7 @@ public class MultiJobDynamicScheduler {
             System.out.println("Inventory job was interrupted");
             logger.warn("Inventory job was interrupted");
         } catch (Exception e) {
-            logger.error("Error performing inventory job", e);
+            logger.error("Error performing inventory job"+ e);
         }
     }
 

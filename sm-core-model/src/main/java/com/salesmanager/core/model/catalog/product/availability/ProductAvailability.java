@@ -82,7 +82,7 @@ public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailab
 	private Product product;
 
 	/** Specific retailer store **/
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "MERCHANT_ID", nullable = true)
 	private MerchantStore merchantStore;
 	
@@ -138,7 +138,7 @@ public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailab
 	@Column(name = "QUANTITY_ORD_MAX")
 	private Integer productQuantityOrderMax = 0;
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "productAvailability", cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "productAvailability", cascade = CascadeType.ALL)
 	private Set<ProductPrice> prices = new HashSet<ProductPrice>();
 	
 
@@ -167,7 +167,30 @@ public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailab
 		this.product = new Product(prID);
 	}
 	
-
+	public ProductAvailability(long availabilityId,int quantity,long productId){
+		long avai = availabilityId;
+		long prID = productId;
+		this.id = avai;
+		this.productQuantity = quantity;
+		this.product = new Product(prID);
+	}
+	public ProductAvailability(long availabilityId,int quantity,Product product){
+		long avai = availabilityId;
+		this.id = avai;
+		this.productQuantity = quantity;
+		this.product = product;
+	}
+	@Override
+	public String toString() {
+		return "ProductAvailability [auditSection=" + auditSection + ", id=" + id + ", product=" + product
+				+ ", merchantStore=" + merchantStore + ", productVariant=" + productVariant + ", sku=" + sku
+				+ ", dimensions=" + dimensions + ", productQuantity=" + productQuantity + ", productDateAvailable="
+				+ productDateAvailable + ", expirationDate=" + expirationDate + ", region=" + region
+				+ ", regionVariant=" + regionVariant + ", owner=" + owner + ", productStatus=" + productStatus
+				+ ", productIsAlwaysFreeShipping=" + productIsAlwaysFreeShipping + ", available=" + available
+				+ ", productQuantityOrderMin=" + productQuantityOrderMin + ", productQuantityOrderMax="
+				+ productQuantityOrderMax + ", prices=" + prices + "]\n";
+	}
 
 	public ProductAvailability(Long id, Product product, MerchantStore merchantStore, ProductVariant productVariant,
 			@Pattern(regexp = "^[a-zA-Z0-9_]*$") String sku, ProductDimensions dimensions,

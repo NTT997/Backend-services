@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.salesmanager.core.business.exception.ServiceException;
+import com.salesmanager.core.business.repositories.catalog.product.availability.ProductAvailabilityRepository;
 import com.salesmanager.core.business.repositories.catalog.product.remote_availability.RemoteProductAvailabilityRepository;
+import com.salesmanager.core.business.services.catalog.inventory.ProductInventoryService;
 import com.salesmanager.core.model.catalog.product.availability.ProductAvailability;
 import com.salesmanager.core.model.catalog.product.remote_availability.RemoteProductAvailability;
 
@@ -15,28 +17,31 @@ public class RemoteProductInventoryServiceImpl implements RemoteProductInventory
 
     @Autowired
     RemoteProductAvailabilityRepository remoteProductAvailabilityRepository;
-
+    
+    @Autowired
+    private ProductAvailabilityRepository localProductAvailabilityRepository;
     @Override
     public void syncDataFromLocalToRemoteService(List<ProductAvailability> productAvailabilityList)
             throws ServiceException {
+    	List<ProductAvailability>productAvailabilities = localProductAvailabilityRepository.findAll();
 
-        if (productAvailabilityList == null || productAvailabilityList.isEmpty()) {
+        
+        if (productAvailabilities == null || productAvailabilities.isEmpty()) {
             // No data to sync
+        	System.out.println("NO PRODUCT FOUND");
             return;
         }
-
-        for (ProductAvailability localProduct : productAvailabilityList) {
+        System.out.println("PRINT LINE 27 OF SYNC METHOD");
+        for (ProductAvailability localProduct : productAvailabilities) {
             try {
+            	System.out.println(localProduct.getId());
                 // Lấy bản copy từ remote server
-                RemoteProductAvailability remoteProduct = null;
-                
-                System.out.println(remoteProduct);
-                long temp_data = 1;
-                remoteProduct = remoteProductAvailabilityRepository.getById(temp_data);
+                RemoteProductAvailability remoteProduct = remoteProductAvailabilityRepository.getById(localProduct.getId());
                 System.out.println(remoteProduct);
                 
                 if (remoteProduct == null) {
-                    RemoteProductAvailability remoteAvaiProduct = new RemoteProductAvailability(localProduct.getId(),localProduct.getProductQuantity(),temp_data);
+                	System.out.println("HANDLE WHEN REMOTE PRODUCT IS NULL");
+                    RemoteProductAvailability remoteAvaiProduct = new RemoteProductAvailability(localProduct.getId(),localProduct.getProductQuantity(),localProduct.getProduct().getId());
                     
                     remoteProductAvailabilityRepository.save(remoteAvaiProduct);
                     continue;

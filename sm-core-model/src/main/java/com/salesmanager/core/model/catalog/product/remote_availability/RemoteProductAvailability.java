@@ -40,8 +40,8 @@ import com.salesmanager.core.model.generic.SalesManagerEntity;
 import com.salesmanager.core.model.merchant.MerchantStore;
 import com.salesmanager.core.utils.CloneUtils;
 @Entity
-@Table(name = "REMOTE4_PRODUCT_AVAILABILITY",
-uniqueConstraints= @UniqueConstraint(columnNames = {"MERCHANT_ID", "PRODUCT_ID", "PRODUCT_VARIANT", "REGION_VARIANT"}),
+@Table(name = "REMOTE_PRODUCT_AVAILABILITY",
+uniqueConstraints= @UniqueConstraint(columnNames = {"MERCHANT_ID", "PRODUCT_VARIANT", "REGION_VARIANT"}),
 indexes = 
 	{ 
 		@Index(name="PRD_AVAIL_STORE_PRD_IDX", columnList = "PRODUCT_ID,MERCHANT_ID"),
@@ -72,7 +72,7 @@ public class RemoteProductAvailability extends SalesManagerEntity<Long, RemotePr
 	private AuditSection auditSection = new AuditSection();
 
 	@Id
-	@Column(name = "PRODUCT_AVAIL_ID", unique = true, nullable = false)
+	@Column(name = "PRODUCT_AVAIL_ID", unique = false, nullable = false)
 	@TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT", pkColumnValue = "PRODUCT_AVAIL_SEQ_NEXT_VAL")
 	//@GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
 	private Long id;
@@ -139,8 +139,9 @@ public class RemoteProductAvailability extends SalesManagerEntity<Long, RemotePr
 	@Column(name = "QUANTITY_ORD_MAX")
 	private Integer productQuantityOrderMax = 0;
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "productAvailability", cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "productAvailability", cascade = CascadeType.ALL)
 	private Set<ProductPrice> prices = new HashSet<ProductPrice>();
+	
 	public RemoteProductAvailability(Long availabilityId,int quantity,Long productId){
 		long avai = availabilityId;
 		long prID = productId;
