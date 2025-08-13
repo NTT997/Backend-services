@@ -1,5 +1,6 @@
 package com.salesmanager.core.business.services.catalog.inventory;
 
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -10,6 +11,7 @@ import org.springframework.util.CollectionUtils;
 
 import com.salesmanager.core.business.constants.Constants;
 import com.salesmanager.core.business.exception.ServiceException;
+import com.salesmanager.core.business.repositories.catalog.product.availability.ProductAvailabilityRepository;
 import com.salesmanager.core.business.services.catalog.pricing.PricingService;
 import com.salesmanager.core.model.catalog.product.Product;
 import com.salesmanager.core.model.catalog.product.availability.ProductAvailability;
@@ -24,6 +26,9 @@ public class ProductInventoryServiceImpl implements ProductInventoryService {
 	
 	@Autowired
 	private PricingService pricingService;
+	
+	@Autowired
+	private ProductAvailabilityRepository localProductAvailabilityRepository;
 
 	@Override
 	public ProductInventory inventory(Product product) throws ServiceException {
@@ -81,5 +86,9 @@ public class ProductInventoryServiceImpl implements ProductInventoryService {
 		
 		return inventory;
 	}
-
+	
+	@Override
+	public List<ProductAvailability>findAllProductInventory(){
+		return localProductAvailabilityRepository.findAll();
+	}
 }

@@ -60,6 +60,7 @@ public interface PageableProductAvailabilityRepository extends PagingAndSortingR
 					+ "where ppr.sku=?1 or ppi.sku=?1 ")
 	Page<ProductAvailability> getBySku(String productCode, Pageable pageable);
 
+	
 		
 	
 }
