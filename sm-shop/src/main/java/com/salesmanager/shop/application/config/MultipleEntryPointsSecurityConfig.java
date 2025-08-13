@@ -346,6 +346,7 @@ public class MultipleEntryPointsSecurityConfig {
 	        return provider;
 	    }
 
+
 		@Bean
 		public AuthenticationEntryPoint apiAdminAuthenticationEntryPoint() {
 			BasicAuthenticationEntryPoint entryPoint = new BasicAuthenticationEntryPoint();

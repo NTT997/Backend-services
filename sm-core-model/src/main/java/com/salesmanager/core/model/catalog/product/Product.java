@@ -249,6 +249,9 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
 
 	public Product() {
 	}
+	public Product(Long id) {
+		this.id = id; 
+	}
 
 	@Override
 	public Long getId() {
