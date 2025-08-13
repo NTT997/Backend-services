@@ -42,7 +42,7 @@ public interface OrderFacade {
 	/** process a valid order against an initial transaction **/
 	Order processOrder(ShopOrder order, Customer customer, Transaction transaction, MerchantStore store, Language language) throws ServiceException;
 	/** process a valid order submitted from the API **/
-	Order processOrder(com.salesmanager.shop.model.order.v1.PersistableOrder order, Customer customer, MerchantStore store, Language language, Locale locale) throws ServiceException;
+	Order processOrder(com.salesmanager.shop.model.order.v1.PersistableOrder order, Customer customer, MerchantStore store, Language language, Locale locale, String username) throws ServiceException;
 
 
 

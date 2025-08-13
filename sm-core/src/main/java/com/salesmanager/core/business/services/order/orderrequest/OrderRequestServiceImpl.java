@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.salesmanager.core.business.exception.ServiceException;
 import com.salesmanager.core.business.repositories.order.orderrequest.OrderRequestRepository;
 import com.salesmanager.core.model.order.orderrequest.OrderRequest;
+import com.salesmanager.core.model.order.orderrequest.RequestApprovalStatus;
 
 
 @Service("OrderRequestService")
@@ -26,8 +26,8 @@ public class OrderRequestServiceImpl implements OrderRequestService{
 	}
 
 	@Override
-	public List<OrderRequest> listByEmail(String email) {
-		return orderRequestRepository.findByEmail(email);
+	public List<OrderRequest> listByEmailAndOptionalStatus(String email, RequestApprovalStatus status) {
+		return orderRequestRepository.findByApproverAndOptionalStatus(email, status);
 	}
 
 	@Override
@@ -40,4 +40,5 @@ public class OrderRequestServiceImpl implements OrderRequestService{
 		// TODO Auto-generated method stub
 		orderRequestRepository.save(o);
 	}
+
 }

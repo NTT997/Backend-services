@@ -8,6 +8,8 @@ import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -52,6 +54,7 @@ public class SystemConfiguration extends SalesManagerEntity<Long, SystemConfigur
 	
 	@OneToMany(mappedBy = "systemConfig", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<SystemConfigApprover> approvers;
+	
 
 	public List<SystemConfigApprover> getApprovers() {
 	    return approvers;

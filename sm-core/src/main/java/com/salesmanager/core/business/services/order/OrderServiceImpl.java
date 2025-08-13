@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.support.SecurityContextProvider;
 import org.springframework.stereotype.Service;
 
 import com.salesmanager.core.business.constants.Constants;
@@ -46,6 +47,7 @@ import com.salesmanager.core.model.catalog.product.Product;
 import com.salesmanager.core.model.catalog.product.availability.ProductAvailability;
 import com.salesmanager.core.model.catalog.product.price.FinalPrice;
 import com.salesmanager.core.model.common.UserContext;
+import com.salesmanager.core.model.common.audit.AuditSection;
 import com.salesmanager.core.model.customer.Customer;
 import com.salesmanager.core.model.merchant.MerchantStore;
 import com.salesmanager.core.model.order.Order;
@@ -61,6 +63,7 @@ import com.salesmanager.core.model.order.OrderValueType;
 import com.salesmanager.core.model.order.orderproduct.OrderProduct;
 import com.salesmanager.core.model.order.orderrequest.OrderRequest;
 import com.salesmanager.core.model.order.orderrequest.OrderRequestApproval;
+import com.salesmanager.core.model.order.orderrequest.OrderRequestStatus;
 import com.salesmanager.core.model.order.orderrequest.RequestApprovalStatus;
 import com.salesmanager.core.model.order.orderstatus.OrderStatus;
 import com.salesmanager.core.model.order.orderstatus.OrderStatusHistory;
@@ -128,17 +131,17 @@ public class OrderServiceImpl  extends SalesManagerEntityServiceImpl<Long, Order
     }
 
     @Override
-    public Order processOrder(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary, Payment payment, MerchantStore store) throws ServiceException {
+    public Order processOrder(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary, Payment payment, MerchantStore store, String username) throws ServiceException {
 
-    	return process(order, customer, items, summary, payment, null, store);
+    	return process(order, customer, items, summary, payment, null, store, username);
     }
 
     @Override
     public Order processOrder(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary, Payment payment, Transaction transaction, MerchantStore store) throws ServiceException {
-    	return process(order, customer, items, summary, payment, transaction, store);
+    	return process(order, customer, items, summary, payment, transaction, store, "");
     }
 
-	private Order process(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary, Payment payment, Transaction transaction, MerchantStore store) throws ServiceException {
+	private Order process(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary, Payment payment, Transaction transaction, MerchantStore store, String username) throws ServiceException {
 
 
     	Validate.notNull(order, "Order cannot be null");
@@ -172,7 +175,7 @@ public class OrderServiceImpl  extends SalesManagerEntityServiceImpl<Long, Order
     	{
     		OrderStatus status = order.getStatus();
     		if(status==null) {
-    			status = OrderStatus.ORDERED;
+    			status = OrderStatus.PROCESSING;
     			order.setStatus(status);
     		}
     		Set<OrderStatusHistory> statusHistorySet = new HashSet<OrderStatusHistory>();
@@ -190,6 +193,12 @@ public class OrderServiceImpl  extends SalesManagerEntityServiceImpl<Long, Order
         }
 
         order.setCustomerId(customer.getId());
+        
+        //Auditsecion for order
+        AuditSection audit = new AuditSection();
+        audit.setModifiedBy(username);
+        order.setAuditSection(audit);
+        
         this.create(order);
         
         System.out.println("tao xong order");
@@ -199,10 +208,11 @@ public class OrderServiceImpl  extends SalesManagerEntityServiceImpl<Long, Order
         orderRequest.setOrder(order); 
         orderRequest.setCode("OR" + order.getId());
         orderRequest.setCreatedAt(LocalDateTime.now());
+        orderRequest.setStatus(OrderRequestStatus.PENDING);
                 
         	//tim user updated
         	orderRequest.setCreatedBy(null);
-        	//tim system config (Check dua vao gia se update auto sau)
+        	//tim system config (Check dua vao gia )
         	Long orderTotalConfig = order.getTotal()
         									.divide(BigDecimal.valueOf(1000), RoundingMode.DOWN) //chia 100, lam tron xuong
         									.longValue();
@@ -232,6 +242,10 @@ public class OrderServiceImpl  extends SalesManagerEntityServiceImpl<Long, Order
         			
         			listOrderRequestApproval.add(orderRequestApprover);
         		}
+        	}
+        	if (orderConfig.getApprovers() == null || listOrderRequestApproval.size() == 0) {
+        		order.setStatus(OrderStatus.APPROVED);
+        		orderRepository.save(order);
         	}
 			orderRequest.setListOrderRequestApproval(listOrderRequestApproval);
 			
@@ -768,6 +782,7 @@ public class OrderServiceImpl  extends SalesManagerEntityServiceImpl<Long, Order
 
 		return returnOrders;
 	}
+
 
 
 

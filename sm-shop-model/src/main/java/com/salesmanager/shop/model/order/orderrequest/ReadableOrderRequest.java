@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.salesmanager.core.model.order.orderrequest.OrderRequestApproval;
+import com.salesmanager.core.model.order.orderrequest.OrderRequestStatus;
 import com.salesmanager.core.model.user.User;
 
 public class ReadableOrderRequest implements Serializable {
@@ -20,7 +21,14 @@ public class ReadableOrderRequest implements Serializable {
 	private LocalDateTime createdAt;
     private List<ReadableOrderRequestApproval> listOrderRequestApproval;
     private Long configId;
+    private OrderRequestStatus status;
     
+	public OrderRequestStatus getStatus() {
+		return status;
+	}
+	public void setStatus(OrderRequestStatus status) {
+		this.status = status;
+	}
 	public Long getConfigId() {
 		return configId;
 	}
