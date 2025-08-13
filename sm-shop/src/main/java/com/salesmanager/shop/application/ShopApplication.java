@@ -16,16 +16,12 @@ import org.springframework.boot.ApplicationRunner;
 
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
 
-public class ShopApplication implements ApplicationRunner{
+public class ShopApplication{
 
 	public static void main(String[] args) throws InterruptedException {
 
 		SpringApplication.run(ShopApplication.class, args);
 	}
 
-	@Override
-	public void run(ApplicationArguments args) throws Exception {
-		SqlUtilities.syncDataFromLocalToRemote();
-	}
 
 }

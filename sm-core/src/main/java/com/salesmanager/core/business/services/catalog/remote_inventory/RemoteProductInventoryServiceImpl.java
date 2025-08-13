@@ -22,6 +22,7 @@ public class RemoteProductInventoryServiceImpl implements RemoteProductInventory
     
     @Autowired
     private ProductAvailabilityRepository localProductAvailabilityRepository;
+    
     @Override
     public void syncDataFromLocalToRemoteService(List<ProductAvailability> productAvailabilityList)
             throws ServiceException {
@@ -37,7 +38,7 @@ public class RemoteProductInventoryServiceImpl implements RemoteProductInventory
         for (ProductAvailability localProduct : productAvailabilities) {
             try {
             	System.out.println(localProduct.getId());
-                // Lấy bản copy từ remote server
+                
                 RemoteProductAvailability remoteProduct = remoteProductAvailabilityRepository.getById(localProduct.getId());
                 System.out.println(remoteProduct);
                 
@@ -49,7 +50,7 @@ public class RemoteProductInventoryServiceImpl implements RemoteProductInventory
                     continue;
                 }
 
-                // So sánh số lượng và cập nhật nếu cần
+                
                 if (localProduct.getProductQuantity() < remoteProduct.getProductQuantity()) {
                     remoteProduct.setProductQuantity(localProduct.getProductQuantity());
                     remoteProductAvailabilityRepository.save(remoteProduct); // Lưu lại
@@ -71,5 +72,6 @@ public class RemoteProductInventoryServiceImpl implements RemoteProductInventory
 	public void syncDataFromLocalToRemoteServiceSQL() throws SQLException {
 		SqlUtilities.syncDataFromLocalToRemote();	
 	}
+
     
 }

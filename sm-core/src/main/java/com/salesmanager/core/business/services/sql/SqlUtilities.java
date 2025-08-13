@@ -6,9 +6,9 @@ import java.util.*;
 public class SqlUtilities {
 	public static Connection getConnectionToDatabase() {
         // Database credentials
-        String url = ""; 
-        String user = "";
-        String password = "";
+        String url = "jdbc:oracle:thin:@localhost:1521/orclpdb"; 
+        String user = "SALESMANAGERS";
+        String password = "system";
         Connection connection = null;
         
         try {
@@ -31,6 +31,7 @@ public class SqlUtilities {
 	    ResultSet localData = getDataFromTableNamed("PRODUCT_AVAILABILITY");
 	    ResultSet remoteData = getDataFromTableNamed("REMOTE_PRODUCT_AVAILABILITY");
 
+	    System.out.println("print line 34 at syncDataFromLocalToRemote");
 	    Map<Integer, Integer> localMap = new HashMap<>();
 	    Map<Integer, Integer> remoteMap = new HashMap<>();
 
