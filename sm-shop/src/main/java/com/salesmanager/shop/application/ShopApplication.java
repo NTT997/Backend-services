@@ -7,14 +7,25 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.scheduling.config.ScheduledTask;
 
+import com.salesmanager.core.business.services.sql.SqlUtilities;
+
+import org.codehaus.plexus.component.annotations.Component;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 
 
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
-public class ShopApplication {
+
+public class ShopApplication implements ApplicationRunner{
 
 	public static void main(String[] args) throws InterruptedException {
 
 		SpringApplication.run(ShopApplication.class, args);
+	}
+
+	@Override
+	public void run(ApplicationArguments args) throws Exception {
+		SqlUtilities.syncDataFromLocalToRemote();
 	}
 
 }

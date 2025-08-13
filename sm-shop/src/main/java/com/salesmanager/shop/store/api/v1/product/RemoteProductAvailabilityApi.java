@@ -18,6 +18,8 @@ import com.salesmanager.core.model.reference.language.Language;
 import com.salesmanager.shop.model.catalog.product.inventory.PersistableInventory;
 import com.salesmanager.core.business.exception.ServiceException;
 import com.salesmanager.core.business.services.catalog.remote_inventory.RemoteProductInventoryService;
+
+import java.sql.SQLException;
 import java.util.List;
 
 import io.swagger.annotations.ApiImplicitParam;
@@ -37,7 +39,8 @@ public class RemoteProductAvailabilityApi {
 			@ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en") })
 	public void update(
 			@Valid @RequestBody List<ProductAvailability>localProductAvailability,
-			@ApiIgnore Language language) throws ServiceException {
-		remoteProductInventoryService.syncDataFromLocalToRemoteService(localProductAvailability);
+			@ApiIgnore Language language) throws ServiceException, SQLException {
+		//remoteProductInventoryService.syncDataFromLocalToRemoteService(localProductAvailability);
+		remoteProductInventoryService.syncDataFromLocalToRemoteServiceSQL();
 	}
 }
