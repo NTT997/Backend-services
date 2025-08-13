@@ -1,5 +1,6 @@
 package com.salesmanager.core.business.services.catalog.remote_inventory;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import com.salesmanager.core.business.exception.ServiceException;
 import com.salesmanager.core.business.repositories.catalog.product.availability.ProductAvailabilityRepository;
 import com.salesmanager.core.business.repositories.catalog.product.remote_availability.RemoteProductAvailabilityRepository;
 import com.salesmanager.core.business.services.catalog.inventory.ProductInventoryService;
+import com.salesmanager.core.business.services.sql.SqlUtilities;
 import com.salesmanager.core.model.catalog.product.availability.ProductAvailability;
 import com.salesmanager.core.model.catalog.product.remote_availability.RemoteProductAvailability;
 
@@ -62,6 +64,12 @@ public class RemoteProductInventoryServiceImpl implements RemoteProductInventory
                 throw new ServiceException("Failed to sync product ID: " + localProduct.getId(), e);
             }
         }
+        
+ 
     }
+	@Override
+	public void syncDataFromLocalToRemoteServiceSQL() throws SQLException {
+		SqlUtilities.syncDataFromLocalToRemote();	
+	}
     
 }
