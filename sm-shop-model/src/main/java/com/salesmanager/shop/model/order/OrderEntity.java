@@ -32,6 +32,14 @@ public class OrderEntity extends Order implements Serializable {
 	private boolean confirmedAddress;
 	private String comments;
 	
+	private String username;
+	
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
 	public void setTotals(List<OrderTotal> totals) {
 		this.totals = totals;
 	}

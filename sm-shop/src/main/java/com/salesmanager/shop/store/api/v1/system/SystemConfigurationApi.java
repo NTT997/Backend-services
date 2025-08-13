@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.salesmanager.core.business.exception.ServiceException;
 import com.salesmanager.core.business.services.system.SystemConfigurationService;
-import com.salesmanager.core.business.services.system.SystemConfigurationServiceImpl;
 import com.salesmanager.core.model.system.SystemConfigApprover;
 import com.salesmanager.core.model.system.SystemConfiguration;
 

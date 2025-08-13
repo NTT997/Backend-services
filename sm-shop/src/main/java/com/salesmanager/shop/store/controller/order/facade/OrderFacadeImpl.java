@@ -548,7 +548,7 @@ public class OrderFacadeImpl implements OrderFacade {
 			payment.setModuleName(order.getPaymentModule());
 
 			if (transaction != null) {
-				orderService.processOrder(modelOrder, customer, order.getShoppingCartItems(), summary, payment, store);
+				orderService.processOrder(modelOrder, customer, order.getShoppingCartItems(), summary, payment, store, "");
 			} else {
 				orderService.processOrder(modelOrder, customer, order.getShoppingCartItems(), summary, payment,
 						transaction, store);
@@ -1194,7 +1194,7 @@ public class OrderFacadeImpl implements OrderFacade {
 	 */
 	@Override
 	public Order processOrder(com.salesmanager.shop.model.order.v1.PersistableOrder order, Customer customer,
-			MerchantStore store, Language language, Locale locale) throws ServiceException {
+			MerchantStore store, Language language, Locale locale, String username) throws ServiceException {
 
 		Validate.notNull(order, "Order cannot be null");
 		Validate.notNull(customer, "Customer cannot be null");
@@ -1325,7 +1325,7 @@ public class OrderFacadeImpl implements OrderFacade {
 
 
 			//order service
-			modelOrder = orderService.processOrder(modelOrder, customer, items, orderTotalSummary, paymentModel, store);
+			modelOrder = orderService.processOrder(modelOrder, customer, items, orderTotalSummary, paymentModel, store, username);
 
 			// update cart
 			try {
