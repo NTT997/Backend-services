@@ -39,7 +39,7 @@ public class CorsConfig {
 
 	private static final List<String> ALLOWED_ORIGINS = List.of("http://localhost:5173","http://localhost:5174" ,// React web app
 			"http://localhost:19006", // React Native Expo web preview
-			"http://localhost:8081" // (optional) Other local UIs
+			"http://localhost:8081"
 	);
 
 	@Bean

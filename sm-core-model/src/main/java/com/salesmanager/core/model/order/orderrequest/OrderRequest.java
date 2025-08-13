@@ -4,7 +4,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -45,7 +48,11 @@ public class OrderRequest extends SalesManagerEntity<Long, OrderRequest> impleme
 	@JoinColumn(name = "order_id")
 	private Order order;
 	
+	@Column(name = "CREATED_AT")
     private LocalDateTime createdAt;
+	
+	@Enumerated(EnumType.STRING)
+	private OrderRequestStatus status;
     
     @ManyToOne
     @JoinColumn(name = "system_config_id")
@@ -102,6 +109,14 @@ public class OrderRequest extends SalesManagerEntity<Long, OrderRequest> impleme
 
 	public void setListOrderRequestApproval(List<OrderRequestApproval> listOrderRequestApproval) {
 		this.listOrderRequestApproval = listOrderRequestApproval;
+	}
+	
+	public OrderRequestStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(OrderRequestStatus status) {
+		this.status = status;
 	}
 
 	@Override

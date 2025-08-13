@@ -13,6 +13,7 @@ import com.salesmanager.core.model.order.OrderCriteria;
 import com.salesmanager.core.model.order.OrderList;
 import com.salesmanager.core.model.order.OrderSummary;
 import com.salesmanager.core.model.order.OrderTotalSummary;
+import com.salesmanager.core.model.order.orderrequest.OrderRequest;
 import com.salesmanager.core.model.order.orderstatus.OrderStatusHistory;
 import com.salesmanager.core.model.payments.Payment;
 import com.salesmanager.core.model.payments.Transaction;
@@ -23,7 +24,7 @@ import com.salesmanager.core.model.shoppingcart.ShoppingCartItem;
 
 
 public interface OrderService extends SalesManagerEntityService<Long, Order> {
-
+	
     void addOrderStatusHistory(Order order, OrderStatusHistory history)
                     throws ServiceException;
 
@@ -99,7 +100,7 @@ public interface OrderService extends SalesManagerEntityService<Long, Order> {
 
 	Order processOrder(Order order, Customer customer,
 			List<ShoppingCartItem> items, OrderTotalSummary summary,
-			Payment payment, MerchantStore store) throws ServiceException;
+			Payment payment, MerchantStore store, String username) throws ServiceException;
 
 	Order processOrder(Order order, Customer customer,
 			List<ShoppingCartItem> items, OrderTotalSummary summary,
