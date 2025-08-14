@@ -91,7 +91,7 @@ public class UserApi {
 			throw new UnauthorizedException();
 		}
 		// only admin and superadmin allowed
-		userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()));
+//		userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()));
 
 		return userFacade.findById(id, merchantStore, language);
 	}

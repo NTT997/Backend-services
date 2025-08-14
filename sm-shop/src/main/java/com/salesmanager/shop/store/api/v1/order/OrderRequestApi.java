@@ -1,10 +1,12 @@
 package com.salesmanager.shop.store.api.v1.order;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
 import org.opensearch.common.collect.Map;
 import org.springframework.http.HttpStatus;
@@ -170,7 +172,10 @@ public class OrderRequestApi {
 	public ResponseEntity<?> rejectOrderRequest(
 	    @PathVariable Long id,
 	    @RequestParam String approverEmail,
-	    @RequestBody(required = false) String rejectNotes) {
+	    @RequestBody(required = false) String rejectNotes, HttpServletRequest req) {
+		
+		Principal princial = req.getUserPrincipal();
+		String username = princial.getName();
 		
 	    // Tim OrderRequest từ DB
 	    OrderRequest orderRequest = orderRequestService.getById(id);
@@ -178,6 +183,8 @@ public class OrderRequestApi {
 	        return ResponseEntity.status(HttpStatus.NOT_FOUND)
 	                             .body("Order request not found");
 	    }
+	    
+	    
 	    // Tìm approver đang duyệt (status = PENDING)
 	    List<OrderRequestApproval> approvals = orderRequest.getListOrderRequestApproval();
 
@@ -200,18 +207,16 @@ public class OrderRequestApi {
 	                            		 "success", false,
 	                            		 "message", "This approver is not in PENDING status"));
 	    }
-	    // Cập nhật trạng thái PENDING => Null or REJECTED
+	    
+	    // Cập nhật trạng thái PENDING => REJECTED
 	    currentApprover.setStatus(RequestApprovalStatus.REJECTED);
 	    currentApprover.setApprovedNotes(rejectNotes);
 	    currentApprover.setApprovedTime(LocalDateTime.now());
-	    //Nếu là người đầu tiên thì ko cần set người trước
-	    if(currentApprover.getOrders() != 0) {
-	    	//tìm người kế trước để set status == PENDING lại
-	    	approvals.stream()
-	    			.filter(a -> a.getOrders() == currentApprover.getOrders() -1)
-	    			.findFirst()
-	    			.ifPresent(a -> a.setStatus(RequestApprovalStatus.PENDING));
-	    }
+
+	    //finally set orderStatus = REJECTED
+	    orderRequest.setStatus(OrderRequestStatus.REJECTED);
+
+	    
 		orderRequestService.save(orderRequest);
 		
 		return ResponseEntity.ok(Map.of(
@@ -220,6 +225,4 @@ public class OrderRequestApi {
 		    		"approver", currentApprover.getApprovedBy() ,
 		    		"status", currentApprover.getStatus()));
 	}
-	
-	
 }

@@ -128,4 +128,5 @@ public interface OrderService extends SalesManagerEntityService<Long, Order> {
 	 */
 	List<Order> getCapturableOrders(MerchantStore store, Date startDate, Date endDate) throws ServiceException;
 
+	List<Order> getListOrderRejectByEmail(String email);
 }

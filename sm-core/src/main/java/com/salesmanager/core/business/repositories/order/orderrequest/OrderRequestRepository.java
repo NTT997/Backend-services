@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.salesmanager.core.model.order.Order;
 import com.salesmanager.core.model.order.orderrequest.OrderRequest;
 import com.salesmanager.core.model.order.orderrequest.RequestApprovalStatus;
 
@@ -23,4 +24,7 @@ public interface OrderRequestRepository extends JpaRepository<OrderRequest, Long
      List<OrderRequest> findByApproverAndOptionalStatus(
              @Param("approverEmail") String approverEmail,
              @Param("status") RequestApprovalStatus status);
+    
+    @Query("SELECT o FROM OrderRequest o WHERE o.order = :order")
+    OrderRequest findByOrder(@Param("order") Order order);
 }

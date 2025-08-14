@@ -783,6 +783,12 @@ public class OrderServiceImpl  extends SalesManagerEntityServiceImpl<Long, Order
 		return returnOrders;
 	}
 
+	@Override
+	public List<Order> getListOrderRejectByEmail(String email) {
+		
+		return orderRepository.findAllOrderRejectedByEmail(email);
+	}
+
 
 
 

@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.salesmanager.core.business.repositories.order.orderrequest.OrderRequestRepository;
+import com.salesmanager.core.model.order.Order;
 import com.salesmanager.core.model.order.orderrequest.OrderRequest;
 import com.salesmanager.core.model.order.orderrequest.RequestApprovalStatus;
 
@@ -39,6 +40,11 @@ public class OrderRequestServiceImpl implements OrderRequestService{
 	public void save(OrderRequest o) {
 		// TODO Auto-generated method stub
 		orderRequestRepository.save(o);
+	}
+
+	@Override
+	public OrderRequest getByOrder(Order order) {
+		return orderRequestRepository.findByOrder(order);
 	}
 
 }

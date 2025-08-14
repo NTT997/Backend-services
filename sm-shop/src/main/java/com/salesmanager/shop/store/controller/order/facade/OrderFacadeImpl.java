@@ -41,6 +41,7 @@ import com.salesmanager.core.business.services.catalog.product.ProductService;
 import com.salesmanager.core.business.services.catalog.product.attribute.ProductAttributeService;
 import com.salesmanager.core.business.services.catalog.product.file.DigitalProductService;
 import com.salesmanager.core.business.services.order.OrderService;
+import com.salesmanager.core.business.services.order.orderrequest.OrderRequestService;
 import com.salesmanager.core.business.services.payments.PaymentService;
 import com.salesmanager.core.business.services.payments.TransactionService;
 import com.salesmanager.core.business.services.reference.country.CountryService;
@@ -64,6 +65,10 @@ import com.salesmanager.core.model.order.OrderSummary;
 import com.salesmanager.core.model.order.OrderTotalSummary;
 import com.salesmanager.core.model.order.attributes.OrderAttribute;
 import com.salesmanager.core.model.order.orderproduct.OrderProduct;
+import com.salesmanager.core.model.order.orderrequest.OrderRequest;
+import com.salesmanager.core.model.order.orderrequest.OrderRequestApproval;
+import com.salesmanager.core.model.order.orderrequest.OrderRequestStatus;
+import com.salesmanager.core.model.order.orderrequest.RequestApprovalStatus;
 import com.salesmanager.core.model.order.orderstatus.OrderStatus;
 import com.salesmanager.core.model.order.orderstatus.OrderStatusHistory;
 import com.salesmanager.core.model.order.payment.CreditCard;
@@ -143,6 +148,9 @@ public class OrderFacadeImpl implements OrderFacade {
 	private CountryService countryService;
 	@Inject
 	private ZoneService zoneService;
+	
+	@Inject 
+	private OrderRequestService orderRequestSerivce;
 
 
 	@Autowired
@@ -1501,6 +1509,20 @@ public class OrderFacadeImpl implements OrderFacade {
 		modelOrder.setCustomerEmailAddress(customer.getEmailAddress());
 		modelOrder.setBilling(this.convertBilling(customer.getBilling()));
 		modelOrder.setDelivery(this.convertDelivery(customer.getDelivery()));
+		
+		//update lai OrderRequest + OrderRequest Approver de resubmit nhu khi tao moi Order
+		OrderRequest orderRequest = orderRequestSerivce.getByOrder(modelOrder);
+		
+		for(OrderRequestApproval approver : orderRequest.getListOrderRequestApproval()) {
+			if(approver.getOrders() == 0) {
+				approver.setStatus(RequestApprovalStatus.PENDING);
+			}
+			else {
+				approver.setStatus(null);
+			}
+		}
+		orderRequest.setStatus(OrderRequestStatus.PENDING);
+		orderRequestSerivce.save(orderRequest);
 
 		orderService.saveOrUpdate(modelOrder);
 
