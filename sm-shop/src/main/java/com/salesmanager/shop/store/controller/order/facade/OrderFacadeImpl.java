@@ -1206,6 +1206,7 @@ public class OrderFacadeImpl implements OrderFacade {
 
 
 			Order modelOrder = new Order();
+			System.out.println(order.getCustomerId());
 			persistableOrderApiPopulator.populate(order, modelOrder, store, language);
 
 			Long shoppingCartId = order.getShoppingCartId();
