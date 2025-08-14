@@ -2,6 +2,8 @@ package com.salesmanager.core.business.repositories.order;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -35,4 +37,10 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderReposi
     	       "AND o.audit.modifiedBy = :email")
     List<Order> findAllOrderRejectedByEmail(@Param("email") String email);
     
+    
+    @Query("SELECT o FROM OrderRequest req " +
+    	       "JOIN req.order o " +
+    	       "WHERE req.status = com.salesmanager.core.model.order.orderrequest.OrderRequestStatus.REJECTED " +
+    	       "AND o.audit.modifiedBy = :email")
+    	Page<Order> findRejectedOrdersByEmail(@Param("email") String email, Pageable pageable);
 }

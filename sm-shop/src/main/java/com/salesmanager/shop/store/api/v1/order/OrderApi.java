@@ -2,6 +2,7 @@ package com.salesmanager.shop.store.api.v1.order;
 
 import java.net.http.HttpRequest;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -22,6 +23,10 @@ import org.jsoup.helper.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,6 +39,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.salesmanager.core.business.exception.ServiceException;
+import com.salesmanager.core.business.repositories.order.OrderRepository;
 import com.salesmanager.core.business.services.customer.CustomerService;
 import com.salesmanager.core.business.services.shoppingcart.ShoppingCartService;
 import com.salesmanager.core.business.services.user.UserService;
@@ -48,6 +54,7 @@ import com.salesmanager.core.model.user.User;
 import com.salesmanager.shop.constants.Constants;
 import com.salesmanager.shop.model.customer.PersistableCustomer;
 import com.salesmanager.shop.model.customer.ReadableCustomer;
+import com.salesmanager.shop.model.order.ReadableOrderV2;
 import com.salesmanager.shop.model.order.v0.ReadableOrder;
 import com.salesmanager.shop.model.order.v0.ReadableOrderList;
 import com.salesmanager.shop.model.order.v1.PersistableAnonymousOrder;
@@ -108,6 +115,9 @@ public class OrderApi {
 
 	@Inject
 	private CredentialsService credentialsService;
+
+	@Inject
+	private OrderRepository orderRepository;
 
 	private static final String DEFAULT_ORDER_LIST_COUNT = "25";
 
@@ -610,27 +620,42 @@ public class OrderApi {
 	}
 
 	// get List Order co Order Request = REJECTED
-	@RequestMapping(value = { "/private/orders/resubmit" },method = RequestMethod.GET)
-		@ResponseStatus(HttpStatus.OK)
-		@ResponseBody
-		@ApiImplicitParams({
-		    @ApiImplicitParam(name = "store", dataType = "string", defaultValue = "DEFAULT"),
-		    @ApiImplicitParam(name = "lang", dataType = "string", defaultValue = "en")
-		})
-	public List<Order> getListOrderResubmitByAdmin(
-			@RequestParam(value = "start", required = false) Integer start,
-			@RequestParam(value = "count", required = false) Integer count, @ApiIgnore MerchantStore merchantStore,
-			@RequestParam("email") String email) {
+	@RequestMapping(value = { "/private/orders/resubmit" }, method = RequestMethod.GET)
+	@ResponseStatus(HttpStatus.OK)
+	@ResponseBody
+	@ApiImplicitParams({
+	    @ApiImplicitParam(name = "store", dataType = "string", defaultValue = "DEFAULT"),
+	    @ApiImplicitParam(name = "lang", dataType = "string", defaultValue = "en")
+	})
+	public List<ReadableOrderV2> getListOrderResubmitByAdmin(
+	        @RequestParam(value = "page", defaultValue = "0", required = false) Integer page,
+	        @RequestParam(value = "size", defaultValue = "15", required = false) Integer size,
+	        @ApiIgnore MerchantStore merchantStore, @ApiIgnore Language lang,
+	        @RequestParam("email") String email) throws Exception {
 
-		List<Order> listOrders = orderService.getListOrderRejectByEmail(email);
+//	    Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+//	    Page<Order> pageResult = orderRepository.findRejectedOrdersByEmail(email, pageable);
+//
+//	    OrderList orderList = new OrderList();
+//	    orderList.setOrders(pageResult.getContent());
+//	    orderList.setTotalCount((int) pageResult.getTotalElements());
+//	    orderList.setTotalPages(pageResult.getTotalPages());
+		List<Order> orders = orderService.getListOrderRejectByEmail(email);
+		List<ReadableOrderV2> lstReadableOrder = new ArrayList<>();
+		for (Order o : orders) {
+			ReadableOrderV2 readableOrder = new ReadableOrderV2();
+			readableOrder.setId(o.getId());
+			readableOrder.setCustomerEmailAddress(o.getCustomerEmailAddress());
+			readableOrder.setDatePurchased(o.getDatePurchased());
+			readableOrder.setStatus(o.getStatus().getValue());
+			readableOrder.setTotal(o.getTotal());
+			readableOrder.setCreatedB(o.getAuditSection().getModifiedBy());
+			
+			lstReadableOrder.add(readableOrder);
+		}
 
-//		OrderList orderList = new OrderList();
-//		orderList.setOrders(listOrders);
-//		
-//		orderList.setTotalCount(count);
-//		orderList.setTotalPages(0);
-		
-		return listOrders;
+	    return lstReadableOrder; 
 	}
+
 
 }
