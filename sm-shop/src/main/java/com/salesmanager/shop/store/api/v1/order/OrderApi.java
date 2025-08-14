@@ -242,6 +242,8 @@ public class OrderApi {
 			@RequestParam(value = "status", required = false) String status,
 			@RequestParam(value = "phone", required = false) String phone,
 			@RequestParam(value = "email", required = false) String email,
+			@RequestParam(value = "emailAdmin", required = false) String emailAdmin,
+
 			@ApiIgnore MerchantStore merchantStore,
 			@ApiIgnore Language language) {
 
@@ -254,11 +256,15 @@ public class OrderApi {
 		orderCriteria.setStatus(status);
 		orderCriteria.setEmail(email);
 		orderCriteria.setId(id);
+		orderCriteria.setUser(emailAdmin);
 
 
-		String user = authorizationUtils.authenticatedUser();
-		authorizationUtils.authorizeUser(user, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN,
-				Constants.GROUP_ADMIN_ORDER, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()), merchantStore);
+//		String user = authorizationUtils.authenticatedUser();
+//		authorizationUtils.authorizeUser(user, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN,
+//				Constants.GROUP_ADMIN_ORDER, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()), merchantStore);
+//		String user = authorizationUtils.authenticatedUser();
+//		authorizationUtils.authorizeUser(user, Stream.of(Constants.GROUP_ADMIN,
+//				Constants.GROUP_ADMIN_ORDER, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()), merchantStore);
 
 		ReadableOrderList orders = orderFacade.getReadableOrderList(orderCriteria, merchantStore);
 
@@ -442,6 +448,7 @@ public class OrderApi {
 			
 			Customer customer = customerService.getById(order.getCustomerId());
 			if(customer == null) {
+				System.out.println("customer id: " + order.getCustomerId().toString());
 				response.sendError(400, "Cant find any customer");
 				return null;
 			}
@@ -453,7 +460,6 @@ public class OrderApi {
 			}
 
 			order.setShoppingCartId(cart.getId());
-			order.setCustomerId(user.getId());//That is an existing customer purchasing
 
 			Order modelOrder = orderFacade.processOrder(order, customer, merchantStore, language, locale, request.getUserPrincipal().getName());
 			Long orderId = modelOrder.getId();
