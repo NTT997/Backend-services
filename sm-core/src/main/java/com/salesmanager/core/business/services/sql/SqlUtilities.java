@@ -1,23 +1,20 @@
 package com.salesmanager.core.business.services.sql;
 
 import java.sql.*;
+import java.sql.Date;
 import java.util.*;
 
+
 public class SqlUtilities {
-	public static Connection getConnectionToDatabase() {
-        // Database credentials
-        String url = ""; 
-        String user = "";
-        String password = "";
-        Connection connection = null;
-        
-        try {
-        	 connection = DriverManager.getConnection(url, user, password);    
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }  
+    private static final String DB_URL = "jdbc:oracle:thin:@localhost:1521/orclpdb";
+    private static final String DB_USER = "tienlocsuper";
+    private static final String DB_PASSWORD = "tienlocvuive12";
+    
+    public static Connection getConnectionToDatabase() throws SQLException {
+        Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+        System.out.println("Database connection successful.");
         return connection;
-	}
+    }
 	public static ResultSet getDataFromTableNamed(String TableName) throws SQLException {
         // SQL query
         String query = "SELECT * FROM "+TableName;
@@ -83,6 +80,68 @@ public class SqlUtilities {
 	        }
 	    }
 	}
+	
+	public static void loggingERRORToLogDB(
+	        String METHOD,
+	        String logMessage,
+	        String LOG_USERID_FK,  // optional, ignore if not used
+	        String LOG_IP_ADDRESS,
+	        String LogMenu,
+	        String MESSAGE_TEMPLATE,
+	        String EXCEPTION,
+	        String PROPERTIES
+	) {
+	    // Build SQL string with values directly
+	    String sql = "INSERT INTO \"TIENLOCSUPER\".\"APPLOG\" (" +
+	            "\"LOG_METHOD\", \"LOG_MESSAGE\", \"LOG_IP_ADDRESS\", \"LOG_TIME\", " +
+	            "\"LOG_MENU\", \"MESSAGE_TEMPLATE\", \"LOGLEVEL\", \"EXCEPTION\", \"PROPERTIES\"" +
+	            ") VALUES (" +
+	            "'" + METHOD.replace("'", "''") + "'," +
+	            "'" + logMessage.replace("'", "''") + "'," +
+	            "'" + LOG_IP_ADDRESS.replace("'", "''") + "'," +
+	            "SYSDATE," +  // Oracle current date/time
+	            "'" + LogMenu.replace("'", "''") + "'," +
+	            "'" + MESSAGE_TEMPLATE.replace("'", "''") + "'," +
+	            "'INFO'," +
+	            "'" + EXCEPTION.replace("'", "''") + "'," +
+	            "'" + PROPERTIES.replace("'", "''") + "'" +
+	            ")";
+
+	    System.out.println("Executing SQL: " + sql);
+
+	    try (Connection conn = getConnectionToDatabase();
+	         Statement stmt = conn.createStatement()) {
+
+	        stmt.executeUpdate(sql);
+	        System.out.println("Log inserted successfully.");
+
+	    } catch (SQLException e) {
+	        System.err.println("Failed to write log to DB: " + e.getMessage());
+	    }
+	}
+
+
+    public static void printAllTables() {
+        String schema = "TIENLOCSUPER"; // change to any schema you want
+
+        String sql = "SELECT TABLE_NAME FROM ALL_TABLES WHERE OWNER = ? ORDER BY TABLE_NAME";
+
+        try (Connection connection = getConnectionToDatabase();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setString(1, schema.toUpperCase());
+            try (ResultSet rs = stmt.executeQuery()) {
+                System.out.println("Tables in schema " + schema + ":");
+                while (rs.next()) {
+                    System.out.println(rs.getString("TABLE_NAME"));
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error fetching tables: " + e.getMessage());
+        }
+    }
+
 
 
 	
