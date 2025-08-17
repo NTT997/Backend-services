@@ -6,7 +6,7 @@ import java.util.*;
 
 
 public class SqlUtilities {
-    private static final String DB_URL = "jdbc:oracle:thin:@localhost:1521/orclpdb";
+    private static final String DB_URL = "";
     private static final String DB_USER = "tienlocsuper";
     private static final String DB_PASSWORD = "tienlocvuive12";
     
@@ -121,26 +121,6 @@ public class SqlUtilities {
 	}
 
 
-    public static void printAllTables() {
-        String schema = "TIENLOCSUPER"; // change to any schema you want
-
-        String sql = "SELECT TABLE_NAME FROM ALL_TABLES WHERE OWNER = ? ORDER BY TABLE_NAME";
-
-        try (Connection connection = getConnectionToDatabase();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-
-            stmt.setString(1, schema.toUpperCase());
-            try (ResultSet rs = stmt.executeQuery()) {
-                System.out.println("Tables in schema " + schema + ":");
-                while (rs.next()) {
-                    System.out.println(rs.getString("TABLE_NAME"));
-                }
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Error fetching tables: " + e.getMessage());
-        }
-    }
 
 
 

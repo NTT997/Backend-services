@@ -4,19 +4,29 @@ import com.salesmanager.core.business.repositories.log.DbLogRepository;
 import com.salesmanager.core.model.logging.DbLog;
 
 import java.time.LocalDateTime;
+
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.util.ContentCachingRequestWrapper;
 
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Service
 public class LoggingServiceImpl implements LogService {
 
     private final DbLogRepository dbLogRepository;
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public LoggingServiceImpl(DbLogRepository dbLogRepository) {
         this.dbLogRepository = dbLogRepository;
@@ -26,7 +36,6 @@ public class LoggingServiceImpl implements LogService {
     @Transactional
     public void log(String method,
                     String message,
-                    String userId,
                     String ipAddress,
                     String menu,
                     String messageTemplate,
@@ -37,7 +46,7 @@ public class LoggingServiceImpl implements LogService {
         DbLog log = new DbLog();
         log.setMethod(method);
         log.setLogMessage(message);
-        log.setLogUserId(userId);
+        log.setLogUserId(resolveUserId());
         log.setLogIpAddress(ipAddress != null ? ipAddress : resolveIp());
         log.setLogTime(LocalDateTime.now());
         log.setLogMenu(menu);
@@ -45,27 +54,33 @@ public class LoggingServiceImpl implements LogService {
         log.setLogLevel(logLevel != null ? logLevel : logLevel);
         log.setException(exception);
         log.setProperties(properties);
-
-        dbLogRepository.save(log);
+        log.setRequest_url(resolveRequestURI());
+        executor.submit(() -> {
+            try {
+                dbLogRepository.save(log);
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        });
         System.out.println("SAVE LOG SUCCESSFULLY");
     }
 
     @Override
-    public void info(String method, String message, String userId, String menu, String messageTemplate) {
-        log(method, message, userId, null, menu, messageTemplate, "INFO", null, null);
+    public void info(String method, String message, String menu) {
+        log(method, message, null, menu, resolvePayload(), "INFO", null, null);
     }
     
     @Override
-    public void error(String method, String message, String userId, String menu, String messageTemplate, String exception) {
-        log(method, message, userId, null, menu, messageTemplate, "ERROR", exception, null);
+    public void error(String method, String message, String menu, String exception) {
+        log(method, message, null, menu, resolvePayload(), "ERROR", exception, null);
     }
     
     @Override
-    public void debug(String method, String message, String userId, String menu, String messageTemplate) {
-        log(method, message, userId, null, menu, messageTemplate, "DEBUG", null, null);
+    public void debug(String method, String message, String menu) {
+        log(method, message, null, menu, resolvePayload(), "DEBUG", null, null);
     }
 
-    // Resolve IP automatically
+
     private String resolveIp() {
         ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attrs != null) {
@@ -78,7 +93,6 @@ public class LoggingServiceImpl implements LogService {
         return getServerIp();
     }
 
-    // Get server IP if not in web request
     private String getServerIp() {
         try {
             return InetAddress.getLocalHost().getHostAddress();
@@ -86,4 +100,40 @@ public class LoggingServiceImpl implements LogService {
             return "unknown";
         }
     }
+    private String resolveRequestURI() {
+        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attrs != null) {
+            return attrs.getRequest().getRequestURI();
+        }
+        return "unknown";
+   }
+    private String resolveUserId() {
+        try {
+            return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+                    .map(auth -> auth.getName())
+                    .orElse("anonymous");
+        } catch (Exception e) {
+            return "system";
+        }
+    }
+    private String resolvePayload(){
+        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attrs != null) {
+            HttpServletRequest request = attrs.getRequest();
+            if (request instanceof ContentCachingRequestWrapper) {
+                ContentCachingRequestWrapper wrapper = (ContentCachingRequestWrapper) request;
+                byte[] buf = wrapper.getContentAsByteArray();
+                if (buf.length > 0) {
+                    try {
+						return new String(buf, 0, buf.length, wrapper.getCharacterEncoding());
+					} catch (UnsupportedEncodingException e) {
+						e.printStackTrace();
+					}
+                }
+            }
+        }
+        return null;
+    }
+
+
 }

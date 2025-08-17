@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import org.apache.http.auth.AuthenticationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.salesmanager.core.business.services.log.LogService;
 import com.salesmanager.shop.store.api.exception.RestApiException;
 import com.salesmanager.shop.store.security.AuthenticationRequest;
 import com.salesmanager.shop.store.security.AuthenticationResponse;
@@ -56,6 +58,9 @@ public class AuthenticateUserApi {
 
     @Inject
     private JWTTokenUtil jwtTokenUtil;
+    
+    @Autowired
+    private LogService loggingService;
 
 	/**
 	 * Authenticate a user using username & password
@@ -70,8 +75,9 @@ public class AuthenticateUserApi {
     	//TODO SET STORE in flow
         // Perform the security
     	Authentication authentication = null;
+    	loggingService.info(AuthenticateUserApi.class.getName(), "User authentication", "null");
     	try {
-    		
+    		loggingService.info(AuthenticateUserApi.class.getName(), "User authentication", "null");
 	
         		//to be used when username and password are set
         		authentication = jwtAdminAuthenticationManager.authenticate(

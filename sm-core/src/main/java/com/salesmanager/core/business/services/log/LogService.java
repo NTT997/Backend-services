@@ -12,7 +12,6 @@ public interface LogService {
 	
 	public void log(String method,
             String message,
-            String userId,
             String ipAddress,
             String menu,
             String messageTemplate,
@@ -20,10 +19,10 @@ public interface LogService {
             String exception,
             String properties);
 	
-	public void info(String method, String message, String userId, String menu, String messageTemplate);
+	public void info(String method, String message, String menu);
 	
-	public void error(String method, String message, String userId, String menu, String messageTemplate, String exception);
+	public void error(String method, String message, String menu, String exception);
 	
-	public void debug(String method, String message, String userId, String menu, String messageTemplate);
+	public void debug(String method, String message, String menu);
 	
 }

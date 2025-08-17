@@ -46,8 +46,20 @@ public class DbLog {
 
     @Column(name = "PROPERTIES", length = 1024)
     private String properties;
+    
+    @Column(name = "REQUEST_URL", length = 1024)
+    private String request_url;
 
-    // Constructors
+
+    public String getRequest_url() {
+		return request_url;
+	}
+
+	public void setRequest_url(String request_url) {
+		this.request_url = request_url;
+	}
+
+	// Constructors
     public DbLog() {
     }
 

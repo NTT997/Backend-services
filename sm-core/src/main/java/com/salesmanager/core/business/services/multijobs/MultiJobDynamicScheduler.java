@@ -1,12 +1,10 @@
 package com.salesmanager.core.business.services.multijobs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.TaskScheduler;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -183,37 +181,13 @@ public class MultiJobDynamicScheduler {
         }
     }
     
-//    // Individual job execution methods
-//    private void performInventoryJob() throws ServiceException {
-//        logger.info("Performing inventory sync processing job...");
-//        System.out.println("Performing inventory processing job...");
-//        try {
-//            Thread.sleep(2000); // Simulate order processing work
-//            System.out.println("Inventory processing job completed");
-//            List<ProductAvailability>productAvailabilities = new ArrayList<>();
-//            ProductAvailability prod1 = new ProductAvailability(1,30,1);
-//            RestTemplate restTemplate = new RestTemplate();//use for external call
-//            
-//            //ProductAvailability prod2 = new ProductAvailability(250,50,250);
-//            //api/v1/public/remote-availability/sync-data
-//            //productAvailabilities.add(prod2);
-//            productAvailabilities.add(prod1);
-//            remoteProductInventoryService.syncDataFromLocalToRemoteService(productAvailabilities);
-//            logger.info("Inventory processing job completed");
-//        } catch (InterruptedException e) {
-//            Thread.currentThread().interrupt();
-//            System.out.println("Inventory job was interrupted");
-//            logger.warn("Inventory job was interrupted");
-//        }
-//    }
+
     // Individual job execution methods
     private void performInventoryJob() throws ServiceException {
         logger.info("Performing inventory sync processing job...");
 		loggingService.info(
 				MultiJobDynamicScheduler.class.getName(), // method
 			    "INVENTORY JOB: performing inventory push job",        // message
-			    "USR-001",                       // userId
-			    "NULL",                  // menu
 			    "NULL"  // messageTemplate
 			);
         System.out.println("Performing inventory processing job...");
@@ -288,9 +262,7 @@ public class MultiJobDynamicScheduler {
 		loggingService.info(
 				MultiJobDynamicScheduler.class.getName(), // method
 			    "PULL DATA JOB: performing PULL DATA FROM REMOTE",        // message
-			    "USR-001",                       // userId
-			    "NULL",                  // menu
-			    "NULL"  // messageTemplate
+			    "NULL"                // menu
 			);
         try {
             Thread.sleep(2000); // Simulate order processing work
@@ -330,9 +302,7 @@ public class MultiJobDynamicScheduler {
         		loggingService.info(
         				MultiJobDynamicScheduler.class.getName(), // method
         			    "PULL DATA JOB: First product information: "+firstName+" "+firstDescription,        // message
-        			    "USR-001",                       // userId
-        			    "NULL",                  // menu
-        			    "NULL"  // messageTemplate
+        			    "NULL"              // menu
         			);
                 System.out.println("\n==============================================================================\n");
             } else {
