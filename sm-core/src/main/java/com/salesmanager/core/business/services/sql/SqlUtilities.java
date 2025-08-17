@@ -7,8 +7,8 @@ import java.util.*;
 
 public class SqlUtilities {
     private static final String DB_URL = "";
-    private static final String DB_USER = "tienlocsuper";
-    private static final String DB_PASSWORD = "tienlocvuive12";
+    private static final String DB_USER = "";
+    private static final String DB_PASSWORD = "";
     
     public static Connection getConnectionToDatabase() throws SQLException {
         Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
