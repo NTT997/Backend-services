@@ -69,7 +69,7 @@ public class RemoteProductInventoryServiceImpl implements RemoteProductInventory
     }
 	@Override
 	public void syncDataFromLocalToRemoteServiceSQL() throws SQLException {
-		SqlUtilities.syncDataFromLocalToRemote();	
+		//SqlUtilities.syncDataFromLocalToRemote();	
 	}
     
 }

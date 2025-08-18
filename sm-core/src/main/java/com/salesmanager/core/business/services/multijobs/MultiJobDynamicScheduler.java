@@ -1,19 +1,23 @@
 package com.salesmanager.core.business.services.multijobs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.TaskScheduler;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.ws.rs.core.MediaType;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.salesmanager.core.business.exception.ServiceException;
 import com.salesmanager.core.business.services.catalog.inventory.ProductInventoryService;
 import com.salesmanager.core.business.services.catalog.remote_inventory.RemoteProductInventoryService;
+import com.salesmanager.core.business.services.log.LogService;
 import com.salesmanager.core.business.services.system.ScheduleConfigService;
 import com.salesmanager.core.model.catalog.product.availability.ProductAvailability;
 import com.salesmanager.core.model.jobscheduleconfig.JobScheduleConfig;
+
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.support.CronTrigger;
@@ -52,7 +56,12 @@ public class MultiJobDynamicScheduler {
     @Autowired 
     private ProductInventoryService localProductInventoryService;
     
-
+    @Autowired
+    private final LogService loggingService;
+    
+    MultiJobDynamicScheduler(LogService logging){
+    	loggingService = logging;
+    }
     // Store multiple scheduled tasks
     private Map<String, ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
     private Map<String, String> currentCronExpressions = new ConcurrentHashMap<>();
@@ -69,7 +78,7 @@ public class MultiJobDynamicScheduler {
     @PostConstruct
     public void initializeScheduler() {
         logger.info("Initializing multi-job scheduler...");
-        
+        logger.info("=== DB Connection Test Log ===");
         // Initialize all defined jobs
         for (JobDefinition jobDef : JOB_DEFINITIONS) {
             scheduleJob(jobDef.getName(), jobDef.getDefaultCron(), jobDef.isDefaultEnabled());
@@ -81,6 +90,7 @@ public class MultiJobDynamicScheduler {
     @PreDestroy
     public void cleanup() {
         logger.info("Cleaning up all scheduled tasks...");
+        logger.info("=== DB Connection Test Log ===");
         scheduledTasks.values().forEach(task -> {
             if (task != null) {
                 task.cancel(false);
@@ -171,32 +181,15 @@ public class MultiJobDynamicScheduler {
         }
     }
     
-//    // Individual job execution methods
-//    private void performInventoryJob() throws ServiceException {
-//        logger.info("Performing inventory sync processing job...");
-//        System.out.println("Performing inventory processing job...");
-//        try {
-//            Thread.sleep(2000); // Simulate order processing work
-//            System.out.println("Inventory processing job completed");
-//            List<ProductAvailability>productAvailabilities = new ArrayList<>();
-//            ProductAvailability prod1 = new ProductAvailability(1,30,1);
-//            RestTemplate restTemplate = new RestTemplate();//use for external call
-//            
-//            //ProductAvailability prod2 = new ProductAvailability(250,50,250);
-//            //api/v1/public/remote-availability/sync-data
-//            //productAvailabilities.add(prod2);
-//            productAvailabilities.add(prod1);
-//            remoteProductInventoryService.syncDataFromLocalToRemoteService(productAvailabilities);
-//            logger.info("Inventory processing job completed");
-//        } catch (InterruptedException e) {
-//            Thread.currentThread().interrupt();
-//            System.out.println("Inventory job was interrupted");
-//            logger.warn("Inventory job was interrupted");
-//        }
-//    }
+
     // Individual job execution methods
     private void performInventoryJob() throws ServiceException {
         logger.info("Performing inventory sync processing job...");
+		loggingService.info(
+				MultiJobDynamicScheduler.class.getName(), // method
+			    "INVENTORY JOB: performing inventory push job",        // message
+			    "NULL"  // messageTemplate
+			);
         System.out.println("Performing inventory processing job...");
         try {
             Thread.sleep(2000); 
@@ -263,9 +256,14 @@ public class MultiJobDynamicScheduler {
         }
     }
     
-    private void performReportJob() {
+    private void performReportJob() throws JsonMappingException, JsonProcessingException {
         logger.info("Performing pull product generation job...");
         System.out.println("Performing pull product generation job...");
+		loggingService.info(
+				MultiJobDynamicScheduler.class.getName(), // method
+			    "PULL DATA JOB: performing PULL DATA FROM REMOTE",        // message
+			    "NULL"                // menu
+			);
         try {
             Thread.sleep(2000); // Simulate order processing work
             System.out.println("Inventory processing job completed");
@@ -285,8 +283,27 @@ public class MultiJobDynamicScheduler {
             // Log result
             if (response.getStatusCode().is2xxSuccessful()) {
                 logger.info("pull product successfully: " + response.getBody());
+
                 System.out.println("\n==============================================================================\n");
                 System.out.println(response.getBody());
+                String json = response.getBody();
+
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode root = mapper.readTree(json);
+
+                // Get first product
+                JsonNode firstProduct = root.path("data").get(0);
+
+                String firstName = firstProduct.path("product_name").asText();
+                String firstDescription = firstProduct.path("description").asText();
+
+                logger.info("First Product Name: {}", firstName);
+                logger.info("First Product Description: {}", firstDescription);
+        		loggingService.info(
+        				MultiJobDynamicScheduler.class.getName(), // method
+        			    "PULL DATA JOB: First product information: "+firstName+" "+firstDescription,        // message
+        			    "NULL"              // menu
+        			);
                 System.out.println("\n==============================================================================\n");
             } else {
                 logger.warn("Inventory sync GET request failed: " + response.getStatusCode());
